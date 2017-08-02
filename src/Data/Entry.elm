@@ -1,4 +1,4 @@
-module Data.Entry exposing (Entry, EntryId, entryIdDecoder, decodeEntry, idToString)
+module Data.Entry exposing (..)
 
 import Date exposing (Date)
 import Json.Encode
@@ -40,8 +40,8 @@ decodeEntry =
 decodeEntryLocation : Decoder EntryLocation
 decodeEntryLocation =
     decode EntryLocation
-        |> required "latitude" (Decode.float)
-        |> required "longitude" (Decode.float)
+        |> required "latitude" (Json.Decode.Extra.parseFloat)
+        |> required "longitude" (Json.Decode.Extra.parseFloat)
         |> required "accuracy" (Decode.int)
 
 
