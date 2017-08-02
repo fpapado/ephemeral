@@ -1,7 +1,10 @@
 module Main exposing (..)
 
 import Html exposing (..)
-import Time exposing (Time)
+import Html.Events exposing (onClick)
+import Http
+import Data.Entry exposing (Entry)
+import Request.Entry
 
 
 main : Program Never Model Msg
@@ -21,28 +24,6 @@ main =
 type alias Model =
     { entries : List Entry
     }
-
-
-type alias Entry =
-    { description : String
-    , completed : Bool
-    , editing : Bool
-    , location : NoteLocation
-    , id : Int
-    }
-
-
-type alias NoteLocation =
-    { latitude : Float
-    , longitude : Float
-    , accuracy : Float
-    , timestamp : Time
-    }
-
-
-emptyLocation : NoteLocation
-emptyLocation =
-    { latitude = 0.0, longitude = 0.0, accuracy = 0.0, timestamp = 0.0 }
 
 
 emptyModel : Model
@@ -66,6 +47,8 @@ to them.
 -}
 type Msg
     = NoOp
+    | NewEntries (Result Http.Error (List Entry))
+    | LoadEntries
 
 
 
@@ -78,6 +61,15 @@ update msg model =
         NoOp ->
             model ! []
 
+        NewEntries (Err err) ->
+            model ! []
+
+        NewEntries (Ok entries) ->
+            { model | entries = entries } ! []
+
+        LoadEntries ->
+            ( model, Http.send NewEntries Request.Entry.list )
+
 
 
 -- VIEW
@@ -85,4 +77,12 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [] []
+    div []
+        [ viewEntries model.entries
+        , button [ onClick LoadEntries ] [ text "Fetch Entries" ]
+        ]
+
+
+viewEntries : List Entry -> Html Msg
+viewEntries entryList =
+    div [] [ Html.text <| toString entryList ]
