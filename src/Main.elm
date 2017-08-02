@@ -2,8 +2,12 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.Events exposing (onClick)
+import Html.Attributes exposing (class)
 import Http
 import Data.Entry exposing (Entry)
+import Date exposing (Date)
+import Date.Extra.Config.Config_en_gb exposing (config)
+import Date.Extra.Format exposing (format)
 import Request.Entry
 
 
@@ -34,7 +38,7 @@ emptyModel =
 
 init : ( Model, Cmd Msg )
 init =
-    emptyModel ! []
+    ( emptyModel, Http.send NewEntries Request.Entry.list )
 
 
 
@@ -77,12 +81,29 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ viewEntries model.entries
-        , button [ onClick LoadEntries ] [ text "Fetch Entries" ]
+    div [ class "pa5 min-vh-100 bg-white" ]
+        [ div [ class "mw7-ns center" ]
+            [ viewEntries model.entries
+            , button [ onClick LoadEntries ] [ text "Fetch Entries" ]
+            ]
         ]
 
 
 viewEntries : List Entry -> Html Msg
-viewEntries entryList =
-    div [] [ Html.text <| toString entryList ]
+viewEntries entries =
+    div [] <| List.map viewEntry entries
+
+
+viewEntry : Entry -> Html Msg
+viewEntry entry =
+    div [ class "pa3 mb3 bg-light-blue" ]
+        [ span [ class "db mb1" ] [ text entry.content ]
+        , span [ class "db mb1" ] [ text entry.translation ]
+        , span [ class "db tr" ] [ text <| viewDate entry.addedAt ]
+        , span [ class "db tr" ] [ text <| toString entry.location.longitude ++ ", " ++ toString entry.location.latitude ]
+        ]
+
+
+viewDate : Date -> String
+viewDate date =
+    format config config.format.dateTime date
