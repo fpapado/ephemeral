@@ -1,6 +1,8 @@
 # TODO
 Add post in Requests
 
+Figure out where to put encodeEntry, especially b/c of "config" construct
+
 Basic page, editing/adding
   Factor out view & update for word input into module (page?)
 
