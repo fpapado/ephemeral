@@ -1,8 +1,13 @@
 # TODO
+Add post in Requests
+
+Basic page, editing/adding
+  Factor out view & update for word input into module (page?)
+
+Complete place creation via geolocation and datetime
 
 # Base
 Abstract Requests API
-Basic page, editing/adding
 Offline detection and queueing
 Localhost usage
 
