@@ -4,23 +4,30 @@ import Data.Entry as Entry exposing (Entry, EntryLocation)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
+import Http
+import Request.Entry
+import Date exposing (Date)
 
 
 -- MODEL --
 
 
 type alias Model =
-    { content : String
+    { errors : List Error
+    , content : String
     , translation : String
     , location : EntryLocation
+    , addedAt : Date
     }
 
 
 initNew : Model
 initNew =
-    { content = ""
+    { errors = []
+    , content = ""
     , translation = ""
     , location = initLocation
+    , addedAt = Date.fromTime 0
     }
 
 
@@ -37,13 +44,29 @@ initLocation =
 
 
 type Msg
-    = SetContent String
+    = Save
+    | SetContent String
     | SetTranslation String
+    | CreateCompleted (Result Http.Error Entry)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        Save ->
+            let
+                reqCmd =
+                    Request.Entry.create model
+                        |> Http.send CreateCompleted
+            in
+                ( model, reqCmd )
+
+        CreateCompleted (Ok article) ->
+            model ! []
+
+        CreateCompleted (Err error) ->
+            { model | errors = model.errors ++ [ ( Form, "Server error while attempting to save note" ) ] } ! []
+
         SetContent content ->
             { model | content = content } ! []
 
@@ -87,3 +110,15 @@ view =
                 ]
             ]
         ]
+
+
+
+-- VALIDATION --
+
+
+type Field
+    = Form
+
+
+type alias Error =
+    ( Field, String )

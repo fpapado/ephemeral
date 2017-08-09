@@ -1,13 +1,11 @@
-module Request.Entry exposing (list)
+module Request.Entry exposing (list, create)
 
 import Data.Entry as Entry exposing (Entry, EntryId, EntryLocation, encodeEntry, encodeEntryLocation)
 import Date exposing (Date)
-import Page.Entry
 import Http
 import HttpBuilder exposing (RequestBuilder, withExpect, withQueryParams, withBody)
 import Json.Decode as Decode
 import Json.Encode as Encode exposing (Value)
-import Json.Encode.Extra
 import Request.Helpers exposing (apiUrl)
 
 
