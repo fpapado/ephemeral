@@ -2,6 +2,7 @@ module Request.Entry exposing (list, create)
 
 import Data.Entry as Entry exposing (Entry, EntryId, EntryLocation, encodeEntry, encodeEntryLocation)
 import Date exposing (Date)
+import Date.Extra.Format exposing (utcIsoString)
 import Http
 import HttpBuilder exposing (RequestBuilder, withExpect, withQueryParams, withBody)
 import Json.Decode as Decode
@@ -45,7 +46,7 @@ create config =
                 [ ( "content", Encode.string config.content )
                 , ( "id", Encode.int 4 )
                 , ( "translation", Encode.string config.translation )
-                , ( "added_at", Encode.string <| toString config.addedAt )
+                , ( "added_at", Encode.string <| utcIsoString config.addedAt )
                 , ( "location", encodeEntryLocation config.location )
                 ]
 

@@ -1,6 +1,7 @@
 module Data.Entry exposing (..)
 
 import Date exposing (Date)
+import Date.Extra.Format exposing (utcIsoString)
 import Json.Encode
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Extra
@@ -50,7 +51,7 @@ encodeEntry record =
     Json.Encode.object
         [ ( "content", Json.Encode.string <| record.content )
         , ( "translation", Json.Encode.string <| record.translation )
-        , ( "added_at", Json.Encode.string <| toString record.addedAt )
+        , ( "added_at", Json.Encode.string <| utcIsoString record.addedAt )
         , ( "location", encodeEntryLocation <| record.location )
         ]
 
