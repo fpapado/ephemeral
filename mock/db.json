@@ -8,8 +8,8 @@
         "latitude": "142.4032",
         "longitude": "-55.2770",
         "accuracy": 1
-      }
-      , "id": 0
+      },
+      "id": 0
     },
     {
       "content": "aut",
@@ -32,6 +32,17 @@
         "accuracy": 1
       },
       "id": 2
+    },
+    {
+      "content": "DEF",
+      "id": 4,
+      "translation": "",
+      "added_at": "2017-08-09T13:58:29.645Z",
+      "location": {
+        "latitude": "0",
+        "longitude": "0",
+        "accuracy": 0
+      }
     }
   ]
 }
