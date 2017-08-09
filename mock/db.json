@@ -1,7 +1,6 @@
 {
   "notes": [
     {
-      "id": 0,
       "content": "mollitia",
       "translation": "error",
       "added_at": "2017-08-09T08:55:22.080Z",
@@ -10,9 +9,9 @@
         "longitude": "-55.2770",
         "accuracy": 1
       }
+      , "id": 0
     },
     {
-      "id": 1,
       "content": "aut",
       "translation": "ab",
       "added_at": "2017-08-08T17:47:54.266Z",
@@ -20,10 +19,10 @@
         "latitude": "-92.1438",
         "longitude": "-81.8551",
         "accuracy": 1
-      }
+      },
+      "id": 1
     },
     {
-      "id": 2,
       "content": "ut",
       "translation": "voluptatem",
       "added_at": "2017-08-09T02:36:04.042Z",
@@ -31,18 +30,8 @@
         "latitude": "-105.9833",
         "longitude": "52.9563",
         "accuracy": 1
-      }
-    },
-    {
-      "content": "abc",
-      "id": 4,
-      "translation": "def",
-      "added_at": "<Thu Jan 01 1970 01:00:00 GMT+0100 (BST)>",
-      "location": {
-        "latitude": 0,
-        "longitude": 0,
-        "accuracy": 0
-      }
+      },
+      "id": 2
     }
   ]
 }

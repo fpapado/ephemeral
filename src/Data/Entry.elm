@@ -8,11 +8,11 @@ import Json.Decode.Pipeline as Pipeline exposing (decode, required)
 
 
 type alias Entry =
-    { id : EntryId
-    , content : String
+    { content : String
     , translation : String
     , addedAt : Date
     , location : EntryLocation
+    , id : EntryId
     }
 
 
@@ -30,11 +30,11 @@ type alias EntryLocation =
 decodeEntry : Decoder Entry
 decodeEntry =
     decode Entry
-        |> required "id" entryIdDecoder
         |> required "content" (Decode.string)
         |> required "translation" (Decode.string)
         |> required "added_at" (Json.Decode.Extra.date)
         |> required "location" (decodeEntryLocation)
+        |> required "id" entryIdDecoder
 
 
 decodeEntryLocation : Decoder EntryLocation

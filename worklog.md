@@ -19,3 +19,6 @@ Localhost usage
 # Dev
 Consider elm and elm-live dev dependencies
 NPM scripts for building, starting elm-live
+
+# Real Data
+Might need to change ordering of id, encoding of floats
