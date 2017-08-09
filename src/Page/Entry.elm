@@ -78,8 +78,8 @@ update msg model =
 -- VIEW --
 
 
-view : Html Msg
-view =
+view : Model -> Html Msg
+view model =
     Html.form [ class "pa4 black-80" ]
         [ div [ class "measure" ]
             [ div []

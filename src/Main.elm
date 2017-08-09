@@ -9,6 +9,7 @@ import Date exposing (Date)
 import Date.Extra.Config.Config_en_gb exposing (config)
 import Date.Extra.Format exposing (format)
 import Request.Entry
+import Page.Entry as Entry
 
 
 main : Program Never Model Msg
@@ -25,14 +26,21 @@ main =
 -- MODEL
 
 
+type Page
+    = Blank
+    | Entry Entry.Model
+
+
 type alias Model =
     { entries : List Entry
+    , pageState : Page
     }
 
 
 emptyModel : Model
 emptyModel =
     { entries = []
+    , pageState = Entry Entry.initNew
     }
 
 
@@ -45,23 +53,17 @@ init =
 -- UPDATE
 
 
-{-| Users of our app can trigger messages by clicking and typing. These
-messages are fed into the `update` function as they occur, letting us react
-to them.
--}
 type Msg
     = NoOp
     | NewEntries (Result Http.Error (List Entry))
     | LoadEntries
-
-
-
--- How we update our Model on a given Msg?
+    | EntryMsg Entry.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        -- Messages that exist for all "pages"
         NoOp ->
             model ! []
 
@@ -74,6 +76,33 @@ update msg model =
         LoadEntries ->
             ( model, Http.send NewEntries Request.Entry.list )
 
+        -- Messages for another segment
+        _ ->
+            updatePage model.pageState msg model
+
+
+updatePage : Page -> Msg -> Model -> ( Model, Cmd Msg )
+updatePage page msg model =
+    let
+        toPage toModel toMsg subUpdate subMsg subModel =
+            let
+                ( newModel, newCmd ) =
+                    subUpdate subMsg subModel
+            in
+                ( { model | pageState = (toModel newModel) }, Cmd.map toMsg newCmd )
+    in
+        case ( msg, page ) of
+            ( EntryMsg subMsg, Entry subModel ) ->
+                toPage Entry EntryMsg (Entry.update) subMsg subModel
+
+            ( _, Blank ) ->
+                -- Disregard messages for Blank page/segment
+                model ! []
+
+            ( _, _ ) ->
+                -- Disregard messages for wrong page/segment
+                model ! []
+
 
 
 -- VIEW
@@ -83,10 +112,23 @@ view : Model -> Html Msg
 view model =
     div [ class "pa5 min-vh-100 bg-white" ]
         [ div [ class "mw7-ns center" ]
-            [ viewEntries model.entries
+            [ viewPage model.pageState
+            , viewEntries model.entries
             , button [ onClick LoadEntries ] [ text "Fetch Entries" ]
             ]
         ]
+
+
+viewPage : Page -> Html Msg
+viewPage page =
+    -- Pass things to page's view
+    case page of
+        Blank ->
+            Html.text ""
+
+        Entry subModel ->
+            Entry.view subModel
+                |> Html.map EntryMsg
 
 
 viewEntries : List Entry -> Html Msg

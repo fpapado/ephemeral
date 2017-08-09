@@ -4,6 +4,8 @@ Basic page, editing/adding
   [] Add boilerplate
   [] Add list page
 
+NOTE: A bit redundant to have "pages" atm. It is more like separating the updates, views etc. rather than routes (hence sharing a view in Main)
+
 Figure out where to put encodeEntry, especially b/c of "config" construct
 
 
