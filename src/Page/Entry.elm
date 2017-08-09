@@ -137,8 +137,27 @@ view model =
                 ]
             , button [ class "f6 link dim ph3 pv2 mt3 mb2 dib white bg-dark-blue bw0" ]
                 [ text "Save" ]
+            , viewIf (model.errors /= []) (viewErrors model.errors)
             ]
         ]
+
+
+viewErrors : List Error -> Html Msg
+viewErrors errors =
+    let
+        viewError ( field, err ) =
+            span [ class "db mb2" ] [ text err ]
+    in
+        div [ class "mt2 pa3 f5 bg-light-red white" ] <|
+            List.map viewError errors
+
+
+viewIf : Bool -> Html msg -> Html msg
+viewIf condition content =
+    if condition then
+        content
+    else
+        Html.text ""
 
 
 
