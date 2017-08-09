@@ -1,4 +1,4 @@
-module Map exposing (Model, Msg, update, addMarkers, initModel, Msg(..), addMarker)
+module Map exposing (Model, Msg, update, addMarkers, initModel, Msg(..))
 
 import Dict exposing (Dict)
 import Task
@@ -68,20 +68,36 @@ addMarkers entries =
 
 addMarkerCmd : Int -> Entry -> Cmd Msg
 addMarkerCmd id_ entry =
-    Task.perform
-        (always
-            (AddMarker
-                ( id_
-                , ( entry.location.latitude, entry.location.longitude )
-                , entry.content
-                    ++ "\n"
-                    ++ entry.translation
-                    ++ "\n"
-                    ++ viewDate entry.addedAt
+    let
+        { latitude, longitude } =
+            entry.location
+
+        popupText =
+            makePopup entry
+    in
+        Task.perform
+            (always
+                (AddMarker
+                    ( id_
+                    , ( latitude, longitude )
+                    , popupText
+                    )
                 )
             )
-        )
-        (Task.succeed ())
+            (Task.succeed ())
+
+
+makePopup : Entry -> String
+makePopup entry =
+    "<div>"
+        ++ entry.content
+        ++ "</div>"
+        ++ "<div>"
+        ++ entry.translation
+        ++ "</div>"
+        ++ "<div>"
+        ++ viewDate entry.addedAt
+        ++ "</div>"
 
 
 markersAsOutboundType : Dict Int ( LatLng, String ) -> List ( Int, LatLng, MarkerOptions, String )
