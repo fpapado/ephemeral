@@ -2,6 +2,7 @@ module Request.Entry exposing (list)
 
 import Data.Entry as Entry exposing (Entry, EntryId, EntryLocation, encodeEntry, encodeEntryLocation)
 import Date exposing (Date)
+import Page.Entry
 import Http
 import HttpBuilder exposing (RequestBuilder, withExpect, withQueryParams, withBody)
 import Json.Decode as Decode

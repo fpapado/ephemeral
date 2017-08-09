@@ -1,10 +1,11 @@
 # TODO
-Add post in Requests
+Basic page, editing/adding
+  [X] Factor out view & update for word input into module (page?)
+  [] Add boilerplate
+  [] Add list page
 
 Figure out where to put encodeEntry, especially b/c of "config" construct
 
-Basic page, editing/adding
-  Factor out view & update for word input into module (page?)
 
 Complete place creation via geolocation and datetime
 
