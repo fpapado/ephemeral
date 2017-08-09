@@ -1,20 +1,24 @@
 # TODO
-[] Editing entries
+[] Map prototype
+[] Prototype local store
 
 # Base
 Abstract Requests API
 Offline detection and queueing
 Localhost usage
 Decide which fields are editable
+Decide between pages
+ |> Routing
 
 # UI
 [] Refresh/cleanup
 [] "Success" message
+[] Dismiss errors
 
 # Later
+[] Authorization & Authentication
 [] Leaflet integration
 [] Location picker
-[] Dismiss errors
 [] Export to Anki
 
 # Dev

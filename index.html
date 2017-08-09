@@ -4,15 +4,21 @@
   <head>
     <meta charset="UTF-8">
     <title>Ephemeral</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+    integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
+    integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+    crossorigin=""></script>
     <link rel="stylesheet" href="https://unpkg.com/tachyons@4.7.0/css/tachyons.min.css"/>
+    <link rel="stylesheet" href="/assets/css/style.css"/>
     <script type="text/javascript" src="elm.js"></script>
   </head>
 
   <body class="pa3 min-h-100 bg-light-gray">
+    <div id="mapid"></div>
+    <div id="root"></div>
   </body>
 
-  <script type="text/javascript">
-    var ephemeral = Elm.Main.fullscreen();
-  </script>
-
+  <script type="text/javascript" src="index.js"></script>
 </html>
