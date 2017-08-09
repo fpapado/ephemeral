@@ -16,7 +16,7 @@ list : Http.Request (List Entry)
 list =
     apiUrl ("/notes/")
         |> HttpBuilder.get
-        |> HttpBuilder.withExpect (Http.expectJson (Decode.field "notes" (Decode.list Entry.decodeEntry)))
+        |> HttpBuilder.withExpect (Http.expectJson (Decode.list Entry.decodeEntry))
         |> HttpBuilder.toRequest
 
 
@@ -43,6 +43,7 @@ create config =
         entry =
             Encode.object
                 [ ( "content", Encode.string config.content )
+                , ( "id", Encode.int 4 )
                 , ( "translation", Encode.string config.translation )
                 , ( "added_at", Encode.string <| toString config.addedAt )
                 , ( "location", encodeEntryLocation config.location )

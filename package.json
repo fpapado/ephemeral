@@ -6,7 +6,7 @@
   "dependencies": {},
   "devDependencies": {
     "faker": "^4.1.0",
-    "json-server": "^0.11.2",
+    "json-server": "^0.12.0",
     "lodash": "^4.17.4"
   },
   "scripts": {
