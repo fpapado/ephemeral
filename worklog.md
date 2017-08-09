@@ -1,7 +1,9 @@
 # TODO
 [X] Complete entry creation via geolocation and datetime
 
-[] Show Errors for entry creation
+[X] Show Errors for entry creation
+
+[] "Success" message
 
 Basic page, editing/adding
   [X] Factor out view & update for word input into module (page?)
@@ -19,6 +21,7 @@ Localhost usage
 
 # Later
 [] Leaflet integration
+[] Dismiss errors
 
 # Dev
 Consider elm and elm-live dev dependencies

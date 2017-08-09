@@ -88,8 +88,8 @@ update msg model =
         LocationFound (Err error) ->
             { model | errors = model.errors ++ [ ( Form, "Geolocation error" ) ] } ! []
 
-        CreateCompleted (Ok article) ->
-            model ! []
+        CreateCompleted (Ok entry) ->
+            initNew ! []
 
         CreateCompleted (Err error) ->
             { model | errors = model.errors ++ [ ( Form, "Server error while attempting to save note" ) ] } ! []
@@ -113,6 +113,7 @@ view model =
                 [ label [ class "f6 b db mv2", for "word" ] [ text "Word " ]
                 , input
                     [ attribute "aria-describedby" "word-desc"
+                    , value model.content
                     , class "input-reset ba b--black-20 pa2 mb2 db w-100"
                     , id "name"
                     , type_ "text"
@@ -126,6 +127,7 @@ view model =
                 [ label [ class "f6 b db mb2", for "translation" ] [ text "Translation " ]
                 , input
                     [ attribute "aria-describedby" "tranlsation-desc"
+                    , value model.translation
                     , class "input-reset ba b--black-20 pa2 mb2 db w-100"
                     , id "name"
                     , type_ "text"
