@@ -34,6 +34,15 @@ type alias CreateConfig record =
     }
 
 
+
+-- type alias LocationConfig record =
+--     { record
+--         | latitude : Float
+--         , longitude : Float
+--         , accuracy : Float
+--     }
+
+
 create : CreateConfig record -> Http.Request Entry
 create config =
     let

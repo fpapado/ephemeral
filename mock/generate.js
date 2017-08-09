@@ -11,7 +11,7 @@ module.exports = function(){
         location: {
           latitude: faker.address.longitude(),
           longitude: faker.address.latitude(),
-          accuracy: 1.0
+          accuracy: "1.0"
         },
         id: n
       };

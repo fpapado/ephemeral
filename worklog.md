@@ -1,12 +1,12 @@
 # TODO
-[] Complete entry creation via geolocation and datetime
+[X] Complete entry creation via geolocation and datetime
+
+[] Show Errors for entry creation
 
 Basic page, editing/adding
   [X] Factor out view & update for word input into module (page?)
   [X] Add boilerplate
   [?] Add list page
-
-[] Show Errors for entry creation
 
 [] Figure out where to put encodeEntry, especially b/c of "config" construct (duplicated atm)
 

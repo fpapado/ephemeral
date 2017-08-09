@@ -20,7 +20,7 @@ type alias Entry =
 type alias EntryLocation =
     { latitude : Float
     , longitude : Float
-    , accuracy : Int
+    , accuracy : Float
     }
 
 
@@ -43,7 +43,7 @@ decodeEntryLocation =
     decode EntryLocation
         |> required "latitude" (Json.Decode.Extra.parseFloat)
         |> required "longitude" (Json.Decode.Extra.parseFloat)
-        |> required "accuracy" (Decode.int)
+        |> required "accuracy" (Json.Decode.Extra.parseFloat)
 
 
 encodeEntry : Entry -> Json.Encode.Value
@@ -61,7 +61,7 @@ encodeEntryLocation record =
     Json.Encode.object
         [ ( "latitude", Json.Encode.string <| toString record.latitude )
         , ( "longitude", Json.Encode.string <| toString record.longitude )
-        , ( "accuracy", Json.Encode.int <| record.accuracy )
+        , ( "accuracy", Json.Encode.string <| toString record.accuracy )
         ]
 
 

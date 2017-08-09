@@ -7,7 +7,7 @@
       "location": {
         "latitude": "142.4032",
         "longitude": "-55.2770",
-        "accuracy": 1
+        "accuracy": "1.0"
       },
       "id": 0
     },
@@ -18,7 +18,7 @@
       "location": {
         "latitude": "-92.1438",
         "longitude": "-81.8551",
-        "accuracy": 1
+        "accuracy": "1.0"
       },
       "id": 1
     },
@@ -29,7 +29,7 @@
       "location": {
         "latitude": "-105.9833",
         "longitude": "52.9563",
-        "accuracy": 1
+        "accuracy": "1.0"
       },
       "id": 2
     },
@@ -41,7 +41,7 @@
       "location": {
         "latitude": "0",
         "longitude": "0",
-        "accuracy": 0
+        "accuracy": "1.0"
       }
     }
   ]

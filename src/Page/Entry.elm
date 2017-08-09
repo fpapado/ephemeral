@@ -8,6 +8,7 @@ import Http
 import Request.Entry
 import Date exposing (Date)
 import Task
+import Geolocation exposing (Location)
 
 
 -- MODEL --
@@ -46,15 +47,25 @@ initLocation =
 
 type Msg
     = Save
+    | Commit
     | SetContent String
     | SetTranslation String
     | CreateCompleted (Result Http.Error Entry)
+    | LocationFound (Result Geolocation.Error Location)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Save ->
+            let
+                getLocation =
+                    Geolocation.now
+                        |> Task.attempt LocationFound
+            in
+                ( model, getLocation )
+
+        Commit ->
             let
                 reqTask addedAt =
                     Request.Entry.create { model | addedAt = addedAt }
@@ -66,6 +77,16 @@ update msg model =
                         |> Task.attempt CreateCompleted
             in
                 ( model, getTimeAndSave )
+
+        LocationFound (Ok location) ->
+            let
+                entryLocation =
+                    geoToEntryLocation location
+            in
+                update Commit { model | location = entryLocation }
+
+        LocationFound (Err error) ->
+            { model | errors = model.errors ++ [ ( Form, "Geolocation error" ) ] } ! []
 
         CreateCompleted (Ok article) ->
             model ! []
@@ -130,3 +151,12 @@ type Field
 
 type alias Error =
     ( Field, String )
+
+
+
+-- UTIL --
+
+
+geoToEntryLocation : Location -> EntryLocation
+geoToEntryLocation { latitude, longitude, accuracy } =
+    EntryLocation latitude longitude accuracy
