@@ -1,5 +1,4 @@
 # TODO
-[] Map prototype
 [] Prototype local store
 
 # Base
@@ -20,6 +19,7 @@ Decide between pages
 [] Leaflet integration
 [] Location picker
 [] Export to Anki
+[] Merge markers and Entries?
 
 # Dev
 Consider elm and elm-live dev dependencies
