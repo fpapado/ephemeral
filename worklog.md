@@ -1,5 +1,10 @@
 # TODO
 [] Prototype local store
+[] Routing with pages:
+  [] List (map + items; current Main)
+  [] Entry.Editor
+  [] Entry.New
+[] Add markers as words are added
 
 # Base
 Abstract Requests API
@@ -15,11 +20,13 @@ Decide between pages
 [] Dismiss errors
 
 # Later
+[] Full CRUD
 [] Authorization & Authentication
-[] Leaflet integration
 [] Location picker
 [] Export to Anki
 [] Merge markers and Entries?
+[] Filter based on date, range
+[X] Leaflet integration
 
 # Dev
 Consider elm and elm-live dev dependencies
