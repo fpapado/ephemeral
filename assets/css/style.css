@@ -1,3 +1,11 @@
-#mapid {
+/*#mapid {
   height: 400px
+}*/
+.h6 {
+ height:24rem
+}
+@media screen and (min-width:30em) {
+ .h6-ns {
+  height:24rem
+ }
 }

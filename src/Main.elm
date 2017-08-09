@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
 import Http
+import Task
 import Dict exposing (Dict)
 import Data.Entry exposing (Entry)
 import Date exposing (Date)
@@ -55,7 +56,7 @@ emptyModel =
 
 helsinkiLatLng : LatLng
 helsinkiLatLng =
-    ( 60.192059, 24.945831 )
+    ( 60.1719, 24.9414 )
 
 
 init : ( Model, Cmd Msg )
@@ -88,7 +89,7 @@ update msg model =
             model ! []
 
         NewEntries (Ok entries) ->
-            { model | entries = entries } ! []
+            { model | entries = entries } ! [ addMarkers entries ]
 
         LoadEntries ->
             ( model, Http.send NewEntries Request.Entry.list )
@@ -118,6 +119,30 @@ update msg model =
 addMarker : ( Int, LatLng, String ) -> Model -> Model
 addMarker ( id, latLng, popupText ) model =
     { model | markers = Dict.insert id ( latLng, popupText ) model.markers }
+
+
+addMarkers : List Entry -> Cmd Msg
+addMarkers entries =
+    Cmd.batch <|
+        List.indexedMap addMarkerCmd entries
+
+
+addMarkerCmd : Int -> Entry -> Cmd Msg
+addMarkerCmd id_ entry =
+    Task.perform
+        (always
+            (AddMarker
+                ( id_
+                , ( entry.location.latitude, entry.location.longitude )
+                , entry.content
+                    ++ "\n"
+                    ++ entry.translation
+                    ++ "\n"
+                    ++ viewDate entry.addedAt
+                )
+            )
+        )
+        (Task.succeed ())
 
 
 markersAsOutboundType : Dict Int ( LatLng, String ) -> List ( Int, LatLng, MarkerOptions, String )
