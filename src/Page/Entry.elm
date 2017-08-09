@@ -108,7 +108,7 @@ view model =
                     , class "input-reset ba b--black-20 pa2 mb2 db w-100"
                     , id "name"
                     , type_ "text"
-                    , onInput SetContent
+                    , onInput SetTranslation
                     ]
                     []
                 , small [ class "f6 black-60 db mb2", id "translation-desc" ]
