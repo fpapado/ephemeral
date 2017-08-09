@@ -58,8 +58,8 @@ encodeEntry record =
 encodeEntryLocation : EntryLocation -> Json.Encode.Value
 encodeEntryLocation record =
     Json.Encode.object
-        [ ( "latitude", Json.Encode.float <| record.latitude )
-        , ( "longitude", Json.Encode.float <| record.longitude )
+        [ ( "latitude", Json.Encode.string <| toString record.latitude )
+        , ( "longitude", Json.Encode.string <| toString record.longitude )
         , ( "accuracy", Json.Encode.int <| record.accuracy )
         ]
 
