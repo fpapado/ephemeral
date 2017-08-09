@@ -184,8 +184,6 @@ view model =
         [ div [ class "mw7-ns center" ]
             [ viewPage model.pageState
             , button [ onClick LoadEntries ] [ text "Fetch Entries" ]
-            , button [ onClick <| SetLatLng helsinkiLatLng ] [ text "Locate Helsinki" ]
-            , button [ onClick <| AddMarker ( 1, helsinkiLatLng, "Helsinki, FI" ) ] [ text "Pin Helsinki" ]
             , viewEntries model.entries
             ]
         ]
