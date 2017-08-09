@@ -143,6 +143,7 @@ viewEntry entry =
         , span [ class "db mb1" ] [ text entry.translation ]
         , span [ class "db tr" ] [ text <| viewDate entry.addedAt ]
         , span [ class "db tr" ] [ text <| toString entry.location.longitude ++ ", " ++ toString entry.location.latitude ]
+        , a [ class "dib link bb bw2 white pointer", onClick (EntryMsg (Entry.Edit entry)) ] [ text "edit" ]
         ]
 
 

@@ -1,6 +1,6 @@
-module Request.Entry exposing (list, create)
+module Request.Entry exposing (list, create, update)
 
-import Data.Entry as Entry exposing (Entry, EntryId, EntryLocation, encodeEntry, encodeEntryLocation)
+import Data.Entry as Entry exposing (Entry, EntryId, EntryLocation, encodeEntry, encodeEntryLocation, idToString)
 import Date exposing (Date)
 import Date.Extra.Format exposing (utcIsoString)
 import Http
@@ -34,13 +34,11 @@ type alias CreateConfig record =
     }
 
 
-
--- type alias LocationConfig record =
---     { record
---         | latitude : Float
---         , longitude : Float
---         , accuracy : Float
---     }
+type alias EditConfig record =
+    { record
+        | content : String
+        , translation : String
+    }
 
 
 create : CreateConfig record -> Http.Request Entry
@@ -69,11 +67,24 @@ create config =
             |> HttpBuilder.toRequest
 
 
+update : EntryId -> EditConfig record -> Http.Request Entry
+update entryId config =
+    let
+        expect =
+            Entry.decodeEntry
+                |> Http.expectJson
 
--- type alias EditConfig record =
---     { record
---         | content : String
---         , translation : String
---         , addedAt : Date
---         , location : EntryLocation
---     }
+        entry =
+            Encode.object
+                [ ( "content", Encode.string config.content )
+                , ( "translation", Encode.string config.translation )
+                ]
+
+        body =
+            entry |> Http.jsonBody
+    in
+        apiUrl ("/notes/" ++ idToString entryId)
+            |> HttpBuilder.patch
+            |> withBody body
+            |> withExpect expect
+            |> HttpBuilder.toRequest

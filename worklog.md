@@ -1,31 +1,29 @@
 # TODO
-[X] Complete entry creation via geolocation and datetime
-
-[X] Show Errors for entry creation
-
-[] "Success" message
-
-Basic page, editing/adding
-  [X] Factor out view & update for word input into module (page?)
-  [X] Add boilerplate
-  [?] Add list page
-
-[] Figure out where to put encodeEntry, especially b/c of "config" construct (duplicated atm)
-
-NOTE: A bit redundant to have "pages" atm. It is more like separating the updates, views etc. rather than routes (hence sharing a view in Main)
+[] Editing entries
 
 # Base
 Abstract Requests API
 Offline detection and queueing
 Localhost usage
+Decide which fields are editable
+
+# UI
+[] Refresh/cleanup
+[] "Success" message
 
 # Later
 [] Leaflet integration
+[] Location picker
 [] Dismiss errors
+[] Export to Anki
 
 # Dev
 Consider elm and elm-live dev dependencies
 NPM scripts for building, starting elm-live
+
+# Refactoring
+[] Figure out where to put encodeEntry, especially b/c of "config" construct (duplicated atm)
+NOTE: A bit redundant to have "pages" atm. It is more like separating the updates, views etc. rather than routes (hence sharing a view in Main)
 
 # Real Data
 Might need to change ordering of id, encoding of floats

@@ -1,6 +1,6 @@
-module Page.Entry exposing (Model, Msg, initNew, update, view)
+module Page.Entry exposing (Model, Msg, initNew, update, view, Msg(..))
 
-import Data.Entry as Entry exposing (Entry, EntryLocation)
+import Data.Entry as Entry exposing (Entry, EntryLocation, EntryId)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onSubmit)
@@ -20,6 +20,7 @@ type alias Model =
     , translation : String
     , location : EntryLocation
     , addedAt : Date
+    , editingEntry : Maybe EntryId
     }
 
 
@@ -30,6 +31,7 @@ initNew =
     , translation = ""
     , location = initLocation
     , addedAt = Date.fromTime 0
+    , editingEntry = Nothing
     }
 
 
@@ -48,35 +50,66 @@ initLocation =
 type Msg
     = Save
     | Commit
+    | Edit Entry
     | SetContent String
     | SetTranslation String
-    | CreateCompleted (Result Http.Error Entry)
     | LocationFound (Result Geolocation.Error Location)
+    | CreateCompleted (Result Http.Error Entry)
+    | EditCompleted (Result Http.Error Entry)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Save ->
-            let
-                getLocation =
-                    Geolocation.now
-                        |> Task.attempt LocationFound
-            in
-                ( model, getLocation )
+            case model.editingEntry of
+                Nothing ->
+                    let
+                        getLocation =
+                            Geolocation.now
+                                |> Task.attempt LocationFound
+                    in
+                        ( model, getLocation )
+
+                Just entryId ->
+                    update Commit model
 
         Commit ->
-            let
-                reqTask addedAt =
-                    Request.Entry.create { model | addedAt = addedAt }
-                        |> Http.toTask
+            case model.editingEntry of
+                Nothing ->
+                    let
+                        reqTask addedAt =
+                            Request.Entry.create { model | addedAt = addedAt }
+                                |> Http.toTask
 
-                getTimeAndSave =
-                    Date.now
-                        |> Task.andThen reqTask
-                        |> Task.attempt CreateCompleted
-            in
-                ( model, getTimeAndSave )
+                        getTimeAndSave =
+                            Date.now
+                                |> Task.andThen reqTask
+                                |> Task.attempt CreateCompleted
+                    in
+                        ( model, getTimeAndSave )
+
+                Just eid ->
+                    let
+                        req =
+                            Request.Entry.update eid model
+                                |> Http.send EditCompleted
+                    in
+                        ( model, req )
+
+        Edit entry ->
+            { model
+                | content = entry.content
+                , translation = entry.translation
+                , editingEntry = Just entry.id
+            }
+                ! []
+
+        SetContent content ->
+            { model | content = content } ! []
+
+        SetTranslation translation ->
+            { model | translation = translation } ! []
 
         LocationFound (Ok location) ->
             let
@@ -94,11 +127,11 @@ update msg model =
         CreateCompleted (Err error) ->
             { model | errors = model.errors ++ [ ( Form, "Server error while attempting to save note" ) ] } ! []
 
-        SetContent content ->
-            { model | content = content } ! []
+        EditCompleted (Ok entry) ->
+            initNew ! []
 
-        SetTranslation translation ->
-            { model | translation = translation } ! []
+        EditCompleted (Err error) ->
+            { model | errors = model.errors ++ [ ( Form, "Server error while attempting to edit note" ) ] } ! []
 
 
 
@@ -107,41 +140,51 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    Html.form [ class "pa4 black-80", onSubmit Save ]
-        [ fieldset [ class "measure ba b--transparent ph0 mh0" ]
-            [ div []
-                [ label [ class "f6 b db mv2", for "word" ] [ text "Word " ]
-                , input
-                    [ attribute "aria-describedby" "word-desc"
-                    , value model.content
-                    , class "input-reset ba b--black-20 pa2 mb2 db w-100"
-                    , id "name"
-                    , type_ "text"
-                    , onInput SetContent
+    let
+        isEditing =
+            model.editingEntry /= Nothing
+
+        saveButtonText =
+            if isEditing then
+                "Update"
+            else
+                "Save"
+    in
+        Html.form [ class "pa4 black-80", onSubmit Save ]
+            [ fieldset [ class "measure ba b--transparent ph0 mh0" ]
+                [ div []
+                    [ label [ class "f6 b db mv2", for "word" ] [ text "Word " ]
+                    , input
+                        [ attribute "aria-describedby" "word-desc"
+                        , value model.content
+                        , class "input-reset ba b--black-20 pa2 mb2 db w-100"
+                        , id "name"
+                        , type_ "text"
+                        , onInput SetContent
+                        ]
+                        []
+                    , small [ class "f6 black-60 db mb2", id "word-desc" ]
+                        [ text "The word to save." ]
                     ]
-                    []
-                , small [ class "f6 black-60 db mb2", id "word-desc" ]
-                    [ text "The word to save." ]
-                ]
-            , div [ class "mt3" ]
-                [ label [ class "f6 b db mb2", for "translation" ] [ text "Translation " ]
-                , input
-                    [ attribute "aria-describedby" "tranlsation-desc"
-                    , value model.translation
-                    , class "input-reset ba b--black-20 pa2 mb2 db w-100"
-                    , id "name"
-                    , type_ "text"
-                    , onInput SetTranslation
+                , div [ class "mt3" ]
+                    [ label [ class "f6 b db mb2", for "translation" ] [ text "Translation " ]
+                    , input
+                        [ attribute "aria-describedby" "tranlsation-desc"
+                        , value model.translation
+                        , class "input-reset ba b--black-20 pa2 mb2 db w-100"
+                        , id "name"
+                        , type_ "text"
+                        , onInput SetTranslation
+                        ]
+                        []
+                    , small [ class "f6 black-60 db mb2", id "translation-desc" ]
+                        [ text "The translation for the word." ]
                     ]
-                    []
-                , small [ class "f6 black-60 db mb2", id "translation-desc" ]
-                    [ text "The translation for the word." ]
+                , button [ class "f6 link dim ph3 pv2 mt3 mb2 dib white bg-dark-blue bw0" ]
+                    [ text saveButtonText ]
+                , viewIf (model.errors /= []) (viewErrors model.errors)
                 ]
-            , button [ class "f6 link dim ph3 pv2 mt3 mb2 dib white bg-dark-blue bw0" ]
-                [ text "Save" ]
-            , viewIf (model.errors /= []) (viewErrors model.errors)
             ]
-        ]
 
 
 viewErrors : List Error -> Html Msg
