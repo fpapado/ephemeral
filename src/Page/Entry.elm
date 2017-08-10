@@ -44,18 +44,29 @@ initLocation =
     }
 
 
+initGeoLocation : Location
+initGeoLocation =
+    { accuracy = 0.0
+    , altitude = Just { value = 0.0, accuracy = 0.0 }
+    , latitude = 0.0
+    , longitude = 0.0
+    , movement = Just Geolocation.Static
+    , timestamp = 0
+    }
+
+
 
 -- UPDATE --
 
 
 type Msg
     = Save
-    | Commit
     | CommitPouch
     | Edit Entry
     | SetContent String
     | SetTranslation String
     | SetLocationTime (Result Geolocation.Error ( Location, Date ))
+    | SetWithNullLoc ( EntryLocation, Date )
     | LocationFound (Result Geolocation.Error Location)
     | CreateCompleted (Result Http.Error Entry)
     | EditCompleted (Result Http.Error Entry)
@@ -70,6 +81,7 @@ update msg model =
                     let
                         getLocation =
                             Geolocation.now
+                                |> Task.onError (\err -> Task.succeed initGeoLocation)
 
                         getTime a =
                             Date.now
@@ -86,30 +98,13 @@ update msg model =
                     update CommitPouch model
 
         CommitPouch ->
-            ( initNew, Request.Entry.createPouch model )
-
-        Commit ->
             case model.editingEntry of
                 Nothing ->
-                    let
-                        reqTask addedAt =
-                            Request.Entry.create { model | addedAt = addedAt }
-                                |> Http.toTask
-
-                        getTimeAndSave =
-                            Date.now
-                                |> Task.andThen reqTask
-                                |> Task.attempt CreateCompleted
-                    in
-                        ( model, getTimeAndSave )
+                    ( initNew, Request.Entry.createPouch model )
 
                 Just eid ->
-                    let
-                        req =
-                            Request.Entry.update eid model
-                                |> Http.send EditCompleted
-                    in
-                        ( model, req )
+                    -- ( initNew, Request.Entry.updatePouch model )
+                    ( initNew, Request.Entry.createPouch model )
 
         Edit entry ->
             { model
@@ -150,6 +145,16 @@ update msg model =
 
         SetLocationTime (Err error) ->
             { model | errors = model.errors ++ [ ( Form, viewGeoError error ) ] } ! []
+
+        SetWithNullLoc ( location, addedAt ) ->
+            let
+                newModel =
+                    { model
+                        | location = location
+                        , addedAt = addedAt
+                    }
+            in
+                update CommitPouch newModel
 
         CreateCompleted (Ok entry) ->
             initNew ! []

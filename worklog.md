@@ -9,10 +9,12 @@
 
 [] Abstract away msg and flow for PouchDb
   [] Notify UI when Entry is created
+  [] Add markers, update list as words are added
+[] Save revisions
+[] Full CRUD
+
 
 [] Redundant create messages in Main, Request.Entry, Page.Entry
-
-[] Add markers, update list as words are added
 
 [] Clean console logs
 
