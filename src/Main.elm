@@ -149,7 +149,7 @@ updatePage page msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "pa5 min-vh-100 bg-white" ]
+    div [ class "pa3 pa5-ns min-vh-100 bg-white" ]
         [ div [ class "mw7-ns center" ]
             [ viewPage model.pageState
             , button [ onClick LoadEntriesPouch ] [ text "Fetch Entries" ]

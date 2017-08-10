@@ -179,7 +179,7 @@ view model =
             else
                 "Save"
     in
-        Html.form [ class "pa4 black-80", onSubmit Save ]
+        Html.form [ class "mt3 mb3 black-80", onSubmit Save ]
             [ fieldset [ class "measure ba b--transparent ph0 mh0" ]
                 [ div []
                     [ label [ class "f6 b db mv2", for "word" ] [ text "Word " ]
