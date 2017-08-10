@@ -12,8 +12,9 @@
 
 [X] Abstract away msg and flow for PouchDb
   [X] Notify UI when Entry is created
-  [] Notify UI when Entry is updated
-    [] Add markers based on entry.id
+  [X] Notify UI when Entry is updated
+    [X] Add markers based on entry.id
+    [] Properly handle markers on update (delete & reset?)
   [X] Cmd -> to Pouch
   [X] Sub -> message to Elm -> decode -> Cmd
   [X] Add markers, update list as words are added
@@ -52,6 +53,7 @@ Decide between pages
  |> Routing
 
 # UI
+[] Spider spread for map
 [] Html.lazy2
 [] Refresh/cleanup
 [] "Success" message

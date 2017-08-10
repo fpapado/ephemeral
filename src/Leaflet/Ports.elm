@@ -9,4 +9,4 @@ port setView : ( LatLng, Int, ZoomPanOptions ) -> Cmd msg
 port getCenter : (LatLng -> msg) -> Sub msg
 
 
-port setMarkers : List ( Int, LatLng, MarkerOptions, String ) -> Cmd msg
+port setMarkers : List ( String, LatLng, MarkerOptions, String ) -> Cmd msg

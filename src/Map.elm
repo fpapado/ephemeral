@@ -1,6 +1,7 @@
 module Map exposing (Model, Msg, update, addMarkers, addMarker, initModel, Msg(..))
 
 import Dict exposing (Dict)
+import Data.Entry exposing (idToString)
 import Task
 import Util exposing (viewDate)
 import Data.Entry exposing (Entry)
@@ -11,7 +12,7 @@ import Leaflet.Ports
 type alias Model =
     { latLng : LatLng
     , zoomPanOptions : ZoomPanOptions
-    , markers : Dict Int ( LatLng, String )
+    , markers : Dict String ( LatLng, String )
     }
 
 
@@ -31,7 +32,7 @@ helsinkiLatLng =
 type Msg
     = SetLatLng LatLng
     | GetCenter LatLng
-    | AddMarker ( Int, LatLng, String )
+    | AddMarker ( String, LatLng, String )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -55,7 +56,7 @@ update msg model =
             { model | latLng = latLng } ! []
 
 
-addMarkerToModel : ( Int, LatLng, String ) -> Model -> Model
+addMarkerToModel : ( String, LatLng, String ) -> Model -> Model
 addMarkerToModel ( id, latLng, popupText ) model =
     { model | markers = Dict.insert id ( latLng, popupText ) model.markers }
 
@@ -63,11 +64,11 @@ addMarkerToModel ( id, latLng, popupText ) model =
 addMarkers : List Entry -> Cmd Msg
 addMarkers entries =
     Cmd.batch <|
-        List.indexedMap addMarker entries
+        List.map addMarker entries
 
 
-addMarker : Int -> Entry -> Cmd Msg
-addMarker id_ entry =
+addMarker : Entry -> Cmd Msg
+addMarker entry =
     let
         { latitude, longitude } =
             entry.location
@@ -78,7 +79,7 @@ addMarker id_ entry =
         Task.perform
             (always
                 (AddMarker
-                    ( id_
+                    ( idToString entry.id
                     , ( latitude, longitude )
                     , popupText
                     )
@@ -100,7 +101,7 @@ makePopup entry =
         ++ "</div>"
 
 
-markersAsOutboundType : Dict Int ( LatLng, String ) -> List ( Int, LatLng, MarkerOptions, String )
+markersAsOutboundType : Dict String ( LatLng, String ) -> List ( String, LatLng, MarkerOptions, String )
 markersAsOutboundType markers =
     Dict.toList markers
         |> List.map (\( id, ( latLng, popupText ) ) -> ( id, latLng, defaultMarkerOptions, popupText ))

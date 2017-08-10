@@ -108,7 +108,7 @@ update msg model =
                 nextId =
                     List.length model.entries
             in
-                { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarker nextId entry) ]
+                { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarker entry) ]
 
         UpdatedEntryPouch (Err err) ->
             model ! []
@@ -125,7 +125,7 @@ update msg model =
                 nextId =
                     List.length model.entries
             in
-                { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarker nextId entry) ]
+                { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarker entry) ]
 
         LoadEntries ->
             ( model, Http.send NewEntries Request.Entry.list )
