@@ -71,7 +71,17 @@ app.ports.saveEntry.subscribe((data) => {
   let meta = {"type": "entry"};
   let doc = Object.assign(data, meta);
   console.log(doc);
-  db.post(doc);
+
+  db.post(doc)
+    .then((res) => {
+      db.get(res.id).then((doc) => {
+        console.log("Successfully created", doc);
+        app.ports.newEntry.send(doc);
+      })
+    })
+    .catch((err) => {
+    console.log("Failed to create", err);
+  })
 });
 
 app.ports.updateEntry.subscribe((data) => {

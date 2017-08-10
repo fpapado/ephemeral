@@ -1,4 +1,4 @@
-module Map exposing (Model, Msg, update, addMarkers, initModel, Msg(..))
+module Map exposing (Model, Msg, update, addMarkers, addMarker, initModel, Msg(..))
 
 import Dict exposing (Dict)
 import Task
@@ -45,7 +45,7 @@ update msg model =
         AddMarker ( id, latLng, popupText ) ->
             let
                 newModel =
-                    addMarker ( id, latLng, popupText ) model
+                    addMarkerToModel ( id, latLng, popupText ) model
             in
                 ( newModel
                 , Leaflet.Ports.setMarkers <| markersAsOutboundType newModel.markers
@@ -55,19 +55,19 @@ update msg model =
             { model | latLng = latLng } ! []
 
 
-addMarker : ( Int, LatLng, String ) -> Model -> Model
-addMarker ( id, latLng, popupText ) model =
+addMarkerToModel : ( Int, LatLng, String ) -> Model -> Model
+addMarkerToModel ( id, latLng, popupText ) model =
     { model | markers = Dict.insert id ( latLng, popupText ) model.markers }
 
 
 addMarkers : List Entry -> Cmd Msg
 addMarkers entries =
     Cmd.batch <|
-        List.indexedMap addMarkerCmd entries
+        List.indexedMap addMarker entries
 
 
-addMarkerCmd : Int -> Entry -> Cmd Msg
-addMarkerCmd id_ entry =
+addMarker : Int -> Entry -> Cmd Msg
+addMarker id_ entry =
     let
         { latitude, longitude } =
             entry.location

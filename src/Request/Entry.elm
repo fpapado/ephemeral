@@ -1,6 +1,26 @@
-module Request.Entry exposing (list, create, update, createPouch, updatePouch, listPouch, decodeEntryList)
+module Request.Entry
+    exposing
+        ( list
+        , create
+        , update
+        , createPouch
+        , updatePouch
+        , listPouch
+        , decodeEntryList
+        , decodePouchEntries
+        , decodePouchEntry
+        )
 
-import Data.Entry as Entry exposing (Entry, EntryId, EntryLocation, encodeEntry, encodeEntryLocation, idToString)
+import Data.Entry as Entry
+    exposing
+        ( Entry
+        , EntryId
+        , EntryLocation
+        , encodeEntry
+        , encodeEntryLocation
+        , idToString
+        , decodeEntry
+        )
 import Date exposing (Date)
 import Date.Extra.Format exposing (utcIsoString)
 import Http
@@ -134,3 +154,25 @@ listPouch =
 decodeEntryList : Decode.Decoder (List Entry)
 decodeEntryList =
     Decode.list (Entry.decodeEntry)
+
+
+
+-- Called from subscriptions --
+
+
+decodePouchEntries : (Result String (List Entry) -> msg) -> Value -> msg
+decodePouchEntries toMsg entries =
+    let
+        result =
+            Decode.decodeValue decodeEntryList entries
+    in
+        toMsg result
+
+
+decodePouchEntry : (Result String Entry -> msg) -> Value -> msg
+decodePouchEntry toMsg entry =
+    let
+        result =
+            Decode.decodeValue decodeEntry entry
+    in
+        toMsg result

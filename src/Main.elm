@@ -4,9 +4,8 @@ import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
 import Http
-import Views exposing (epButton)
 import Data.Entry exposing (Entry)
-import Request.Entry
+import Request.Entry exposing (decodePouchEntries, decodePouchEntry)
 import Page.Entry as Entry
 import Map as Map
 import Util exposing (viewDate)
@@ -27,16 +26,10 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Pouch.Ports.getEntries (decodePouchEntries)
-
-
-decodePouchEntries : Value -> Msg
-decodePouchEntries entries =
-    let
-        result =
-            Decode.decodeValue (Decode.list (Data.Entry.decodeEntry)) entries
-    in
-        NewEntriesPouch result
+    Sub.batch
+        [ Pouch.Ports.getEntries (decodePouchEntries NewEntriesPouch)
+        , Pouch.Ports.newEntry (decodePouchEntry NewEntryPouch)
+        ]
 
 
 
@@ -78,6 +71,7 @@ type Msg
     | LoadEntries
     | LoadEntriesPouch
     | NewEntriesPouch (Result String (List Entry))
+    | NewEntryPouch (Result String Entry)
     | EntryMsg Entry.Msg
     | MapMsg Map.Msg
 
@@ -100,6 +94,19 @@ update msg model =
 
         NewEntriesPouch (Ok entries) ->
             { model | entries = entries } ! [ Cmd.map MapMsg (Map.addMarkers entries) ]
+
+        NewEntryPouch (Err err) ->
+            model ! []
+
+        NewEntryPouch (Ok entry) ->
+            let
+                newEntries =
+                    entry :: model.entries
+
+                nextId =
+                    List.length model.entries
+            in
+                { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarker nextId entry) ]
 
         LoadEntries ->
             ( model, Http.send NewEntries Request.Entry.list )
