@@ -21,7 +21,7 @@ formField inputValue msg inputId labelText inputType descText =
             ]
             []
         , small [ class "f6 black-60 db mb2", id <| inputId ++ "-desc" ]
-            [ text "The word to save." ]
+            [ text descText ]
         ]
 
 
