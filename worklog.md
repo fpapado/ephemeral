@@ -1,6 +1,6 @@
 # TODO
 [X] Prototype local store
-[] Date back in
+[X] Date back in
 [] Abstract away msg and flow for PouchDb
   [] Notify UI when Entry is created
 
@@ -32,6 +32,7 @@ Decide between pages
  |> Routing
 
 # UI
+[] Save after Geo Error anyway?
 [] Refresh/cleanup
 [] "Success" message
 [] Dismiss errors

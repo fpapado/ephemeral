@@ -54,6 +54,7 @@ type Msg
     | Edit Entry
     | SetContent String
     | SetTranslation String
+    | SetLocationTime (Result Geolocation.Error ( Location, Date ))
     | LocationFound (Result Geolocation.Error Location)
     | CreateCompleted (Result Http.Error Entry)
     | EditCompleted (Result Http.Error Entry)
@@ -68,17 +69,23 @@ update msg model =
                     let
                         getLocation =
                             Geolocation.now
-                                |> Task.attempt LocationFound
+
+                        getTime a =
+                            Date.now
+                                |> Task.andThen (\b -> Task.succeed ( a, b ))
+
+                        seq =
+                            getLocation
+                                |> Task.andThen getTime
+                                |> Task.attempt SetLocationTime
                     in
-                        ( model, getLocation )
+                        ( model, seq )
 
                 Just entryId ->
                     update CommitPouch model
 
         CommitPouch ->
-            ( initNew
-            , Request.Entry.createPouch model
-            )
+            ( initNew, Request.Entry.createPouch model )
 
         Commit ->
             case model.editingEntry of
@@ -122,10 +129,26 @@ update msg model =
                 entryLocation =
                     geoToEntryLocation location
             in
-                update CommitPouch { model | location = entryLocation }
+                { model | location = entryLocation } ! []
 
         LocationFound (Err error) ->
             { model | errors = model.errors ++ [ ( Form, "Geolocation error" ) ] } ! []
+
+        SetLocationTime (Ok ( location, addedAt )) ->
+            let
+                entryLocation =
+                    geoToEntryLocation location
+
+                newModel =
+                    { model
+                        | location = entryLocation
+                        , addedAt = addedAt
+                    }
+            in
+                update CommitPouch newModel
+
+        SetLocationTime (Err error) ->
+            { model | errors = model.errors ++ [ ( Form, viewGeoError error ) ] } ! []
 
         CreateCompleted (Ok entry) ->
             initNew ! []
@@ -230,3 +253,16 @@ type alias Error =
 geoToEntryLocation : Location -> EntryLocation
 geoToEntryLocation { latitude, longitude, accuracy } =
     EntryLocation latitude longitude accuracy
+
+
+viewGeoError : Geolocation.Error -> String
+viewGeoError error =
+    case error of
+        Geolocation.PermissionDenied string ->
+            "Permission Denied"
+
+        Geolocation.LocationUnavailable string ->
+            "Location Unavailable"
+
+        Geolocation.Timeout string ->
+            "Location Search Timed Out"
