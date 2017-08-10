@@ -1,19 +1,29 @@
 const webpack = require('webpack');
-var merge = require('webpack-merge');
-var path = require('path');
+const path = require('path');
+const merge = require('webpack-merge');
 
-var CopyWebpackPlugin = require('copy-webpack-plugin');
-var HTMLWebpackPlugin = require('html-webpack-plugin');
-
-var OfflinePlugin = require('offline-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HTMLWebpackPlugin = require('html-webpack-plugin');
+const OfflinePlugin = require('offline-plugin');
 
 var TARGET_ENV = process.env.npm_lifecycle_event === 'prod'
   ? 'production'
   : 'development';
+
 var filename = (TARGET_ENV == 'production')
   ? '[name]-[hash].js'
   : 'index.js';
 
+// -- Offline Plugin --
+let offlinePlugin = new OfflinePlugin({
+  ServiceWorker: {
+    navigateFallbackURL: '/',
+    events: true
+  }
+})
+
+
+// -- Common Config --
 var common = {
   entry: './src/index.js',
   output: {
@@ -97,8 +107,7 @@ if (TARGET_ENV === 'development') {
       new webpack.NamedModulesPlugin(),
       // Prevents compilation errors causing the hot loader to lose state
       new webpack.NoEmitOnErrorsPlugin(),
-
-      new OfflinePlugin()
+      offlinePlugin
     ],
     module: {
       rules: [
@@ -139,7 +148,7 @@ if (TARGET_ENV === 'production') {
         }
       ]),
       new webpack.optimize.UglifyJsPlugin(),
-      new OfflinePlugin()
+      offlinePlugin,
     ],
     module: {
       rules: [
@@ -158,3 +167,4 @@ if (TARGET_ENV === 'production') {
     }
   });
 }
+
