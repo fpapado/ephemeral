@@ -185,7 +185,7 @@ view model =
             else
                 "Save"
     in
-        Html.form [ class "mt3 mb3 black-80", onSubmit Save ]
+        Html.form [ class "black-80", onSubmit Save ]
             [ fieldset [ class "measure ba b--transparent ph0 mh0 center" ]
                 [ formField model.content SetContent "word" "Word" "text" "The word to save."
                 , formField model.translation SetTranslation "translation" "Translation" "text" "The translation for the word."

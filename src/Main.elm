@@ -152,7 +152,7 @@ view : Model -> Html Msg
 view model =
     div [ class "pa3 ph5-ns bg-white" ]
         [ div [ class "mw7-ns center" ]
-            [ div [ class "mv4" ]
+            [ div [ class "mv2 mv4-ns" ]
                 [ viewPage model.pageState
                 ]
             , div [ class "pt3" ]
