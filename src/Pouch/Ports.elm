@@ -5,6 +5,7 @@ port module Pouch.Ports
         , listEntries
         , getEntries
         , newEntry
+        , updatedEntry
         )
 
 import Json.Encode exposing (Value)
@@ -23,3 +24,6 @@ port getEntries : (Value -> msg) -> Sub msg
 
 
 port newEntry : (Value -> msg) -> Sub msg
+
+
+port updatedEntry : (Value -> msg) -> Sub msg

@@ -29,6 +29,7 @@ subscriptions model =
     Sub.batch
         [ Pouch.Ports.getEntries (decodePouchEntries NewEntriesPouch)
         , Pouch.Ports.newEntry (decodePouchEntry NewEntryPouch)
+        , Pouch.Ports.updatedEntry (decodePouchEntry UpdatedEntryPouch)
         ]
 
 
@@ -72,6 +73,7 @@ type Msg
     | LoadEntriesPouch
     | NewEntriesPouch (Result String (List Entry))
     | NewEntryPouch (Result String Entry)
+    | UpdatedEntryPouch (Result String Entry)
     | EntryMsg Entry.Msg
     | MapMsg Map.Msg
 
@@ -103,6 +105,23 @@ update msg model =
                 newEntries =
                     entry :: model.entries
 
+                nextId =
+                    List.length model.entries
+            in
+                { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarker nextId entry) ]
+
+        UpdatedEntryPouch (Err err) ->
+            model ! []
+
+        UpdatedEntryPouch (Ok entry) ->
+            -- NOTE: not updating all fields atm, see Request.EditConfig
+            let
+                newEntries =
+                    entry
+                        :: List.filter (\e -> e.id /= entry.id) model.entries
+
+                -- BUG: This is currently busted since the list ordering changes
+                -- TODO: use Dict for entries, use entry id in Map marker dict
                 nextId =
                     List.length model.entries
             in

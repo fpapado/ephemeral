@@ -81,6 +81,7 @@ app.ports.saveEntry.subscribe((data) => {
     })
     .catch((err) => {
     console.log("Failed to create", err);
+    // TODO: Send back over port that Err error?
   })
 });
 
@@ -99,8 +100,10 @@ app.ports.updateEntry.subscribe((data) => {
 
     return db.put(newDoc);
   }).then((res) => {
-    console.log("Successfully updated", res);
-    // TODO: Send back over port that Ok entryToDecode
+    db.get(res.id).then((doc) => {
+      console.log("Successfully updated", doc);
+      app.ports.updatedEntry.send(doc);
+    })
   }).catch((err) =>{
     console.log("Failed to update", err);
     // TODO: Send back over port that Err error

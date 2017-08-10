@@ -13,6 +13,7 @@
 [X] Abstract away msg and flow for PouchDb
   [X] Notify UI when Entry is created
   [] Notify UI when Entry is updated
+    [] Add markers based on entry.id
   [X] Cmd -> to Pouch
   [X] Sub -> message to Elm -> decode -> Cmd
   [X] Add markers, update list as words are added
@@ -21,11 +22,14 @@
   [] Port architecture
     [] Single port per responsibility, parse on either side?
   [] Redundant create messages in Main, Request.Entry, Page.Entry
+  [] Errors over ports when creation/deletion fails?
 
 [] GeoLocate user on start? with button
 [] "Fly to": Helsinki, My Location
 
 [] Use entry.id instead of indexed map in entries
+[] Use Dict instead of List for entries
+  |> Could probably merge update and new entry Msg at that point?
 
 [] Check SW updates
 
@@ -40,10 +44,10 @@
 
 
 # Base
+Decide which fields are editable
 Abstract Requests API
 Offline detection and queueing
 Localhost usage
-Decide which fields are editable
 Decide between pages
  |> Routing
 
