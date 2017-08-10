@@ -41,10 +41,10 @@ let app = Elm.Main.embed(root);
 let center;
 let markers = {};
 
-mymap.on('move', (evt) => {
-  center = mymap.getCenter();
-  app.ports.getCenter.send([center.lat, center.lng])
-})
+// mymap.on('move', (evt) => {
+//   center = mymap.getCenter();
+//   app.ports.getCenter.send([center.lat, center.lng])
+// })
 
 app.ports.setView.subscribe((data) => {
     mymap.setView.apply(mymap, data);
@@ -59,10 +59,13 @@ app.ports.setMarkers.subscribe((data) => {
 
       marker.bindPopup(popupText);
 
-      if(!markers.hasOwnProperty(id)){
+      if(!markers.hasOwnProperty(id)) {
         marker.addTo(mymap);
+        markers[id] = marker;
       }
-      markers[id] = marker;
+      else {
+        Object.assign(markers[id], marker);
+      }
     })
 });
 
