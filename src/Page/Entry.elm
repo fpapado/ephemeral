@@ -21,7 +21,7 @@ type alias Model =
     , translation : String
     , location : EntryLocation
     , addedAt : Date
-    , editingEntry : Maybe EntryId
+    , editingEntry : Maybe ( EntryId, String )
     }
 
 
@@ -94,7 +94,7 @@ update msg model =
                     in
                         ( model, seq )
 
-                Just entryId ->
+                Just ( entryId, rev ) ->
                     update CommitPouch model
 
         CommitPouch ->
@@ -102,15 +102,15 @@ update msg model =
                 Nothing ->
                     ( initNew, Request.Entry.createPouch model )
 
-                Just eid ->
+                Just ( eid, rev ) ->
                     -- ( initNew, Request.Entry.updatePouch model )
-                    ( initNew, Request.Entry.createPouch model )
+                    ( initNew, Request.Entry.updatePouch eid rev model )
 
         Edit entry ->
             { model
                 | content = entry.content
                 , translation = entry.translation
-                , editingEntry = Just entry.id
+                , editingEntry = Just ( entry.id, entry.rev )
             }
                 ! []
 

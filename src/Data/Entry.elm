@@ -15,6 +15,7 @@ type alias Entry =
     , translation : String
     , type_ : String
     , id : EntryId
+    , rev : String
     }
 
 
@@ -39,6 +40,7 @@ decodeEntry =
         |> required "translation" (Decode.string)
         |> required "type" (Decode.string)
         |> required "_id" entryIdDecoder
+        |> required "_rev" (Decode.string)
 
 
 decodeEntryLocation : Decoder EntryLocation
@@ -78,7 +80,7 @@ type EntryId
 
 idToString : EntryId -> String
 idToString (EntryId id) =
-    toString id
+    id
 
 
 entryIdDecoder : Decoder EntryId

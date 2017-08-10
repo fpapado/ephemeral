@@ -67,11 +67,35 @@ app.ports.setMarkers.subscribe((data) => {
 });
 
 app.ports.saveEntry.subscribe((data) => {
-  console.log(data);
+  console.log("Got entry to create", data);
   let meta = {"type": "entry"};
   let doc = Object.assign(data, meta);
   console.log(doc);
   db.post(doc);
+});
+
+app.ports.updateEntry.subscribe((data) => {
+  console.log("Got entry to update", data);
+
+  let {_id} = data;
+  console.log(_id);
+
+  db.get(_id).then((doc) => {
+    // NOTE: We disregard the _rev from Elm, to be safe
+    let {_rev} = doc;
+
+    let newDoc = Object.assign(doc, data);
+    newDoc._rev = _rev;
+
+    return db.put(newDoc);
+  }).then((res) => {
+    console.log("Successfully updated", res);
+    // TODO: Send back over port that Ok entryToDecode
+  }).catch((err) =>{
+    console.log("Failed to update", err);
+    // TODO: Send back over port that Err error
+  });
+
 });
 
 app.ports.listEntries.subscribe((str) => {

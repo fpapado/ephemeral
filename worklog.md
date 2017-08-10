@@ -7,20 +7,22 @@
 
 [X] Save after Geo Error anyway, with (0, 0)
 
-[] Save revisions
-[] updatePouch (use revision, add subscription to put)
+[X] Save revisions
+[X] updatePouch
 
 [] Abstract away msg and flow for PouchDb
+  [] Cmd -> to Pouch
+  [] Sub -> message to Elm -> decode -> Cmd
   [] Notify UI when Entry is created
+  [] Notify UI when Entry is updated
   [] Add markers, update list as words are added
-
+  [] Full CRUD
+  [] Port architecture
+    [] Single port per responsibility, parse on either side?
 
 [] Check SW updates
 [] Redundant create messages in Main, Request.Entry, Page.Entry
 
-[] Full CRUD
-[] Port architecture
-  [] Single port per responsibility, parse on either side?
 
 [] Clean console logs
 
@@ -45,6 +47,9 @@ Decide between pages
 [] Dismiss errors
 
 # Later
+[] PouchDB Auth
+[] DateTime based id https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
+[] migrations?
 [] Translation Helper
 [] Filtering on PouchDB messages
 [] Save revision of Entry; used for updates
@@ -65,6 +70,7 @@ Decide between pages
 [] View.elm signatures
 [] Figure out where to put encodeEntry, especially b/c of "config" construct (duplicated atm)
 NOTE: A bit redundant to have "pages" atm. It is more like separating the updates, views etc. rather than routes (hence sharing a view in Main)
+[] When doing put(), I disregard the rev from the Elm side, since the get() has the latest already
 
 # Real Data
 Might need to change ordering of id, encoding of floats

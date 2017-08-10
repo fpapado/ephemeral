@@ -1,4 +1,4 @@
-module Request.Entry exposing (list, create, update, createPouch, listPouch, decodeEntryList)
+module Request.Entry exposing (list, create, update, createPouch, updatePouch, listPouch, decodeEntryList)
 
 import Data.Entry as Entry exposing (Entry, EntryId, EntryLocation, encodeEntry, encodeEntryLocation, idToString)
 import Date exposing (Date)
@@ -107,6 +107,23 @@ createPouch config =
                 ]
     in
         Pouch.Ports.saveEntry entry
+
+
+updatePouch : EntryId -> String -> EditConfig record -> Cmd msg
+updatePouch entryId rev config =
+    let
+        id_ =
+            idToString entryId
+
+        entry =
+            Encode.object
+                [ ( "content", Encode.string config.content )
+                , ( "translation", Encode.string config.translation )
+                , ( "_id", Encode.string id_ )
+                , ( "_rev", Encode.string rev )
+                ]
+    in
+        Pouch.Ports.updateEntry entry
 
 
 listPouch : Cmd msg
