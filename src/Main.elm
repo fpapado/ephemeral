@@ -3,7 +3,9 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
+import Views exposing (epButton)
 import Http
+import Task
 import Data.Entry exposing (Entry)
 import Request.Entry exposing (decodePouchEntries, decodePouchEntry)
 import Page.Entry as Entry
@@ -104,9 +106,6 @@ update msg model =
             let
                 newEntries =
                     entry :: model.entries
-
-                nextId =
-                    List.length model.entries
             in
                 { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarker entry) ]
 
@@ -119,11 +118,6 @@ update msg model =
                 newEntries =
                     entry
                         :: List.filter (\e -> e.id /= entry.id) model.entries
-
-                -- BUG: This is currently busted since the list ordering changes
-                -- TODO: use Dict for entries, use entry id in Map marker dict
-                nextId =
-                    List.length model.entries
             in
                 { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarker entry) ]
 
@@ -179,13 +173,30 @@ view model =
     div [ class "pa3 ph5-ns bg-white" ]
         [ div [ class "mw7-ns center" ]
             [ div [ class "mv2 mv4-ns" ]
-                [ viewPage model.pageState
+                [ viewFlight
+                , viewPage model.pageState
                 ]
             , div [ class "pt3" ]
                 [ viewEntries model.entries
                 ]
             ]
         ]
+
+
+viewFlight : Html Msg
+viewFlight =
+    let
+        classNames =
+            "mr3 bg-washed-green near-black"
+    in
+        div [ class "mb1 tc" ]
+            [ epButton [ class classNames, onClick <| MapMsg (Map.SetLatLng ( Map.helsinkiLatLng, 12 )) ]
+                [ text "Helsinki" ]
+            , epButton [ class classNames, onClick <| MapMsg (Map.SetLatLng ( Map.worldLatLng, 1 )) ]
+                [ text "World" ]
+            , epButton [ class classNames, onClick <| MapMsg (Map.GoToCurrentLocation) ]
+                [ text "Current" ]
+            ]
 
 
 viewPage : Page -> Html Msg

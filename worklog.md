@@ -14,10 +14,15 @@
   [X] Notify UI when Entry is created
   [X] Notify UI when Entry is updated
     [X] Add markers based on entry.id
-    [] Properly handle markers on update (delete & reset?)
+    [X] Properly handle markers on update ()
   [X] Cmd -> to Pouch
   [X] Sub -> message to Elm -> decode -> Cmd
   [X] Add markers, update list as words are added
+
+  [] Scroll up on edit
+  [] Cancel button on edit
+  [] Popup for editing?
+
   [] Full CRUD
     [] Delete |> with confirmation message
   [] Port architecture
@@ -25,8 +30,8 @@
   [] Redundant create messages in Main, Request.Entry, Page.Entry
   [] Errors over ports when creation/deletion fails?
 
-[] GeoLocate user on start? with button
-[] "Fly to": Helsinki, My Location
+[] GeoLocate user on start?
+[] "Fly to": Helsinki, World, My Location
 
 [] Use entry.id instead of indexed map in entries
 [] Use Dict instead of List for entries

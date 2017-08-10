@@ -1,10 +1,21 @@
-module Map exposing (Model, Msg, update, addMarkers, addMarker, initModel, Msg(..))
+module Map
+    exposing
+        ( Model
+        , Msg
+        , update
+        , addMarkers
+        , addMarker
+        , initModel
+        , Msg(..)
+        , helsinkiLatLng
+        , worldLatLng
+        )
 
+import Geolocation exposing (Location)
 import Dict exposing (Dict)
-import Data.Entry exposing (idToString)
+import Data.Entry exposing (Entry, idToString)
 import Task
 import Util exposing (viewDate)
-import Data.Entry exposing (Entry)
 import Leaflet.Types exposing (LatLng, ZoomPanOptions, defaultZoomPanOptions, MarkerOptions, defaultMarkerOptions)
 import Leaflet.Ports
 
@@ -29,8 +40,15 @@ helsinkiLatLng =
     ( 60.1719, 24.9414 )
 
 
+worldLatLng : LatLng
+worldLatLng =
+    ( 0.0, 0.0 )
+
+
 type Msg
-    = SetLatLng LatLng
+    = SetLatLng ( LatLng, Int )
+    | SetToCurrent (Result Geolocation.Error Location)
+    | GoToCurrentLocation
     | GetCenter LatLng
     | AddMarker ( String, LatLng, String )
 
@@ -38,9 +56,9 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        SetLatLng latLng ->
+        SetLatLng ( latLng, zoom ) ->
             ( { model | latLng = latLng }
-            , Leaflet.Ports.setView ( latLng, 13, model.zoomPanOptions )
+            , Leaflet.Ports.setView ( latLng, zoom, model.zoomPanOptions )
             )
 
         AddMarker ( id, latLng, popupText ) ->
@@ -54,6 +72,20 @@ update msg model =
 
         GetCenter latLng ->
             { model | latLng = latLng } ! []
+
+        SetToCurrent (Ok { latitude, longitude }) ->
+            update (SetLatLng ( ( latitude, longitude ), 12 )) model
+
+        SetToCurrent (Err error) ->
+            update (SetLatLng ( ( 0, 0 ), 1 )) model
+
+        GoToCurrentLocation ->
+            let
+                geoTask =
+                    Geolocation.now
+                        |> Task.attempt SetToCurrent
+            in
+                model ! [ geoTask ]
 
 
 addMarkerToModel : ( String, LatLng, String ) -> Model -> Model
