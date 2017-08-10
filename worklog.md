@@ -1,18 +1,24 @@
 # TODO
-[X] Prototype local store
-[X] Date back in
+[X] Webpack
+[X] Demo dist
+
+[] Service worker caching
+
 [] Abstract away msg and flow for PouchDb
   [] Notify UI when Entry is created
 
-[] Clean console logs
-[] Redundant create messages in Main, Request.Entry
 
-[] Webpack
+[] Redundant create messages in Main, Request.Entry, Page.Entry
+
+[] Add markers, update list as words are added
+
+[] Clean console logs
+
 [] Routing with pages:
   [] List (map + items; current Main)
   [] Entry.Editor
   [] Entry.New
-[] Add markers as words are added
+
 
 # How to work offline
 ## Manual / optimistic
@@ -51,7 +57,7 @@ Decide between pages
 
 # Dev
 Consider elm and elm-live dev dependencies
-NPM scripts for building, starting elm-live
+[X] NPM scripts for building, starting elm-live
 
 # Refactoring
 [] Figure out where to put encodeEntry, especially b/c of "config" construct (duplicated atm)

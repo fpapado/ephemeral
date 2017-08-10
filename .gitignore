@@ -3,3 +3,4 @@ repl-temp-*
 node_modules/
 
 elm.js
+dist

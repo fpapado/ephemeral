@@ -1,10 +1,22 @@
-let root = document.getElementById('root');
+'use strict';
+
+import L from 'leaflet';
+import PouchDB from 'pouchdb-browser';
+
+require("./assets/css/styles.css");
+
+const Elm = require('./Main');
+
+window.PouchDB = PouchDB;
+let db = new PouchDB('ephemeral');
 
 let mymap = L.map('mapid').setView([60.1719, 24.9414], 12);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mymap);
 
+let root = document.getElementById('root');
 let app = Elm.Main.embed(root);
 
+// -- Port Subscriptions --
 let center;
 let markers = {};
 
@@ -32,8 +44,6 @@ app.ports.setMarkers.subscribe((data) => {
       markers[id] = marker;
     })
 });
-
-var db = new PouchDB('ephemeral')
 
 app.ports.saveEntry.subscribe((data) => {
   console.log(data);
