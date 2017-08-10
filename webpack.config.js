@@ -16,6 +16,19 @@ var filename = (TARGET_ENV == 'production')
 
 // -- Offline Plugin --
 let offlinePlugin = new OfflinePlugin({
+  safeToUseOptionalCaches: true,
+
+  caches: {
+    main: [':rest:'],
+    additional: [':externals:']
+  },
+
+  externals: [
+    'https://unpkg.com/leaflet@1.2.0/dist/leaflet.css',
+    'https://unpkg.com/tachyons@4.7.0/css/tachyons.min.css',
+    'https://fonts.googleapis.com/css?family=Pacifico'
+  ],
+
   ServiceWorker: {
     navigateFallbackURL: '/',
     events: true
@@ -44,7 +57,7 @@ var common = {
       path.join(__dirname, "src"),
       "node_modules"
     ],
-    extensions: ['.js', '.elm', '.scss', '.png']
+    extensions: ['.js', '.elm', '.css', '.scss', '.png']
   },
   module: {
     // noParse: /(lie|pouchdb|pouchdb-browser)\.js$/,

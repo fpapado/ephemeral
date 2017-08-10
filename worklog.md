@@ -41,6 +41,7 @@ Decide between pages
  |> Routing
 
 # UI
+[] Html.lazy2
 [] Refresh/cleanup
 [] "Success" message
 [] Dismiss errors
