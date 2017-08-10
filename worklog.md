@@ -1,10 +1,27 @@
 # TODO
-[] Prototype local store
+[X] Prototype local store
+[] Date back in
+[] Abstract away msg and flow for PouchDb
+  [] Notify UI when Entry is created
+
+[] Clean console logs
+[] Redundant create messages in Main, Request.Entry
+
+[] Webpack
 [] Routing with pages:
   [] List (map + items; current Main)
   [] Entry.Editor
   [] Entry.New
 [] Add markers as words are added
+
+# How to work offline
+## Manual / optimistic
+Always try to save online, add to queue and sync otherwise
+  |> Would this be too much to track? We'd need ports etc. anyway, and to handle IndexedDB
+    |> At that point, might as well use Pouch?
+
+## PouchDB
+I could "just" wrap PouchDB and treat it as my store, letting it do its thing
 
 # Base
 Abstract Requests API
@@ -20,6 +37,9 @@ Decide between pages
 [] Dismiss errors
 
 # Later
+[] Filtering on PouchDB messages
+[] Save revision of Entry; used for updates
+[] Timestamp for ID?
 [] Full CRUD
 [] Authorization & Authentication
 [] Location picker

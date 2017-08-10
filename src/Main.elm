@@ -5,11 +5,13 @@ import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
 import Http
 import Data.Entry exposing (Entry)
-import Date exposing (Date)
 import Request.Entry
 import Page.Entry as Entry
 import Map as Map
 import Util exposing (viewDate)
+import Pouch.Ports
+import Json.Encode exposing (Value)
+import Json.Decode as Decode
 
 
 main : Program Never Model Msg
@@ -18,8 +20,22 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = subscriptions
         }
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Pouch.Ports.getEntries (decodePouchEntries)
+
+
+decodePouchEntries : Value -> Msg
+decodePouchEntries entries =
+    let
+        result =
+            Decode.decodeValue (Decode.list (Data.Entry.decodeEntry)) entries
+    in
+        NewEntriesPouch result
 
 
 
@@ -48,7 +64,7 @@ emptyModel =
 
 init : ( Model, Cmd Msg )
 init =
-    ( emptyModel, Http.send NewEntries Request.Entry.list )
+    ( emptyModel, Request.Entry.listPouch )
 
 
 
@@ -59,13 +75,15 @@ type Msg
     = NoOp
     | NewEntries (Result Http.Error (List Entry))
     | LoadEntries
+    | LoadEntriesPouch
+    | NewEntriesPouch (Result String (List Entry))
     | EntryMsg Entry.Msg
     | MapMsg Map.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
+    case Debug.log "msg" msg of
         -- Messages that exist for all "pages"
         NoOp ->
             model ! []
@@ -76,8 +94,17 @@ update msg model =
         NewEntries (Ok entries) ->
             { model | entries = entries } ! [ Cmd.map MapMsg (Map.addMarkers entries) ]
 
+        NewEntriesPouch (Err err) ->
+            model ! []
+
+        NewEntriesPouch (Ok entries) ->
+            { model | entries = entries } ! [ Cmd.map MapMsg (Map.addMarkers entries) ]
+
         LoadEntries ->
             ( model, Http.send NewEntries Request.Entry.list )
+
+        LoadEntriesPouch ->
+            ( model, Pouch.Ports.listEntries "entry" )
 
         MapMsg msg ->
             -- more ad-hoc for Map messages, since we might want map to be co-located
@@ -125,7 +152,7 @@ view model =
     div [ class "pa5 min-vh-100 bg-white" ]
         [ div [ class "mw7-ns center" ]
             [ viewPage model.pageState
-            , button [ onClick LoadEntries ] [ text "Fetch Entries" ]
+            , button [ onClick LoadEntriesPouch ] [ text "Fetch Entries" ]
             , viewEntries model.entries
             ]
         ]

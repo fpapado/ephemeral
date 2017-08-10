@@ -9,10 +9,11 @@ import Json.Decode.Pipeline as Pipeline exposing (decode, required)
 
 
 type alias Entry =
-    { content : String
-    , translation : String
-    , addedAt : Date
+    { addedAt : Date
+    , content : String
     , location : EntryLocation
+    , translation : String
+    , type_ : String
     , id : EntryId
     }
 
@@ -30,12 +31,14 @@ type alias EntryLocation =
 
 decodeEntry : Decoder Entry
 decodeEntry =
+    -- PouchDB has these things sorted alphabetically
     decode Entry
-        |> required "content" (Decode.string)
-        |> required "translation" (Decode.string)
         |> required "added_at" (Json.Decode.Extra.date)
+        |> required "content" (Decode.string)
         |> required "location" (decodeEntryLocation)
-        |> required "id" entryIdDecoder
+        |> required "translation" (Decode.string)
+        |> required "type" (Decode.string)
+        |> required "_id" entryIdDecoder
 
 
 decodeEntryLocation : Decoder EntryLocation
@@ -70,7 +73,7 @@ encodeEntryLocation record =
 
 
 type EntryId
-    = EntryId Int
+    = EntryId String
 
 
 idToString : EntryId -> String
@@ -80,4 +83,4 @@ idToString (EntryId id) =
 
 entryIdDecoder : Decoder EntryId
 entryIdDecoder =
-    Decode.map EntryId Decode.int
+    Decode.map EntryId Decode.string

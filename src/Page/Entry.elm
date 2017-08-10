@@ -50,6 +50,7 @@ initLocation =
 type Msg
     = Save
     | Commit
+    | CommitPouch
     | Edit Entry
     | SetContent String
     | SetTranslation String
@@ -72,7 +73,12 @@ update msg model =
                         ( model, getLocation )
 
                 Just entryId ->
-                    update Commit model
+                    update CommitPouch model
+
+        CommitPouch ->
+            ( initNew
+            , Request.Entry.createPouch model
+            )
 
         Commit ->
             case model.editingEntry of
@@ -116,7 +122,7 @@ update msg model =
                 entryLocation =
                     geoToEntryLocation location
             in
-                update Commit { model | location = entryLocation }
+                update CommitPouch { model | location = entryLocation }
 
         LocationFound (Err error) ->
             { model | errors = model.errors ++ [ ( Form, "Geolocation error" ) ] } ! []

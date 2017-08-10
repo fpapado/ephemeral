@@ -32,3 +32,24 @@ app.ports.setMarkers.subscribe((data) => {
       markers[id] = marker;
     })
 });
+
+var db = new PouchDB('ephemeral')
+
+app.ports.saveEntry.subscribe((data) => {
+  console.log(data);
+  let meta = {"type": "entry"};
+  let doc = Object.assign(data, meta);
+  console.log(doc);
+  db.post(doc);
+});
+
+app.ports.listEntries.subscribe((str) => {
+  console.log("Will list entries");
+  let docs = db.allDocs({include_docs: true})
+    .then(docs => {
+      let entries = docs.rows.map(row => row.doc);
+      console.log("Listing entries", entries);
+
+      app.ports.getEntries.send(entries);
+    });
+});

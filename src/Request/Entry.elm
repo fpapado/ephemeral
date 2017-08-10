@@ -1,4 +1,4 @@
-module Request.Entry exposing (list, create, update)
+module Request.Entry exposing (list, create, update, createPouch, listPouch, decodeEntryList)
 
 import Data.Entry as Entry exposing (Entry, EntryId, EntryLocation, encodeEntry, encodeEntryLocation, idToString)
 import Date exposing (Date)
@@ -8,6 +8,7 @@ import HttpBuilder exposing (RequestBuilder, withExpect, withQueryParams, withBo
 import Json.Decode as Decode
 import Json.Encode as Encode exposing (Value)
 import Request.Helpers exposing (apiUrl)
+import Pouch.Ports
 
 
 -- LIST --
@@ -17,7 +18,7 @@ list : Http.Request (List Entry)
 list =
     apiUrl ("/notes/")
         |> HttpBuilder.get
-        |> HttpBuilder.withExpect (Http.expectJson (Decode.list Entry.decodeEntry))
+        |> HttpBuilder.withExpect (Http.expectJson decodeEntryList)
         |> HttpBuilder.toRequest
 
 
@@ -88,3 +89,31 @@ update entryId config =
             |> withBody body
             |> withExpect expect
             |> HttpBuilder.toRequest
+
+
+
+-- CREATE POUCH --
+
+
+createPouch : CreateConfig record -> Cmd msg
+createPouch config =
+    let
+        entry =
+            Encode.object
+                [ ( "content", Encode.string config.content )
+                , ( "translation", Encode.string config.translation )
+                , ( "added_at", Encode.string <| utcIsoString config.addedAt )
+                , ( "location", encodeEntryLocation config.location )
+                ]
+    in
+        Pouch.Ports.saveEntry entry
+
+
+listPouch : Cmd msg
+listPouch =
+    Pouch.Ports.listEntries "list"
+
+
+decodeEntryList : Decode.Decoder (List Entry)
+decodeEntryList =
+    Decode.list (Entry.decodeEntry)
