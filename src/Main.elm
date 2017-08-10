@@ -152,9 +152,12 @@ view : Model -> Html Msg
 view model =
     div [ class "pa3 ph5-ns bg-white" ]
         [ div [ class "mw7-ns center" ]
-            [ viewPage model.pageState
-            , epButton [ onClick LoadEntriesPouch ] [ text "Fetch Entries" ]
-            , viewEntries model.entries
+            [ div [ class "mv4" ]
+                [ viewPage model.pageState
+                ]
+            , div [ class "pt3" ]
+                [ viewEntries model.entries
+                ]
             ]
         ]
 
@@ -173,15 +176,22 @@ viewPage page =
 
 viewEntries : List Entry -> Html Msg
 viewEntries entries =
-    div [] <| List.map viewEntry entries
+    if entries /= [] then
+        div [] <| List.map viewEntry entries
+    else
+        div [ class "pa4 mb3 bg-lightest-blue tc f5" ]
+            [ span [ class "dark-gray" ]
+                [ text "Looks like you don't have any entries yet. Why don't you add one? :)"
+                ]
+            ]
 
 
 viewEntry : Entry -> Html Msg
 viewEntry entry =
-    div [ class "pa3 mb3 bg-light-blue" ]
+    div [ class "pa3 mb3 bg-lightest-blue near-black" ]
         [ span [ class "db mb1" ] [ text entry.content ]
         , span [ class "db mb1" ] [ text entry.translation ]
         , span [ class "db tr" ] [ text <| viewDate entry.addedAt ]
         , span [ class "db tr" ] [ text <| toString entry.location.longitude ++ ", " ++ toString entry.location.latitude ]
-        , a [ class "dib link bb bw2 white pointer", onClick (EntryMsg (Entry.Edit entry)) ] [ text "edit" ]
+        , a [ class "dib link bb bw1 dark-gray pointer", onClick (EntryMsg (Entry.Edit entry)) ] [ text "edit" ]
         ]

@@ -5,16 +5,22 @@
 [X] SW tachyons etc.
 [X] Manifest file
 
-[] Save after Geo Error anyway, with (0, 0)
+[X] Save after Geo Error anyway, with (0, 0)
+
+[] Save revisions
+[] updatePouch (use revision, add subscription to put)
 
 [] Abstract away msg and flow for PouchDb
   [] Notify UI when Entry is created
   [] Add markers, update list as words are added
-[] Save revisions
-[] Full CRUD
 
 
+[] Check SW updates
 [] Redundant create messages in Main, Request.Entry, Page.Entry
+
+[] Full CRUD
+[] Port architecture
+  [] Single port per responsibility, parse on either side?
 
 [] Clean console logs
 
@@ -39,6 +45,7 @@ Decide between pages
 [] Dismiss errors
 
 # Later
+[] Translation Helper
 [] Filtering on PouchDB messages
 [] Save revision of Entry; used for updates
 [] Timestamp for ID?
