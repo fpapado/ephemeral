@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onSubmit)
 import Http
+import Views exposing (formField, epButton)
 import Request.Entry
 import Date exposing (Date)
 import Task
@@ -180,37 +181,10 @@ view model =
                 "Save"
     in
         Html.form [ class "mt3 mb3 black-80", onSubmit Save ]
-            [ fieldset [ class "measure ba b--transparent ph0 mh0" ]
-                [ div []
-                    [ label [ class "f6 b db mv2", for "word" ] [ text "Word " ]
-                    , input
-                        [ attribute "aria-describedby" "word-desc"
-                        , value model.content
-                        , class "input-reset ba b--black-20 pa2 mb2 db w-100"
-                        , id "name"
-                        , type_ "text"
-                        , onInput SetContent
-                        ]
-                        []
-                    , small [ class "f6 black-60 db mb2", id "word-desc" ]
-                        [ text "The word to save." ]
-                    ]
-                , div [ class "mt3" ]
-                    [ label [ class "f6 b db mb2", for "translation" ] [ text "Translation " ]
-                    , input
-                        [ attribute "aria-describedby" "tranlsation-desc"
-                        , value model.translation
-                        , class "input-reset ba b--black-20 pa2 mb2 db w-100"
-                        , id "name"
-                        , type_ "text"
-                        , onInput SetTranslation
-                        ]
-                        []
-                    , small [ class "f6 black-60 db mb2", id "translation-desc" ]
-                        [ text "The translation for the word." ]
-                    ]
-                , button [ class "f6 link dim ph3 pv2 mt3 mb2 dib white bg-dark-blue bw0" ]
-                    [ text saveButtonText ]
+            [ fieldset [ class "measure ba b--transparent ph0 mh0 center" ]
+                [ formField model.content SetContent "word" "Word" "text" "The word to save."
+                , formField model.translation SetTranslation "translation" "Translation" "text" "The translation for the word."
+                , epButton [] [ text saveButtonText ]
                 , viewIf (model.errors /= []) (viewErrors model.errors)
                 ]
             ]

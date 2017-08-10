@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
 import Http
+import Views exposing (epButton)
 import Data.Entry exposing (Entry)
 import Request.Entry
 import Page.Entry as Entry
@@ -152,7 +153,7 @@ view model =
     div [ class "pa3 ph5-ns min-vh-100 bg-white" ]
         [ div [ class "mw7-ns center" ]
             [ viewPage model.pageState
-            , button [ onClick LoadEntriesPouch ] [ text "Fetch Entries" ]
+            , epButton [ onClick LoadEntriesPouch ] [ text "Fetch Entries" ]
             , viewEntries model.entries
             ]
         ]

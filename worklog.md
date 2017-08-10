@@ -5,8 +5,6 @@
 [X] SW tachyons etc.
 [X] Manifest file
 
-[] Critical CSS
-
 [] Save after Geo Error anyway, with (0, 0)
 
 [] Abstract away msg and flow for PouchDb
@@ -23,15 +21,6 @@
   [] Entry.Editor
   [] Entry.New
 
-
-# How to work offline
-## Manual / optimistic
-Always try to save online, add to queue and sync otherwise
-  |> Would this be too much to track? We'd need ports etc. anyway, and to handle IndexedDB
-    |> At that point, might as well use Pouch?
-
-## PouchDB
-I could "just" wrap PouchDB and treat it as my store, letting it do its thing
 
 # Base
 Abstract Requests API
@@ -57,15 +46,25 @@ Decide between pages
 [] Export to Anki
 [] Merge markers and Entries?
 [] Filter based on date, range
+[] Critical CSS
 [X] Leaflet integration
 
 # Dev
-Consider elm and elm-live dev dependencies
 [X] NPM scripts for building, starting elm-live
 
 # Refactoring
+[] View.elm signatures
 [] Figure out where to put encodeEntry, especially b/c of "config" construct (duplicated atm)
 NOTE: A bit redundant to have "pages" atm. It is more like separating the updates, views etc. rather than routes (hence sharing a view in Main)
 
 # Real Data
 Might need to change ordering of id, encoding of floats
+
+# How to work offline
+## Manual / optimistic
+Always try to save online, add to queue and sync otherwise
+  |> Would this be too much to track? We'd need ports etc. anyway, and to handle IndexedDB
+    |> At that point, might as well use Pouch?
+
+## PouchDB
+I could "just" wrap PouchDB and treat it as my store, letting it do its thing

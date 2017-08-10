@@ -135,8 +135,8 @@ if (TARGET_ENV === 'development') {
       // Suggested for hot-loading
       new webpack.NamedModulesPlugin(),
       // Prevents compilation errors causing the hot loader to lose state
-      new webpack.NoEmitOnErrorsPlugin(),
-      offlinePlugin
+      new webpack.NoEmitOnErrorsPlugin()
+      // , offlinePlugin
     ],
     module: {
       rules: [
@@ -196,4 +196,3 @@ if (TARGET_ENV === 'production') {
     }
   });
 }
-
