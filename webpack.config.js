@@ -1,8 +1,11 @@
 const webpack = require('webpack');
 var merge = require('webpack-merge');
+var path = require('path');
+
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var HTMLWebpackPlugin = require('html-webpack-plugin');
-var path = require('path');
+
+var OfflinePlugin = require('offline-plugin');
 
 var TARGET_ENV = process.env.npm_lifecycle_event === 'prod'
   ? 'production'
@@ -18,12 +21,14 @@ var common = {
     // add hash when building for production
     filename: filename
   },
-  plugins: [new HTMLWebpackPlugin({
+  plugins: [
+    new HTMLWebpackPlugin({
     // using .ejs prevents other loaders causing errors
     template: 'src/index.ejs',
     // inject details of output file at end of body
     inject: 'body'
-  })],
+    })
+  ],
   resolve: {
     modules: [
       path.join(__dirname, "src"),
@@ -91,7 +96,9 @@ if (TARGET_ENV === 'development') {
       // Suggested for hot-loading
       new webpack.NamedModulesPlugin(),
       // Prevents compilation errors causing the hot loader to lose state
-      new webpack.NoEmitOnErrorsPlugin()
+      new webpack.NoEmitOnErrorsPlugin(),
+
+      new OfflinePlugin()
     ],
     module: {
       rules: [
@@ -131,7 +138,8 @@ if (TARGET_ENV === 'production') {
           from: 'src/assets'
         }
       ]),
-      new webpack.optimize.UglifyJsPlugin()
+      new webpack.optimize.UglifyJsPlugin(),
+      new OfflinePlugin()
     ],
     module: {
       rules: [

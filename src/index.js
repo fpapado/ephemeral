@@ -2,8 +2,11 @@
 
 import L from 'leaflet';
 import PouchDB from 'pouchdb-browser';
+import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 
-require("./assets/css/styles.css");
+require('./assets/css/styles.css');
+
+OfflinePluginRuntime.install();
 
 const Elm = require('./Main');
 

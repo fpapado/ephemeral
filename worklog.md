@@ -2,11 +2,14 @@
 [X] Webpack
 [X] Demo dist
 
-[] Service worker caching
+[X] Service worker caching
+
+[] SW tachyons etc.
+
+[] Save after Geo Error anyway, with (0, 0)
 
 [] Abstract away msg and flow for PouchDb
   [] Notify UI when Entry is created
-
 
 [] Redundant create messages in Main, Request.Entry, Page.Entry
 
@@ -38,7 +41,6 @@ Decide between pages
  |> Routing
 
 # UI
-[] Save after Geo Error anyway?
 [] Refresh/cleanup
 [] "Success" message
 [] Dismiss errors

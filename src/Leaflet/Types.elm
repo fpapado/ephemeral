@@ -61,7 +61,7 @@ type alias IconOptions =
 
 leafletDistributionBase : String
 leafletDistributionBase =
-    "https://unpkg.com/leaflet@1.0.0-rc.3/dist/images/"
+    "https://unpkg.com/leaflet@1.2.0/dist/images/"
 
 
 iconUrl : String -> String
@@ -77,7 +77,7 @@ defaultIconOptions =
     , iconAnchor = ( 12, 41 )
     , shadowUrl = iconUrl "marker-shadow.png"
     , shadowRetinaUrl =
-        iconUrl "marker-shadow-2x.png"
+        iconUrl "marker-shadow.png"
 
     -- Really just guessing here, doesn't appear to be set by default?
     , shadowSize = ( 41, 41 )
