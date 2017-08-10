@@ -5,6 +5,7 @@ const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const OfflinePlugin = require('offline-plugin');
+var WebpackPwaManifest = require('webpack-pwa-manifest')
 
 var TARGET_ENV = process.env.npm_lifecycle_event === 'prod'
   ? 'production'
@@ -33,8 +34,22 @@ let offlinePlugin = new OfflinePlugin({
     navigateFallbackURL: '/',
     events: true
   }
-})
+});
 
+// -- PWA Manifest --
+let pwaPlugin = new WebpackPwaManifest({
+  name: 'Ephemeral',
+  short_name: 'Ephemeral',
+  description: 'Save words and translations when you see them!',
+  background_color: '#A5DBF7',
+  theme_color: '#A5DBF7',
+  icons: [
+    {
+      src: path.resolve('src/assets/icon.png'),
+      sizes: [96, 128, 192, 256, 384, 512] // multiple sizes
+    },
+  ]
+});
 
 // -- Common Config --
 var common = {
@@ -50,7 +65,8 @@ var common = {
     template: 'src/index.ejs',
     // inject details of output file at end of body
     inject: 'body'
-    })
+    }),
+    pwaPlugin
   ],
   resolve: {
     modules: [

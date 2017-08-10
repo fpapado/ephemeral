@@ -1,10 +1,11 @@
 # TODO
 [X] Webpack
 [X] Demo dist
-
 [X] Service worker caching
+[X] SW tachyons etc.
+[X] Manifest file
 
-[] SW tachyons etc.
+[] Critical CSS
 
 [] Save after Geo Error anyway, with (0, 0)
 
