@@ -18,6 +18,14 @@
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.shadow-button {
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 0.2);
+}
+
+.shadow-button:focus {
+  box-shadow: 0px -2px 0px rgba(0, 0, 0, 0.2);
+}
+
 .bg-beige-gray  {
   background-color: #EDE4DF;
 }
@@ -39,7 +47,11 @@
 }
 
 .bg-muted-blue {
-  background-color: #698EBA;
+  background-color: rgb(72, 122, 172);
+}
+
+.bg-gray-blue {
+  background-color: #3d7ab2;
 }
 
 .main-blue {
@@ -47,7 +59,23 @@
 }
 
 .muted-blue {
-  color: #698EBA;
+  color: rgb(72, 122, 172);
+}
+
+.sharp-blue {
+  color: #37A4D5;
+}
+
+.deep-blue {
+  color: #1556A3;
+}
+
+.beige-gray  {
+  color: #EDE4DF;
+}
+
+.beige-gray-2  {
+  color: #E3E2E4;
 }
 
 /*!

@@ -184,7 +184,7 @@ viewFlight : Html Msg
 viewFlight =
     let
         classNames =
-            "mr3 bg-muted-blue white pointer"
+            "mr3 bg-beige-gray deep-blue pointer fw6 shadow-button"
     in
         div [ class "mb2 tc" ]
             [ epButton [ class classNames, onClick <| MapMsg (Map.SetLatLng ( Map.helsinkiLatLng, 12 )) ]
@@ -237,7 +237,7 @@ viewEntry entry =
             , hr
                 [ class "w-100 mt4 mb3 bb bw1 b--black-10" ]
                 []
-            , div [ class "near-white f6 f5-ns" ]
+            , div [ class "white f6 f5-ns" ]
                 [ span [ class "db mb2 tr truncate" ] [ text <| viewDate entry.addedAt ]
                 , span [ class "db mb1 tr truncate" ] [ text <| toString entry.location.latitude ++ ", " ]
                 , span [ class "db tr truncate" ] [ text <| toString entry.location.longitude ]
