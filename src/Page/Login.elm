@@ -123,7 +123,8 @@ view : Model -> Html Msg
 view model =
     Html.form [ class "black-80", onSubmit SubmitForm ]
         [ fieldset [ class "measure ba b--transparent pa0 ma0 center" ]
-            [ formField model.username SetUsername "username" "Username" "text" "Your username."
+            [ p [ class "lh-copy f5 mb3 black-80" ] [ text "Logging in allows automatic syncing of your files to a remote database. Files on your device are persisted between visits even without logging in, but you might want the backup. Currently, signups are not active, but we're working on it :)" ]
+            , formField model.username SetUsername "username" "Username" "text" "Your username."
             , formField model.password SetPassword "password" "Password" "password" "Your password."
             , epButton [ class "w-100 white bg-deep-blue" ] [ text "Log In" ]
             , viewIf (model.errors /= []) (viewErrors model.errors)

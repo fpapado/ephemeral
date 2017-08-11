@@ -9,7 +9,7 @@ import Request.Entry exposing (decodePouchEntries, decodePouchEntry)
 import Page.Entry as Entry
 import Page.Login as Login exposing (User)
 import Map as Map
-import Util exposing (viewDate)
+import Util exposing (viewDate, viewIf)
 import Pouch.Ports
 import Json.Encode as Encode
 
@@ -208,7 +208,7 @@ view model =
             [ div [ class "mw7-ns center" ]
                 [ div [ class "mb2 mb4-ns" ]
                     [ viewFlight
-                    , viewPage model.pageState
+                    , viewPage model model.pageState
                     ]
                 , div [ class "pt3" ]
                     [ viewEntries model.entries
@@ -267,20 +267,33 @@ viewFlight =
             ]
 
 
-viewPage : Page -> Html Msg
-viewPage page =
+viewPage : Model -> Page -> Html Msg
+viewPage model page =
     -- Pass things to page's view
     case page of
         Blank ->
             Html.text ""
 
         Login subModel ->
-            Login.view subModel
-                |> Html.map LoginMsg
+            viewLoginLogout model.loggedIn subModel
 
         Entry subModel ->
             Entry.view subModel
                 |> Html.map EntryMsg
+
+
+viewLoginLogout : Maybe User -> Login.Model -> Html Msg
+viewLoginLogout loggedIn subModel =
+    case loggedIn of
+        Just user ->
+            div [ class "mt2 measure center" ]
+                [ p [ class "lh-copy f5 mb3 black-80" ] [ text "Note that logging out does not delete your local files. If you log in again, then the database will attempt to synchronise with the remote. This may or may not be what you intend." ]
+                , epButton [ class "w-100 white bg-deep-blue" ] [ text "Log Out" ]
+                ]
+
+        Nothing ->
+            Login.view subModel
+                |> Html.map LoginMsg
 
 
 viewEntries : List Entry -> Html Msg

@@ -28,7 +28,7 @@ formField inputValue msg inputId labelText inputType descText =
 epButton : List (Attribute msg) -> List (Html msg) -> Html msg
 epButton attributes children =
     button
-        ((class "f6 link dim pa3 dib bg-dark-blue bw0 br1")
+        ((class "f6 link dim pa3 dib bg-dark-blue bw0 br1 pointer")
             :: attributes
         )
         children

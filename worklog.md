@@ -7,10 +7,12 @@
     |> View on top
     |> [X] LogIn -> port LogIn,
        [X] sub LoggedIn -> LoggedIn,
-       [] LogOut -> port LogOut,
-       [] sub LoggedOut ->LoggedOut
        [] Show "log out" if user
-       [] (UI/UX) "Logging in is optional, just tap..." explanation on click
+       [] (UI/UX) "Logging in is optional, just tap" explanation on click
+       [] LogOut -> port LogOut,
+       [] sub LoggedOut -> LoggedOut
+       [] CheckAuth periodically?
+       [] loggedOut port message on checkAuth no user found
   [X] Session storage/retrieval on reload?
     [X] Try getSession on init
     [N/A] Subscribe to cookie/store changes on key?
