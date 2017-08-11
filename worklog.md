@@ -6,12 +6,14 @@
   [X] Integrate login/logout and tracking in Elm
     |> View on top
     |> [X] LogIn -> port LogIn,
-       [X] LogOut -> port LogOut,
        [X] sub LoggedIn -> LoggedIn,
-       [X] sub LoggedOut ->LoggedOut
-  [] Session storage/retrieval on reload?
-    [] Try getUser on init?
-    [] Subscribe to cookie/store changes on key?
+       [] LogOut -> port LogOut,
+       [] sub LoggedOut ->LoggedOut
+       [] Show "log out" if user
+       [] (UI/UX) "Logging in is optional, just tap..." explanation on click
+  [X] Session storage/retrieval on reload?
+    [X] Try getSession on init
+    [N/A] Subscribe to cookie/store changes on key?
   [] Configure url based on environment
   [] Cloudant remotely
   [] Handle all sync events (e.g. "pull" _deleted_: true)
@@ -38,10 +40,14 @@
   [] Upsert https://pouchdb.com/guides/conflicts.html
   [] Conflict resolution
   [] Error handling for Pouch
+    [] Particularly, replication errors over ports
+      [] On JS: filter, send on port
+      [] On elm: accept { error: String } on port, display
+        [] Dismissable
 
 
 [] Signup?
-  [] Need the db-per-user strategy
+  [] Need the db-per-user strategy?
 
 [] Handle errors from ports (Entry changes, Login)
   [] How?
@@ -92,10 +98,12 @@ Decide between pages
   [LATER] Flip view for cards
   [LATER] Show/collapse information for cards etc.
 
+[] About page
 [] Spider spread for map
 [] Html.lazy2
 
 # Later
+[] More info on User, getUser() when checking auth
 [] PouchDB Auth
 [] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
 [] migrations?

@@ -7,6 +7,7 @@ port module Pouch.Ports
         , newEntry
         , updatedEntry
         , sendLogin
+        , checkAuthState
         , logIn
         )
 
@@ -23,6 +24,9 @@ port updateEntry : Json.Encode.Value -> Cmd msg
 
 
 port sendLogin : Json.Encode.Value -> Cmd msg
+
+
+port checkAuthState : String -> Cmd msg
 
 
 port getEntries : (Value -> msg) -> Sub msg

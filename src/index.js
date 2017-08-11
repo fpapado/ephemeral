@@ -114,6 +114,27 @@ app.ports.sendLogin.subscribe(user => {
     });
 });
 
+app.ports.checkAuthState.subscribe(data => {
+  console.log('Checking Auth');
+  remoteDB
+    .getSession()
+    .then(res => {
+      if (!res.userCtx.name) {
+        console.log('No user logged in', res);
+        // TODO
+        // app.ports.logOut.send({});
+      } else {
+        console.log('User is logged in', res);
+        let { name } = res.userCtx;
+        // TODO: in the future, will need to add more info
+        app.ports.logIn.send({ username: name });
+      }
+    })
+    .catch(err => {
+      console.log('Error checking Auth', err);
+    });
+});
+
 app.ports.setView.subscribe(data => {
   mymap.setView.apply(mymap, data);
 });

@@ -11,6 +11,7 @@ import Page.Login as Login exposing (User)
 import Map as Map
 import Util exposing (viewDate)
 import Pouch.Ports
+import Json.Encode as Encode
 
 
 main : Program Never Model Msg
@@ -64,7 +65,12 @@ emptyModel =
 
 init : ( Model, Cmd Msg )
 init =
-    ( emptyModel, Request.Entry.list )
+    ( emptyModel
+    , Cmd.batch
+        [ Request.Entry.list
+        , Pouch.Ports.checkAuthState "check"
+        ]
+    )
 
 
 
