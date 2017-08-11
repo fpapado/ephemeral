@@ -39,7 +39,7 @@ avatar name =
     div
         [ class "flex items-center justify-center" ]
         [ img
-            [ src "http://tachyons.io/img/logo.jpg", class "br-100 ba h2 w2 mr2", alt "avatar" ]
+            [ src "icon.png", class "br-100 h2 w2 mr2 bg-main-blue", alt "avatar" ]
             []
         , span [ class "db fw6 f6 black-80" ] [ text name ]
         ]
