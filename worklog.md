@@ -70,7 +70,7 @@
 [] Use Dict instead of List for entries
   |> Could probably merge update and new entry Msg at that point?
 
-[] Check SW updates
+[X] Check SW updates
 
 
 # Base
