@@ -30,8 +30,10 @@
   [] Redundant create messages in Main, Request.Entry, Page.Entry
   [] Errors over ports when creation/deletion fails?
 
-[] GeoLocate user on start?
 [] "Fly to": Helsinki, World, My Location
+
+[] 'Card' view for cards
+  [] Horizontal scroll?
 
 [] Use entry.id instead of indexed map in entries
 [] Use Dict instead of List for entries
