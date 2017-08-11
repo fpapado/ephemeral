@@ -1,28 +1,34 @@
 # TODO
 [X] PouchDB replication
   [X] PouchDB-server locally
-  [] Send changes on change
-  [] Merge NewEntry and UpdatedEntry (same functionality, since they both remove the entry with the id)
-    |> [] Eventually use Dict for entries
+  [X] Send changes on change
   [X] PouchDB-auth
   [] Integrate login/logout and tracking in Elm
-    |> Messages etc, view on top
+    |> View on top
     |> LogIn -> port LogIn,
        LogOut -> port LogOut,
        sub LoggedIn -> LoggedIn,
        sub LoggedOut ->LoggedOut
-  [] Cloudant remotely
   [] Configure url based on environment
+  [] Cloudant remotely
+  [] Signup?
+
+[] Organise JS
+  [] Clean console logs
+  [] Prettier for JS
+  [] Split/organise JS
+
+[] Better Pouch
+  [] API for Pouch access in JS
   [] Upsert https://pouchdb.com/guides/conflicts.html
   [] Conflict resolution
   [] Error handling for Pouch
-  [] API for Pouch access in JS
 
-[] Clean console logs
-[] Prettier for JS
-[] Split/organise JS
 
 [] update README
+
+[X] Merge NewEntry and UpdatedEntry (same functionality, since they both remove the entry with the id)
+  |> [] Eventually use Dict for entries
 
 [] Add Edit back
   [] Scroll up on edit

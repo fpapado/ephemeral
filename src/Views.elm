@@ -1,4 +1,4 @@
-module Views exposing (formField, epButton)
+module Views exposing (formField, epButton, avatar)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -32,3 +32,14 @@ epButton attributes children =
             :: attributes
         )
         children
+
+
+avatar : String -> Html msg
+avatar name =
+    div
+        [ class "flex items-center justify-center" ]
+        [ img
+            [ src "http://tachyons.io/img/logo.jpg", class "br-100 ba h2 w2 mr2", alt "avatar" ]
+            []
+        , span [ class "db fw6 f6 black-80" ] [ text name ]
+        ]

@@ -3,7 +3,7 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
-import Views exposing (epButton)
+import Views exposing (epButton, avatar)
 import Data.Entry exposing (Entry)
 import Request.Entry exposing (decodePouchEntries, decodePouchEntry)
 import Page.Entry as Entry
@@ -27,7 +27,7 @@ subscriptions model =
     Sub.batch
         [ Pouch.Ports.getEntries (decodePouchEntries NewEntries)
         , Pouch.Ports.newEntry (decodePouchEntry NewEntry)
-        , Pouch.Ports.updatedEntry (decodePouchEntry UpdatedEntry)
+        , Pouch.Ports.updatedEntry (decodePouchEntry NewEntry)
         ]
 
 
@@ -44,6 +44,12 @@ type alias Model =
     { entries : List Entry
     , pageState : Page
     , mapState : Map.Model
+    , loggedIn : Maybe User
+    }
+
+
+type alias User =
+    { name : String
     }
 
 
@@ -52,6 +58,7 @@ emptyModel =
     { entries = []
     , pageState = Entry Entry.initNew
     , mapState = Map.initModel
+    , loggedIn = Nothing
     }
 
 
@@ -69,7 +76,6 @@ type Msg
     | LoadEntries
     | NewEntries (Result String (List Entry))
     | NewEntry (Result String Entry)
-    | UpdatedEntry (Result String Entry)
     | EntryMsg Entry.Msg
     | MapMsg Map.Msg
 
@@ -92,17 +98,7 @@ update msg model =
 
         NewEntry (Ok entry) ->
             let
-                newEntries =
-                    entry :: model.entries
-            in
-                { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarker entry) ]
-
-        UpdatedEntry (Err err) ->
-            model ! []
-
-        UpdatedEntry (Ok entry) ->
-            -- NOTE: not updating all fields atm, see Request.EditConfig
-            let
+                -- TODO: would be better if we had a dict
                 newEntries =
                     entry
                         :: List.filter (\e -> e.id /= entry.id) model.entries
@@ -155,17 +151,36 @@ updatePage page msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "pa3 ph5-ns bg-white" ]
-        [ div [ class "mw7-ns center" ]
-            [ div [ class "mv2 mv4-ns" ]
-                [ viewFlight
-                , viewPage model.pageState
-                ]
-            , div [ class "pt3" ]
-                [ viewEntries model.entries
+    div []
+        [ viewHeader model.loggedIn
+        , div [ class "pa3 pt0 ph5-ns bg-white" ]
+            [ div [ class "mw7-ns center" ]
+                [ div [ class "mb2 mb4-ns" ]
+                    [ viewFlight
+                    , viewPage model.pageState
+                    ]
+                , div [ class "pt3" ]
+                    [ viewEntries model.entries
+                    ]
                 ]
             ]
         ]
+
+
+viewHeader : Maybe User -> Html Msg
+viewHeader loggedIn =
+    let
+        name =
+            case loggedIn of
+                Nothing ->
+                    "Guest"
+
+                Just user ->
+                    user.name
+    in
+        div [ class "pa4" ]
+            [ avatar name
+            ]
 
 
 viewFlight : Html Msg
@@ -174,7 +189,7 @@ viewFlight =
         classNames =
             "mr3 bg-beige-gray deep-blue pointer fw6 shadow-button"
     in
-        div [ class "mb2 tc" ]
+        div [ class "mb4 tc" ]
             [ epButton [ class classNames, onClick <| MapMsg (Map.SetLatLng ( Map.helsinkiLatLng, 12 )) ]
                 [ text "Helsinki" ]
             , epButton [ class classNames, onClick <| MapMsg (Map.SetLatLng ( Map.worldLatLng, 1 )) ]

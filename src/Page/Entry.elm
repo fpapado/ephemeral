@@ -186,7 +186,7 @@ view model =
                 "Save"
     in
         Html.form [ class "black-80", onSubmit Save ]
-            [ fieldset [ class "measure ba b--transparent ph0 mh0 center" ]
+            [ fieldset [ class "measure ba b--transparent pa0 ma0 center" ]
                 [ formField model.content SetContent "word" "Word" "text" "The word to save."
                 , formField model.translation SetTranslation "translation" "Translation" "text" "The translation for the word."
                 , epButton [ class "w-100 white bg-deep-blue" ] [ text saveButtonText ]
