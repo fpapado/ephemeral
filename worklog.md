@@ -7,8 +7,8 @@
     |> View on top
     |> [X] LogIn -> port LogIn,
        [X] sub LoggedIn -> LoggedIn,
-       [] Show "log out" if user
-       [] (UI/UX) "Logging in is optional, just tap" explanation on click
+       [X] Show "log out" if user
+       [X] (UI/UX) "Logging in is optional, just tap" explanation on click
        [] LogOut -> port LogOut,
        [] sub LoggedOut -> LoggedOut
        [] CheckAuth periodically?
@@ -92,6 +92,7 @@ Decide between pages
   [] Show message on Geolocation error, that a default position was used
   [] Dismiss errors
   [] "Success" message
+  [] Flexbox for flight buttons
 
 [] Refresh/cleanup
   [X] 'Card' view for cards

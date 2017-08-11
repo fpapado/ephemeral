@@ -34,10 +34,10 @@ epButton attributes children =
         children
 
 
-avatar : String -> Html msg
-avatar name =
+avatar : String -> List (Attribute msg) -> Html msg
+avatar name attributes =
     div
-        [ class "flex items-center justify-center" ]
+        ((class "flex items-center justify-center") :: attributes)
         [ img
             [ src "icon.png", class "br-100 h2 w2 mr2 bg-main-blue", alt "avatar" ]
             []

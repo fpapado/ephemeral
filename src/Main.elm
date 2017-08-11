@@ -230,8 +230,8 @@ viewHeader loggedIn =
                 Just user ->
                     user.username
     in
-        div [ class "pa4 pointer", onClick <| TogglePage ]
-            [ avatar name
+        div [ class "pa4" ]
+            [ avatar name [ class "pointer mw4 center", onClick TogglePage ]
             ]
 
 
