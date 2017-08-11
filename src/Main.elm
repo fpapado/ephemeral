@@ -184,7 +184,7 @@ viewFlight : Html Msg
 viewFlight =
     let
         classNames =
-            "mr3 bg-washed-green near-black pointer"
+            "mr3 bg-muted-blue white pointer"
     in
         div [ class "mb2 tc" ]
             [ epButton [ class classNames, onClick <| MapMsg (Map.SetLatLng ( Map.helsinkiLatLng, 12 )) ]
@@ -222,10 +222,32 @@ viewEntries entries =
 
 viewEntry : Entry -> Html Msg
 viewEntry entry =
-    div [ class "pa3 mb3 bg-lightest-blue near-black" ]
-        [ span [ class "db mb1" ] [ text entry.content ]
-        , span [ class "db mb1" ] [ text entry.translation ]
-        , span [ class "db tr" ] [ text <| viewDate entry.addedAt ]
-        , span [ class "db tr" ] [ text <| toString entry.location.longitude ++ ", " ++ toString entry.location.latitude ]
-        , a [ class "dib link bb bw1 dark-gray pointer", onClick (EntryMsg (Entry.Edit entry)) ] [ text "edit" ]
+    -- div [ class "pa3 mb3 bg-lightest-blue near-black" ]
+    --     [ span [ class "db mb1" ] [ text entry.content ]
+    --     , span [ class "db mb1" ] [ text entry.translation ]
+    --     , span [ class "db tr" ] [ text <| viewDate entry.addedAt ]
+    --     , span [ class "db tr" ] [ text <| toString entry.location.longitude ++ ", " ++ toString entry.location.latitude ]
+    --     , a [ class "dib link bb bw1 dark-gray pointer", onClick (EntryMsg (Entry.Edit entry)) ] [ text "edit" ]
+    --     ]
+    div
+        [ class "mw5 center bg-muted-blue br4 pa4 mv3 shadow-card" ]
+        [ div
+            [ class "tl" ]
+            [ div [ class "white" ]
+                [ h2
+                    [ class "mt0 mb2 f5 f4-ns fw6" ]
+                    [ text entry.content ]
+                , h2
+                    [ class "mt0 f5 f4-ns fw6" ]
+                    [ text entry.translation ]
+                ]
+            ]
+        , hr
+            [ class "w-100 mt4 mb3 bb bw1 b--black-10" ]
+            []
+        , div [ class "near-white f6 f5-ns" ]
+            [ span [ class "db mb2 tr truncate" ] [ text <| viewDate entry.addedAt ]
+            , span [ class "db mb1 tr truncate" ] [ text <| toString entry.location.latitude ++ ", " ]
+            , span [ class "db tr truncate" ] [ text <| toString entry.location.longitude ]
+            ]
         ]

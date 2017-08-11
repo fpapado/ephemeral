@@ -13,3 +13,39 @@
 .handwriting {
   font-family: 'Pacifico', cursive;
 }
+
+.shadow-card {
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.bg-beige-gray  {
+  background-color: #EDE4DF;
+}
+
+.bg-beige-gray-2  {
+  background-color: #E3E2E4;
+}
+
+.bg-main-blue {
+  background-color: #A5DBF7;
+}
+
+.bg-deep-blue {
+  background-color: #1556A3;
+}
+
+.bg-sharp-blue {
+  background-color: #37A4D5;
+}
+
+.bg-muted-blue {
+  background-color: #698EBA;
+}
+
+.main-blue {
+  color: #A5DBF7;
+}
+
+.muted-blue {
+  color: #698EBA;
+}

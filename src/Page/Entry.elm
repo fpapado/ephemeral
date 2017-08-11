@@ -190,7 +190,7 @@ view model =
             [ fieldset [ class "measure ba b--transparent ph0 mh0 center" ]
                 [ formField model.content SetContent "word" "Word" "text" "The word to save."
                 , formField model.translation SetTranslation "translation" "Translation" "text" "The translation for the word."
-                , epButton [ class "w-100 white" ] [ text saveButtonText ]
+                , epButton [ class "w-100 white bg-deep-blue" ] [ text saveButtonText ]
                 , viewIf (model.errors /= []) (viewErrors model.errors)
                 ]
             ]

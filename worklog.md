@@ -25,6 +25,8 @@
 
   [] Full CRUD
     [] Delete |> with confirmation message
+    [] Edit location
+    [] Edit time added
   [] Port architecture
     [] Single port per responsibility, parse on either side?
   [] Redundant create messages in Main, Request.Entry, Page.Entry
@@ -32,10 +34,7 @@
 
 [X] "Fly to": Helsinki, World, My Location
 
-[] 'Card' view for cards
-  [] Horizontal scroll?
-
-[] Use entry.id instead of indexed map in entries
+[X] Use entry.id instead of indexed map in entries
 [] Use Dict instead of List for entries
   |> Could probably merge update and new entry Msg at that point?
 
@@ -50,21 +49,25 @@
   [] Entry.Editor
   [] Entry.New
 
-
 # Base
 Decide which fields are editable
-Abstract Requests API
-Offline detection and queueing
-Localhost usage
 Decide between pages
  |> Routing
 
-# UI
+# UI/UX
+[] UI/UX Pass
+  [] Error view, English
+  [] Show message on Geolocation error, that a default position was used
+  [] Dismiss errors
+  [] "Success" message
+
+[] Refresh/cleanup
+  [X] 'Card' view for cards
+    [] Grid?
+    [] Horizontal scroll?
+
 [] Spider spread for map
 [] Html.lazy2
-[] Refresh/cleanup
-[] "Success" message
-[] Dismiss errors
 
 # Later
 [] PouchDB Auth
