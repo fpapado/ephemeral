@@ -1,36 +1,24 @@
 # TODO
-[X] Webpack
-[X] Demo dist
-[X] Service worker caching
-[X] SW tachyons etc.
-[X] Manifest file
+[] Redundant create messages in Main, Request.Entry, Page.Entry
 
-[X] Save after Geo Error anyway, with (0, 0)
+[] PouchDB replication
+  [] PouchDB-server locally
+  [] PouchDB-auth
+  [] Cloudant remotely
+  [] Configure url based on environment
 
-[X] Save revisions
-[X] updatePouch
-
-[X] Abstract away msg and flow for PouchDb
-  [X] Notify UI when Entry is created
-  [X] Notify UI when Entry is updated
-    [X] Add markers based on entry.id
-    [X] Properly handle markers on update ()
-  [X] Cmd -> to Pouch
-  [X] Sub -> message to Elm -> decode -> Cmd
-  [X] Add markers, update list as words are added
-
+[] Add Edit back
   [] Scroll up on edit
   [] Cancel button on edit
   [] Popup for editing?
 
-  [] Full CRUD
-    [] Delete |> with confirmation message
-    [] Edit location
-    [] Edit time added
-  [] Port architecture
-    [] Single port per responsibility, parse on either side?
-  [] Redundant create messages in Main, Request.Entry, Page.Entry
-  [] Errors over ports when creation/deletion fails?
+[] Full CRUD
+  [] Delete |> with confirmation message
+  [] Edit location
+  [] Edit time added
+[] Port architecture
+  [] Single port per responsibility, parse on either side?
+[] Errors over ports when creation/deletion fails?
 
 [X] "Fly to": Helsinki, World, My Location
 
@@ -114,3 +102,4 @@ I could "just" wrap PouchDB and treat it as my store, letting it do its thing
 # Request module
 I keeping the Requests for decoding the subs from ports in the Request, accepting a toMsg that will be triggered on the caller.
 This allows some separation of concerns, and isn't unlike how Request keeps the Http requests without doing the actual sending, but allowing to specify which Msg will be generated.
+
