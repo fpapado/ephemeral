@@ -301,8 +301,8 @@ viewEntries entries =
     if entries /= [] then
         div [ class "dw" ] <| List.map viewEntry entries
     else
-        div [ class "pa4 mb3 bg-lightest-blue tc f5" ]
-            [ span [ class "dark-gray" ]
+        div [ class "pa4 mb3 bg-main-blue br1 tc f5" ]
+            [ p [ class "dark-gray lh-copy" ]
                 [ text "Looks like you don't have any entries yet. Why don't you add one? :)"
                 ]
             ]
