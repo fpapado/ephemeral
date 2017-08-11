@@ -186,14 +186,14 @@ viewHeader loggedIn =
 
 viewFooter : Html Msg
 viewFooter =
-    div [ class "mt2 mt4-ns" ]
-        [ hr [ class "w-100 bb bw1 b--black-10" ] []
+    div [ class "mt4" ]
+        [ hr [ class "mv0 w-100 bb bw1 b--black-10" ] []
         , div
-            [ class "pt3 tc" ]
-            [ p [ class "f5 lh-copy measure center" ]
+            [ class "pv3 tc" ]
+            [ p [ class "f6 lh-copy measure center" ]
                 [ text "Ephemeral is an app for writing down words and their translations, as you encounter them"
                 ]
-            , span [ class "f5 lh-copy measure center" ]
+            , span [ class "f6 lh-copy measure center" ]
                 [ text "Made with 😭 by Fotis Papadogeogopoulos"
                 ]
             ]

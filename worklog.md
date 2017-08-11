@@ -11,6 +11,7 @@
        sub LoggedOut ->LoggedOut
   [] Configure url based on environment
   [] Cloudant remotely
+  [] Handle all sync events (e.g. "pull" _deleted_: true)
   [] Signup?
 
 [] Organise JS
@@ -121,4 +122,3 @@ I could "just" wrap PouchDB and treat it as my store, letting it do its thing
 # Request module
 I keeping the Requests for decoding the subs from ports in the Request, accepting a toMsg that will be triggered on the caller.
 This allows some separation of concerns, and isn't unlike how Request keeps the Http requests without doing the actual sending, but allowing to specify which Msg will be generated.
-
