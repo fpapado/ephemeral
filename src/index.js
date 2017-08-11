@@ -32,27 +32,31 @@ window.PouchDB = PouchDB;
 PouchDB.plugin(require('pouchdb-authentication'));
 
 let db = new PouchDB('ephemeral');
-let remoteDB= new PouchDB('http://localhost:5984/ephemeral', {skip_setup: true});
+let remoteDB = new PouchDB('http://localhost:5984/ephemeral', {
+  skip_setup: true
+});
 
-remoteDB.info()
+remoteDB
+  .info()
   .then(res => {
-    console.log("Got info", res);
+    console.log('Got info', res);
   })
   .catch(err => {
-    console.log("Info error", err);
+    console.log('Info error', err);
   });
 
-
-  let syncHandler = db.sync(remoteDB, {
+let syncHandler = db
+  .sync(remoteDB, {
     live: true,
-    retry: true,
-  }).on('change', info => {
+    retry: true
+  })
+  .on('change', info => {
     // something changed
-    console.info("Something changed!", info);
+    console.info('Something changed!', info);
 
     let { change, direction } = info;
 
-    if (direction === 'pull'){
+    if (direction === 'pull') {
       change.docs.forEach(doc => {
         // TODO: find whether the document is new or not
         // TODO: handle deletion
@@ -60,15 +64,19 @@ remoteDB.info()
         app.ports.updatedEntry.send(doc);
       });
     }
-  }).on('paused', info => {
+  })
+  .on('paused', info => {
     // replication was paused, usually connection loss
-    console.log("Replication paused");
-  }).on('active', info => {
-    console.log("Replication resumed");
-  }).on('complete', info => {
-    console.log("Replication complete");
-  }).on('error', err => {
-    console.log("Unhandled error");
+    console.log('Replication paused');
+  })
+  .on('active', info => {
+    console.log('Replication resumed');
+  })
+  .on('complete', info => {
+    console.log('Replication complete');
+  })
+  .on('error', err => {
+    console.log('Unhandled error');
   });
 
 let mymap = L.map('mapid').setView([60.1719, 24.9414], 12);
@@ -81,18 +89,19 @@ let app = Elm.Main.embed(root);
 let center;
 let markers = {};
 
-app.ports.sendLogin.subscribe((user) => {
-  console.log("Got user to log in", user);
+app.ports.sendLogin.subscribe(user => {
+  console.log('Got user to log in', user);
 
-  let {username, password} = user;
+  let { username, password } = user;
 
-  remoteDB.login(username, password)
+  remoteDB
+    .login(username, password)
     .then(res => {
       console.log('Logged in!', res);
 
-      if(res.ok === true){
-          let {name} = res;
-          app.ports.logIn.send({"username": name});
+      if (res.ok === true) {
+        let { name } = res;
+        app.ports.logIn.send({ username: name });
       }
     })
     .catch(err => {
@@ -105,81 +114,83 @@ app.ports.sendLogin.subscribe((user) => {
     });
 });
 
-app.ports.setView.subscribe((data) => {
-    mymap.setView.apply(mymap, data);
+app.ports.setView.subscribe(data => {
+  mymap.setView.apply(mymap, data);
 });
 
-app.ports.setMarkers.subscribe((data) => {
-    data.forEach((data, index) => {
-      let [id, latLng, markerOptions, popupText] = data;
+app.ports.setMarkers.subscribe(data => {
+  data.forEach((data, index) => {
+    let [id, latLng, markerOptions, popupText] = data;
 
-      markerOptions.icon = new L.Icon(markerOptions.icon)
-      let marker = L.marker(latLng, markerOptions);
+    markerOptions.icon = new L.Icon(markerOptions.icon);
+    let marker = L.marker(latLng, markerOptions);
 
-      marker.bindPopup(popupText);
+    marker.bindPopup(popupText);
 
-      if(!markers.hasOwnProperty(id)) {
-        marker.addTo(mymap);
-        markers[id] = marker;
-      }
-      else {
-        Object.assign(markers[id], marker);
-      }
-    })
+    if (!markers.hasOwnProperty(id)) {
+      marker.addTo(mymap);
+      markers[id] = marker;
+    } else {
+      Object.assign(markers[id], marker);
+    }
+  });
 });
 
-app.ports.saveEntry.subscribe((data) => {
-  console.log("Got entry to create", data);
-  let meta = {"type": "entry"};
+app.ports.saveEntry.subscribe(data => {
+  console.log('Got entry to create', data);
+  let meta = { type: 'entry' };
   let doc = Object.assign(data, meta);
   console.log(doc);
 
-  db.post(doc)
-    .then((res) => {
-      db.get(res.id).then((doc) => {
-        console.log("Successfully created", doc);
+  db
+    .post(doc)
+    .then(res => {
+      db.get(res.id).then(doc => {
+        console.log('Successfully created', doc);
         app.ports.newEntry.send(doc);
-      })
+      });
     })
-    .catch((err) => {
-    console.log("Failed to create", err);
-    // TODO: Send back over port that Err error?
-  })
+    .catch(err => {
+      console.log('Failed to create', err);
+      // TODO: Send back over port that Err error?
+    });
 });
 
-app.ports.updateEntry.subscribe((data) => {
-  console.log("Got entry to update", data);
+app.ports.updateEntry.subscribe(data => {
+  console.log('Got entry to update', data);
 
-  let {_id} = data;
+  let { _id } = data;
   console.log(_id);
 
-  db.get(_id).then((doc) => {
-    // NOTE: We disregard the _rev from Elm, to be safe
-    let {_rev} = doc;
+  db
+    .get(_id)
+    .then(doc => {
+      // NOTE: We disregard the _rev from Elm, to be safe
+      let { _rev } = doc;
 
-    let newDoc = Object.assign(doc, data);
-    newDoc._rev = _rev;
+      let newDoc = Object.assign(doc, data);
+      newDoc._rev = _rev;
 
-    return db.put(newDoc);
-  }).then((res) => {
-    db.get(res.id).then((doc) => {
-      console.log("Successfully updated", doc);
-      app.ports.updatedEntry.send(doc);
+      return db.put(newDoc);
     })
-  }).catch((err) =>{
-    console.log("Failed to update", err);
-    // TODO: Send back over port that Err error
-  });
-
+    .then(res => {
+      db.get(res.id).then(doc => {
+        console.log('Successfully updated', doc);
+        app.ports.updatedEntry.send(doc);
+      });
+    })
+    .catch(err => {
+      console.log('Failed to update', err);
+      // TODO: Send back over port that Err error
+    });
 });
 
-app.ports.listEntries.subscribe((str) => {
-  console.log("Will list entries");
-  let docs = db.allDocs({include_docs: true})
-    .then(docs => {
-      let entries = docs.rows.map(row => row.doc);
-      console.log("Listing entries", entries);
+app.ports.listEntries.subscribe(str => {
+  console.log('Will list entries');
+  let docs = db.allDocs({ include_docs: true }).then(docs => {
+    let entries = docs.rows.map(row => row.doc);
+    console.log('Listing entries', entries);
 
-      app.ports.getEntries.send(entries);
-    });
+    app.ports.getEntries.send(entries);
+  });
 });

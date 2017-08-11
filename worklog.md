@@ -29,7 +29,7 @@
 
 [] Organise JS
   [] Clean console logs
-  [] Prettier for JS
+  [X] Prettier for JS
   [] Split/organise JS
 
 
