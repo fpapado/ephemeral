@@ -1,63 +1,15 @@
 /*#mapid {
-height: 400px
+  height: 400px
 }*/
 .h6 {
-  height:24rem
+ height:24rem
 }
 @media screen and (min-width:30em) {
-  .h6-ns {
-    height:24rem
-  }
+ .h6-ns {
+  height:24rem
+ }
 }
 
 .handwriting {
   font-family: 'Pacifico', cursive;
-}
-
-.menu {
-    width: 134%;
-    margin-left: -17%;
-}
-
-.main-button {
-  position: relative;
-  width: 90px;
-  height: 90px;
-  border-radius: 100%;
-  background-color: #68AEF0;
-  cursor: pointer;
-  display: flex;
-  justify-content : center;
-  align-items: center;
-  color: #C0FFEE;
-  font-weight: lighter;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-.child-button {
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 50px;
-  height: 50px;
-  left:20px;
-  top:20px;
-  border-radius: 100%;
-  background-color: white;
-  box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px;
-  color: #8898A5;
-  z-index: -1;
-}
-.message {
-  color: #333;
-  position: absolute;
-  width: 100%;
-  text-align: center;
-  bottom: -30px;
-  left: 0;
-  font-family: "Courier New";
-}
-.background {
-  position:relative;
-  z-index:0;
 }

@@ -9,7 +9,6 @@ import Task
 import Data.Entry exposing (Entry)
 import Request.Entry exposing (decodePouchEntries, decodePouchEntry)
 import Page.Entry as Entry
-import Menu
 import Map as Map
 import Util exposing (viewDate)
 import Pouch.Ports
@@ -33,8 +32,6 @@ subscriptions model =
         [ Pouch.Ports.getEntries (decodePouchEntries NewEntriesPouch)
         , Pouch.Ports.newEntry (decodePouchEntry NewEntryPouch)
         , Pouch.Ports.updatedEntry (decodePouchEntry UpdatedEntryPouch)
-        , Menu.subscriptions model.menuState
-            |> Sub.map MenuMsg
         ]
 
 
@@ -51,7 +48,6 @@ type alias Model =
     { entries : List Entry
     , pageState : Page
     , mapState : Map.Model
-    , menuState : Menu.Model
     }
 
 
@@ -60,7 +56,6 @@ emptyModel =
     { entries = []
     , pageState = Entry Entry.initNew
     , mapState = Map.initModel
-    , menuState = Menu.initModel
     }
 
 
@@ -83,12 +78,11 @@ type Msg
     | UpdatedEntryPouch (Result String Entry)
     | EntryMsg Entry.Msg
     | MapMsg Map.Msg
-    | MenuMsg Menu.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
+    case Debug.log "msg" msg of
         -- Messages that exist for all "pages"
         NoOp ->
             model ! []
@@ -141,14 +135,6 @@ update msg model =
             in
                 ( { model | mapState = newModel }, Cmd.map MapMsg newCmd )
 
-        MenuMsg msg ->
-            -- more ad-hoc for Map messages, since we might want map to be co-located
-            let
-                ( newModel, newCmd ) =
-                    Menu.update msg model.menuState
-            in
-                ( { model | menuState = newModel }, Cmd.map MenuMsg newCmd )
-
         -- Messages for another segment
         _ ->
             updatePage model.pageState msg model
@@ -184,11 +170,10 @@ updatePage page msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "pa3 ph5-ns bg-white relative z-0" ]
-        [ div [ class "mw7-ns center relative z-0" ]
-            [ div [ class "mv2 mv4-ns relative z-0" ]
+    div [ class "pa3 ph5-ns bg-white" ]
+        [ div [ class "mw7-ns center" ]
+            [ div [ class "mv2 mv4-ns" ]
                 [ viewFlight
-                , viewMenu model.menuState
                 , viewPage model.pageState
                 ]
             , div [ class "pt3" ]
@@ -212,14 +197,6 @@ viewFlight =
             , epButton [ class classNames, onClick <| MapMsg (Map.GoToCurrentLocation) ]
                 [ text "Current" ]
             ]
-
-
-viewMenu : Menu.Model -> Html Msg
-viewMenu subModel =
-    div [ class "mv3 relative z-0 menu" ]
-        [ Menu.view subModel
-            |> Html.map MenuMsg
-        ]
 
 
 viewPage : Page -> Html Msg
