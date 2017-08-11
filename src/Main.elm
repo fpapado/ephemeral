@@ -211,7 +211,7 @@ viewPage page =
 viewEntries : List Entry -> Html Msg
 viewEntries entries =
     if entries /= [] then
-        div [] <| List.map viewEntry entries
+        div [ class "dw" ] <| List.map viewEntry entries
     else
         div [ class "pa4 mb3 bg-lightest-blue tc f5" ]
             [ span [ class "dark-gray" ]
@@ -222,32 +222,56 @@ viewEntries entries =
 
 viewEntry : Entry -> Html Msg
 viewEntry entry =
-    -- div [ class "pa3 mb3 bg-lightest-blue near-black" ]
-    --     [ span [ class "db mb1" ] [ text entry.content ]
-    --     , span [ class "db mb1" ] [ text entry.translation ]
-    --     , span [ class "db tr" ] [ text <| viewDate entry.addedAt ]
-    --     , span [ class "db tr" ] [ text <| toString entry.location.longitude ++ ", " ++ toString entry.location.latitude ]
-    --     , a [ class "dib link bb bw1 dark-gray pointer", onClick (EntryMsg (Entry.Edit entry)) ] [ text "edit" ]
-    --     ]
     div
-        [ class "mw5 center bg-muted-blue br4 pa4 mv3 shadow-card" ]
+        [ class "dw-panel" ]
         [ div
-            [ class "tl" ]
-            [ div [ class "white" ]
+            [ class "dw-panel__content bg-muted-blue mw5 center br4 pa4 shadow-card" ]
+            [ div [ class "white tl" ]
                 [ h2
-                    [ class "mt0 mb2 f5 f4-ns fw6" ]
+                    [ class "mt0 mb2 f5 f4-ns fw6 overflow-hidden" ]
                     [ text entry.content ]
                 , h2
-                    [ class "mt0 f5 f4-ns fw6" ]
+                    [ class "mt0 f5 f4-ns fw6 overflow-hidden" ]
                     [ text entry.translation ]
                 ]
-            ]
-        , hr
-            [ class "w-100 mt4 mb3 bb bw1 b--black-10" ]
-            []
-        , div [ class "near-white f6 f5-ns" ]
-            [ span [ class "db mb2 tr truncate" ] [ text <| viewDate entry.addedAt ]
-            , span [ class "db mb1 tr truncate" ] [ text <| toString entry.location.latitude ++ ", " ]
-            , span [ class "db tr truncate" ] [ text <| toString entry.location.longitude ]
+            , hr
+                [ class "w-100 mt4 mb3 bb bw1 b--black-10" ]
+                []
+            , div [ class "near-white f6 f5-ns" ]
+                [ span [ class "db mb2 tr truncate" ] [ text <| viewDate entry.addedAt ]
+                , span [ class "db mb1 tr truncate" ] [ text <| toString entry.location.latitude ++ ", " ]
+                , span [ class "db tr truncate" ] [ text <| toString entry.location.longitude ]
+                ]
             ]
         ]
+
+
+
+-- viewEntryFlip : Entry -> Html Msg
+-- viewEntryFlip entry =
+--     div
+--         [ class "dw-panel dw-flip dw-flip--md" ]
+--         [ div
+--             [ class "dw-panel__content dw-flip__content white" ]
+--             [ div
+--                 [ class "dw-flip__panel dw-flip__panel--front bg-muted-blue mw5 center br4 pa4 shadow-card" ]
+--                 [ h2
+--                     [ class "mt0 mb2 f5 f4-ns fw6 overflow-hidden" ]
+--                     [ text entry.content ]
+--                 , hr
+--                     [ class "w-100 mt4 mb3 bb bw1 b--black-10" ]
+--                     []
+--                 , div [ class "near-white f6 f5-ns" ]
+--                     [ span [ class "db mb2 tr truncate" ] [ text <| viewDate entry.addedAt ]
+--                     , span [ class "db mb1 tr truncate" ] [ text <| toString entry.location.latitude ++ ", " ]
+--                     , span [ class "db tr truncate" ] [ text <| toString entry.location.longitude ]
+--                     ]
+--                 ]
+--             , div
+--                 [ class "dw-flip__panel dw-flip__panel--back bg-light-blue mw5 center br4 pa4 shadow-card" ]
+--                 [ h2
+--                     [ class "mt0 f5 f4-ns fw6 overflow-hidden" ]
+--                     [ text entry.translation ]
+--                 ]
+--             ]
+--         ]

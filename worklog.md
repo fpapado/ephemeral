@@ -63,8 +63,10 @@ Decide between pages
 
 [] Refresh/cleanup
   [X] 'Card' view for cards
-    [] Grid?
+    [X] Grid?
     [] Horizontal scroll?
+  [LATER] Flip view for cards
+  [LATER] Show/collapse information for cards etc.
 
 [] Spider spread for map
 [] Html.lazy2
@@ -73,6 +75,7 @@ Decide between pages
 [] PouchDB Auth
 [] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
 [] migrations?
+[] Search
 [] Translation Helper
 [] Filtering on PouchDB messages
 [] Save revision of Entry; used for updates
