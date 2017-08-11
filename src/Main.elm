@@ -5,15 +5,12 @@ import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
 import Views exposing (epButton)
 import Http
-import Task
 import Data.Entry exposing (Entry)
 import Request.Entry exposing (decodePouchEntries, decodePouchEntry)
 import Page.Entry as Entry
 import Map as Map
 import Util exposing (viewDate)
 import Pouch.Ports
-import Json.Encode exposing (Value)
-import Json.Decode as Decode
 
 
 main : Program Never Model Msg
@@ -187,9 +184,9 @@ viewFlight : Html Msg
 viewFlight =
     let
         classNames =
-            "mr3 bg-washed-green near-black"
+            "mr3 bg-washed-green near-black pointer"
     in
-        div [ class "mb1 tc" ]
+        div [ class "mb2 tc" ]
             [ epButton [ class classNames, onClick <| MapMsg (Map.SetLatLng ( Map.helsinkiLatLng, 12 )) ]
                 [ text "Helsinki" ]
             , epButton [ class classNames, onClick <| MapMsg (Map.SetLatLng ( Map.worldLatLng, 1 )) ]

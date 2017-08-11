@@ -10,6 +10,7 @@ import Request.Entry
 import Date exposing (Date)
 import Task
 import Geolocation exposing (Location)
+import Util exposing (viewIf)
 
 
 -- MODEL --
@@ -203,14 +204,6 @@ viewErrors errors =
     in
         div [ class "mt2 pa3 f5 bg-light-red white" ] <|
             List.map viewError errors
-
-
-viewIf : Bool -> Html msg -> Html msg
-viewIf condition content =
-    if condition then
-        content
-    else
-        Html.text ""
 
 
 

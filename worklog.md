@@ -30,8 +30,10 @@
   [] Redundant create messages in Main, Request.Entry, Page.Entry
   [] Errors over ports when creation/deletion fails?
 
-[] GeoLocate user on start?
-[] "Fly to": Helsinki, World, My Location
+[X] "Fly to": Helsinki, World, My Location
+
+[] 'Card' view for cards
+  [] Horizontal scroll?
 
 [] Use entry.id instead of indexed map in entries
 [] Use Dict instead of List for entries
@@ -79,6 +81,7 @@ Decide between pages
 [] Merge markers and Entries?
 [] Filter based on date, range
 [] Critical CSS
+  [] PurifyCSS and Webpack
 [X] Leaflet integration
 
 # Dev
