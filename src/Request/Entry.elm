@@ -3,9 +3,6 @@ module Request.Entry
         ( list
         , create
         , update
-        , createPouch
-        , updatePouch
-        , listPouch
         , decodeEntryList
         , decodePouchEntries
         , decodePouchEntry
@@ -23,23 +20,17 @@ import Data.Entry as Entry
         )
 import Date exposing (Date)
 import Date.Extra.Format exposing (utcIsoString)
-import Http
-import HttpBuilder exposing (RequestBuilder, withExpect, withQueryParams, withBody)
 import Json.Decode as Decode
 import Json.Encode as Encode exposing (Value)
-import Request.Helpers exposing (apiUrl)
 import Pouch.Ports
 
 
 -- LIST --
 
 
-list : Http.Request (List Entry)
+list : Cmd msg
 list =
-    apiUrl ("/notes/")
-        |> HttpBuilder.get
-        |> HttpBuilder.withExpect (Http.expectJson decodeEntryList)
-        |> HttpBuilder.toRequest
+    Pouch.Ports.listEntries "list"
 
 
 
@@ -62,61 +53,8 @@ type alias EditConfig record =
     }
 
 
-create : CreateConfig record -> Http.Request Entry
+create : CreateConfig record -> Cmd msg
 create config =
-    let
-        expect =
-            Entry.decodeEntry
-                |> Http.expectJson
-
-        entry =
-            Encode.object
-                [ ( "content", Encode.string config.content )
-                , ( "translation", Encode.string config.translation )
-                , ( "added_at", Encode.string <| utcIsoString config.addedAt )
-                , ( "location", encodeEntryLocation config.location )
-                ]
-
-        body =
-            entry
-                |> Http.jsonBody
-    in
-        apiUrl "/notes"
-            |> HttpBuilder.post
-            |> withBody body
-            |> withExpect expect
-            |> HttpBuilder.toRequest
-
-
-update : EntryId -> EditConfig record -> Http.Request Entry
-update entryId config =
-    let
-        expect =
-            Entry.decodeEntry
-                |> Http.expectJson
-
-        entry =
-            Encode.object
-                [ ( "content", Encode.string config.content )
-                , ( "translation", Encode.string config.translation )
-                ]
-
-        body =
-            entry |> Http.jsonBody
-    in
-        apiUrl ("/notes/" ++ idToString entryId)
-            |> HttpBuilder.patch
-            |> withBody body
-            |> withExpect expect
-            |> HttpBuilder.toRequest
-
-
-
--- CREATE POUCH --
-
-
-createPouch : CreateConfig record -> Cmd msg
-createPouch config =
     let
         entry =
             Encode.object
@@ -129,8 +67,8 @@ createPouch config =
         Pouch.Ports.saveEntry entry
 
 
-updatePouch : EntryId -> String -> EditConfig record -> Cmd msg
-updatePouch entryId rev config =
+update : EntryId -> String -> EditConfig record -> Cmd msg
+update entryId rev config =
     let
         id_ =
             idToString entryId
@@ -144,16 +82,6 @@ updatePouch entryId rev config =
                 ]
     in
         Pouch.Ports.updateEntry entry
-
-
-listPouch : Cmd msg
-listPouch =
-    Pouch.Ports.listEntries "list"
-
-
-decodeEntryList : Decode.Decoder (List Entry)
-decodeEntryList =
-    Decode.list (Entry.decodeEntry)
 
 
 
@@ -176,3 +104,8 @@ decodePouchEntry toMsg entry =
             Decode.decodeValue decodeEntry entry
     in
         toMsg result
+
+
+decodeEntryList : Decode.Decoder (List Entry)
+decodeEntryList =
+    Decode.list (Entry.decodeEntry)

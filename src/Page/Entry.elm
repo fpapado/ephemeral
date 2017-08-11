@@ -62,7 +62,7 @@ initGeoLocation =
 
 type Msg
     = Save
-    | CommitPouch
+    | Commit
     | Edit Entry
     | SetContent String
     | SetTranslation String
@@ -96,16 +96,15 @@ update msg model =
                         ( model, seq )
 
                 Just ( entryId, rev ) ->
-                    update CommitPouch model
+                    update Commit model
 
-        CommitPouch ->
+        Commit ->
             case model.editingEntry of
                 Nothing ->
-                    ( initNew, Request.Entry.createPouch model )
+                    ( initNew, Request.Entry.create model )
 
                 Just ( eid, rev ) ->
-                    -- ( initNew, Request.Entry.updatePouch model )
-                    ( initNew, Request.Entry.updatePouch eid rev model )
+                    ( initNew, Request.Entry.update eid rev model )
 
         Edit entry ->
             { model
@@ -142,7 +141,7 @@ update msg model =
                         , addedAt = addedAt
                     }
             in
-                update CommitPouch newModel
+                update Commit newModel
 
         SetLocationTime (Err error) ->
             { model | errors = model.errors ++ [ ( Form, viewGeoError error ) ] } ! []
@@ -155,7 +154,7 @@ update msg model =
                         , addedAt = addedAt
                     }
             in
-                update CommitPouch newModel
+                update Commit newModel
 
         CreateCompleted (Ok entry) ->
             initNew ! []

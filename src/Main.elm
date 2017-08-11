@@ -4,7 +4,6 @@ import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
 import Views exposing (epButton)
-import Http
 import Data.Entry exposing (Entry)
 import Request.Entry exposing (decodePouchEntries, decodePouchEntry)
 import Page.Entry as Entry
@@ -26,9 +25,9 @@ main =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Pouch.Ports.getEntries (decodePouchEntries NewEntriesPouch)
-        , Pouch.Ports.newEntry (decodePouchEntry NewEntryPouch)
-        , Pouch.Ports.updatedEntry (decodePouchEntry UpdatedEntryPouch)
+        [ Pouch.Ports.getEntries (decodePouchEntries NewEntries)
+        , Pouch.Ports.newEntry (decodePouchEntry NewEntry)
+        , Pouch.Ports.updatedEntry (decodePouchEntry UpdatedEntry)
         ]
 
 
@@ -58,7 +57,7 @@ emptyModel =
 
 init : ( Model, Cmd Msg )
 init =
-    ( emptyModel, Request.Entry.listPouch )
+    ( emptyModel, Request.Entry.list )
 
 
 
@@ -67,12 +66,10 @@ init =
 
 type Msg
     = NoOp
-    | NewEntries (Result Http.Error (List Entry))
     | LoadEntries
-    | LoadEntriesPouch
-    | NewEntriesPouch (Result String (List Entry))
-    | NewEntryPouch (Result String Entry)
-    | UpdatedEntryPouch (Result String Entry)
+    | NewEntries (Result String (List Entry))
+    | NewEntry (Result String Entry)
+    | UpdatedEntry (Result String Entry)
     | EntryMsg Entry.Msg
     | MapMsg Map.Msg
 
@@ -90,26 +87,20 @@ update msg model =
         NewEntries (Ok entries) ->
             { model | entries = entries } ! [ Cmd.map MapMsg (Map.addMarkers entries) ]
 
-        NewEntriesPouch (Err err) ->
+        NewEntry (Err err) ->
             model ! []
 
-        NewEntriesPouch (Ok entries) ->
-            { model | entries = entries } ! [ Cmd.map MapMsg (Map.addMarkers entries) ]
-
-        NewEntryPouch (Err err) ->
-            model ! []
-
-        NewEntryPouch (Ok entry) ->
+        NewEntry (Ok entry) ->
             let
                 newEntries =
                     entry :: model.entries
             in
                 { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarker entry) ]
 
-        UpdatedEntryPouch (Err err) ->
+        UpdatedEntry (Err err) ->
             model ! []
 
-        UpdatedEntryPouch (Ok entry) ->
+        UpdatedEntry (Ok entry) ->
             -- NOTE: not updating all fields atm, see Request.EditConfig
             let
                 newEntries =
@@ -119,9 +110,6 @@ update msg model =
                 { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarker entry) ]
 
         LoadEntries ->
-            ( model, Http.send NewEntries Request.Entry.list )
-
-        LoadEntriesPouch ->
             ( model, Pouch.Ports.listEntries "entry" )
 
         MapMsg msg ->

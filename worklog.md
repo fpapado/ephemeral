@@ -1,6 +1,4 @@
 # TODO
-[] Redundant create messages in Main, Request.Entry, Page.Entry
-
 [X] PouchDB replication
   [X] PouchDB-server locally
   [] Send changes on change
