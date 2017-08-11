@@ -4,3 +4,7 @@ node_modules/
 
 elm.js
 dist
+
+# PouchDB
+/db
+/pouchdb-server

@@ -1,11 +1,30 @@
 # TODO
 [] Redundant create messages in Main, Request.Entry, Page.Entry
 
-[] PouchDB replication
-  [] PouchDB-server locally
-  [] PouchDB-auth
+[X] PouchDB replication
+  [X] PouchDB-server locally
+  [] Send changes on change
+  [] Merge NewEntry and UpdatedEntry (same functionality, since they both remove the entry with the id)
+    |> [] Eventually use Dict for entries
+  [X] PouchDB-auth
+  [] Integrate login/logout and tracking in Elm
+    |> Messages etc, view on top
+    |> LogIn -> port LogIn,
+       LogOut -> port LogOut,
+       sub LoggedIn -> LoggedIn,
+       sub LoggedOut ->LoggedOut
   [] Cloudant remotely
   [] Configure url based on environment
+  [] Upsert https://pouchdb.com/guides/conflicts.html
+  [] Conflict resolution
+  [] Error handling for Pouch
+  [] API for Pouch access in JS
+
+[] Clean console logs
+[] Prettier for JS
+[] Split/organise JS
+
+[] update README
 
 [] Add Edit back
   [] Scroll up on edit
@@ -27,10 +46,6 @@
   |> Could probably merge update and new entry Msg at that point?
 
 [] Check SW updates
-
-[] Clean console logs
-[] Prettier for JS
-[] Split/organise JS
 
 [] Routing with pages:
   [] List (map + items; current Main)

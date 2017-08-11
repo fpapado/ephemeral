@@ -1,4 +1,7 @@
 # Ephemeral
+TODO: Update with webpack info
+TODO: Update with PouchDB info
+
 Elm app for taking notes of words, tracking time added and location.
 Also includes offline functionality and syncing.
 
@@ -25,3 +28,4 @@ npx json-server --watch mock/generate.js --routes mock/routes.json
 The Elm codes knows to hit this endpoint from `src/Request/Helpers.elm`; feel free to change to suit your needs.
 
 WIP: configure this automatically for production!
+

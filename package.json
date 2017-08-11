@@ -5,6 +5,7 @@
   "main": "elm.js",
   "dependencies": {
     "leaflet": "^1.2.0",
+    "pouchdb-authentication": "^0.5.5",
     "pouchdb-browser": "^6.3.4",
     "tachyons": "^4.7.4"
   },
@@ -42,7 +43,8 @@
     "dev": "webpack-dev-server --hot --inline --port 3000",
     "build": "webpack",
     "prod": "rimraf dist/ && webpack -p",
-    "postinstall": "elm-package install -y"
+    "postinstall": "elm-package install -y",
+    "pouchdb-server": "pouchdb-server --config pouchdb-server/config.json --dir pouchdb-server"
   },
   "author": "fpapado <fotis@fpapado.com>",
   "license": "ISC"
