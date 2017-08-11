@@ -1,4 +1,4 @@
-module Page.Entry exposing (Model, Msg, initNew, update, view, Msg(..))
+module Page.Entry exposing (Model, initNew, update, view, Msg(..))
 
 import Data.Entry as Entry exposing (Entry, EntryLocation, EntryId)
 import Html exposing (..)

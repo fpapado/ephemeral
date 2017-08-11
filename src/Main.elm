@@ -7,6 +7,7 @@ import Views exposing (epButton, avatar)
 import Data.Entry exposing (Entry)
 import Request.Entry exposing (decodePouchEntries, decodePouchEntry)
 import Page.Entry as Entry
+import Page.Login as Login exposing (User)
 import Map as Map
 import Util exposing (viewDate)
 import Pouch.Ports
@@ -28,6 +29,9 @@ subscriptions model =
         [ Pouch.Ports.getEntries (decodePouchEntries NewEntries)
         , Pouch.Ports.newEntry (decodePouchEntry NewEntry)
         , Pouch.Ports.updatedEntry (decodePouchEntry NewEntry)
+
+        -- Not a huge fan of this; I should be mapping the subs
+        , Pouch.Ports.logIn (Login.decodeLogin LoginCompleted)
         ]
 
 
@@ -38,6 +42,7 @@ subscriptions model =
 type Page
     = Blank
     | Entry Entry.Model
+    | Login Login.Model
 
 
 type alias Model =
@@ -45,11 +50,6 @@ type alias Model =
     , pageState : Page
     , mapState : Map.Model
     , loggedIn : Maybe User
-    }
-
-
-type alias User =
-    { name : String
     }
 
 
@@ -74,9 +74,13 @@ init =
 type Msg
     = NoOp
     | LoadEntries
+    | SetPage Page
+    | TogglePage
     | NewEntries (Result String (List Entry))
     | NewEntry (Result String Entry)
+    | LoginCompleted (Result String User)
     | EntryMsg Entry.Msg
+    | LoginMsg Login.Msg
     | MapMsg Map.Msg
 
 
@@ -86,6 +90,24 @@ update msg model =
         -- Messages that exist for all "pages"
         NoOp ->
             model ! []
+
+        SetPage pageState ->
+            { model | pageState = pageState } ! []
+
+        TogglePage ->
+            let
+                nextPage =
+                    case model.pageState of
+                        Blank ->
+                            Blank
+
+                        Entry modelEntry ->
+                            Login Login.initialModel
+
+                        Login modelLogin ->
+                            Entry Entry.initNew
+            in
+                update (SetPage nextPage) model
 
         NewEntries (Err err) ->
             model ! []
@@ -104,6 +126,14 @@ update msg model =
                         :: List.filter (\e -> e.id /= entry.id) model.entries
             in
                 { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarker entry) ]
+
+        LoginCompleted (Err err) ->
+            model ! []
+
+        LoginCompleted (Ok user) ->
+            -- TODO: should be handled as messageToPage in updatePage below
+            -- once subs are mapped
+            { model | loggedIn = Just user } ! []
 
         LoadEntries ->
             ( model, Pouch.Ports.listEntries "entry" )
@@ -135,6 +165,21 @@ updatePage page msg model =
         case ( msg, page ) of
             ( EntryMsg subMsg, Entry subModel ) ->
                 toPage Entry EntryMsg (Entry.update) subMsg subModel
+
+            ( LoginMsg subMsg, Login subModel ) ->
+                let
+                    ( ( pageModel, cmd ), msgFromPage ) =
+                        Login.update subMsg subModel
+
+                    newModel =
+                        case msgFromPage of
+                            Login.NoOp ->
+                                model
+
+                            Login.SetUser user ->
+                                { model | loggedIn = Just user }
+                in
+                    ( { newModel | pageState = (Login pageModel) }, Cmd.map LoginMsg cmd )
 
             ( _, Blank ) ->
                 -- Disregard messages for Blank page/segment
@@ -177,9 +222,9 @@ viewHeader loggedIn =
                     "Guest"
 
                 Just user ->
-                    user.name
+                    user.username
     in
-        div [ class "pa4" ]
+        div [ class "pa4 pointer", onClick <| TogglePage ]
             [ avatar name
             ]
 
@@ -222,6 +267,10 @@ viewPage page =
     case page of
         Blank ->
             Html.text ""
+
+        Login subModel ->
+            Login.view subModel
+                |> Html.map LoginMsg
 
         Entry subModel ->
             Entry.view subModel

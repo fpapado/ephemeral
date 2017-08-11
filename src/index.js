@@ -34,18 +34,6 @@ PouchDB.plugin(require('pouchdb-authentication'));
 let db = new PouchDB('ephemeral');
 let remoteDB= new PouchDB('http://localhost:5984/ephemeral', {skip_setup: true});
 
-remoteDB.login('fotis', '123')
-  .then(res => {
-    console.log('Logged in!', res);
-  })
-  .catch(err => {
-    if (err.name === 'unauthorized') {
-      console.log('Unauthorized');
-    } else {
-      console.log('Other error', err);
-    }
-  });
-
 remoteDB.info()
   .then(res => {
     console.log("Got info", res);
@@ -54,41 +42,34 @@ remoteDB.info()
     console.log("Info error", err);
   });
 
-let syncHandler = db.sync(remoteDB, {
-  live: true,
-  retry: true,
-}).on('change', info => {
-  // something changed
-  console.info("Something changed!", info);
 
-  let { change, direction } = info;
+  let syncHandler = db.sync(remoteDB, {
+    live: true,
+    retry: true,
+  }).on('change', info => {
+    // something changed
+    console.info("Something changed!", info);
 
-  if (direction === 'pull'){
-    change.docs.forEach(doc => {
-      // TODO: find whether the document is new or not
-      // might want to do this on the elm-side?
-      app.ports.updatedEntry.send(doc);
-    });
-  }
+    let { change, direction } = info;
 
-  // TODO: destructure change, send doc to Elm
-  // |> if "push" vs if "pull"
-  // |> include_docs
-}).on('paused', info => {
-  // replication was paused, usually connection loss
-  console.log("Replication paused");
-}).on('active', info => {
-  console.log("Replication resumed");
-}).on('complete', info => {
-  console.log("Replication complete");
-}).on('error', err => {
-  console.log("Unhandled error");
-});
-
-
-// TODO: get info from cancelReplication Port (or listen for logout event), pause replication
-// syncHandler.cancel();
-
+    if (direction === 'pull'){
+      change.docs.forEach(doc => {
+        // TODO: find whether the document is new or not
+        // TODO: handle deletion
+        // might want to do this on the elm-side?
+        app.ports.updatedEntry.send(doc);
+      });
+    }
+  }).on('paused', info => {
+    // replication was paused, usually connection loss
+    console.log("Replication paused");
+  }).on('active', info => {
+    console.log("Replication resumed");
+  }).on('complete', info => {
+    console.log("Replication complete");
+  }).on('error', err => {
+    console.log("Unhandled error");
+  });
 
 let mymap = L.map('mapid').setView([60.1719, 24.9414], 12);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mymap);
@@ -100,10 +81,29 @@ let app = Elm.Main.embed(root);
 let center;
 let markers = {};
 
-// mymap.on('move', (evt) => {
-//   center = mymap.getCenter();
-//   app.ports.getCenter.send([center.lat, center.lng])
-// })
+app.ports.sendLogin.subscribe((user) => {
+  console.log("Got user to log in", user);
+
+  let {username, password} = user;
+
+  remoteDB.login(username, password)
+    .then(res => {
+      console.log('Logged in!', res);
+
+      if(res.ok === true){
+          let {name} = res;
+          app.ports.logIn.send({"username": name});
+      }
+    })
+    .catch(err => {
+      // TODO: send error over port
+      if (err.name === 'unauthorized') {
+        console.log('Unauthorized');
+      } else {
+        console.log('Other error', err);
+      }
+    });
+});
 
 app.ports.setView.subscribe((data) => {
     mymap.setView.apply(mymap, data);

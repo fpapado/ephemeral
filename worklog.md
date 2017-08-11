@@ -3,21 +3,35 @@
   [X] PouchDB-server locally
   [X] Send changes on change
   [X] PouchDB-auth
-  [] Integrate login/logout and tracking in Elm
+  [X] Integrate login/logout and tracking in Elm
     |> View on top
-    |> LogIn -> port LogIn,
-       LogOut -> port LogOut,
-       sub LoggedIn -> LoggedIn,
-       sub LoggedOut ->LoggedOut
+    |> [X] LogIn -> port LogIn,
+       [X] LogOut -> port LogOut,
+       [X] sub LoggedIn -> LoggedIn,
+       [X] sub LoggedOut ->LoggedOut
+  [] Session storage/retrieval on reload?
+    [] Try getUser on init?
+    [] Subscribe to cookie/store changes on key?
   [] Configure url based on environment
   [] Cloudant remotely
   [] Handle all sync events (e.g. "pull" _deleted_: true)
-  [] Signup?
+  [] Factor things out of Page.Login into Request.Session or something
+
+
+[] Routing with pages:
+  [] Main page + Login page
+  [] Map subs for subpages etc.
+  [] Extra, if needed:
+    [] List (map + items; current Main)
+    [] Entry.Editor
+    [] Entry.New
+
 
 [] Organise JS
   [] Clean console logs
   [] Prettier for JS
   [] Split/organise JS
+
 
 [] Better Pouch
   [] API for Pouch access in JS
@@ -25,6 +39,12 @@
   [] Conflict resolution
   [] Error handling for Pouch
 
+
+[] Signup?
+  [] Need the db-per-user strategy
+
+[] Handle errors from ports (Entry changes, Login)
+  [] How?
 
 [] update README
 
@@ -52,10 +72,6 @@
 
 [] Check SW updates
 
-[] Routing with pages:
-  [] List (map + items; current Main)
-  [] Entry.Editor
-  [] Entry.New
 
 # Base
 Decide which fields are editable
@@ -106,6 +122,10 @@ Decide between pages
 [] Figure out where to put encodeEntry, especially b/c of "config" construct (duplicated atm)
 NOTE: A bit redundant to have "pages" atm. It is more like separating the updates, views etc. rather than routes (hence sharing a view in Main)
 [] When doing put(), I disregard the rev from the Elm side, since the get() has the latest already
+
+// TODO: get info from cancelReplication Port (or listen for logout event), pause replication
+// syncHandler.cancel();
+
 
 # Real Data
 Might need to change ordering of id, encoding of floats
