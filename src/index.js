@@ -36,48 +36,79 @@ let remoteDB = new PouchDB('http://localhost:5984/ephemeral', {
   skip_setup: true
 });
 
-remoteDB
-  .info()
-  .then(res => {
-    console.log('Got info', res);
-  })
-  .catch(err => {
-    console.log('Info error', err);
-  });
+let syncHandler;
 
-let syncHandler = db
-  .sync(remoteDB, {
-    live: true,
-    retry: true
-  })
-  .on('change', info => {
-    // something changed
-    console.info('Something changed!', info);
+isUserLoggedIn(remoteDB).then(res => {
+  if (res) {
+    console.info('User is logged in, will sync.');
+    syncHandler = syncRemote(db, remoteDB);
+  } else {
+    console.warn('User is not logged in, not syncing.');
+  }
+});
 
-    let { change, direction } = info;
+function isUserLoggedIn(remote) {
+  let loggedIn = remote
+    .getSession()
+    .then(res => {
+      if (!res.userCtx.name) {
+        return false;
+      } else {
+        return true;
+      }
+    })
+    .catch(err => {
+      throw 'Error in establishing connection';
+    });
+  return loggedIn;
+}
 
-    if (direction === 'pull') {
-      change.docs.forEach(doc => {
-        // TODO: find whether the document is new or not
-        // TODO: handle deletion
-        // might want to do this on the elm-side?
-        app.ports.updatedEntry.send(doc);
-      });
-    }
-  })
-  .on('paused', info => {
-    // replication was paused, usually connection loss
-    console.log('Replication paused');
-  })
-  .on('active', info => {
-    console.log('Replication resumed');
-  })
-  .on('complete', info => {
-    console.log('Replication complete');
-  })
-  .on('error', err => {
-    console.log('Unhandled error');
-  });
+function syncRemote(local, remote) {
+  console.info('Starting sync');
+  let syncHandler = local
+    .sync(remote, {
+      live: true,
+      retry: true
+    })
+    .on('change', info => {
+      // something changed
+      console.info('Something changed!', info);
+
+      let { change, direction } = info;
+
+      if (direction === 'pull') {
+        change.docs.forEach(doc => {
+          // TODO: find whether the document is new or not
+          // TODO: handle deletion
+          // might want to do this on the elm-side?
+          app.ports.updatedEntry.send(doc);
+        });
+      }
+    })
+    .on('paused', info => {
+      // replication was paused, usually connection loss
+      console.log('Replication paused');
+    })
+    .on('active', info => {
+      console.log('Replication resumed');
+    })
+    .on('complete', info => {
+      console.log('Replication complete');
+    })
+    .on('error', err => {
+      if (err.error === 'unauthorized') {
+        console.warn(err.message);
+      } else {
+        console.error('Unhandled error', err);
+      }
+    });
+  return syncHandler;
+}
+
+function cancelSync(handler) {
+  handler.cancel();
+  return true;
+}
 
 let mymap = L.map('mapid').setView([60.1719, 24.9414], 12);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mymap);
@@ -104,6 +135,10 @@ app.ports.sendLogin.subscribe(user => {
         app.ports.logIn.send({ username: name });
       }
     })
+    .then(res => {
+      // Start replication, assign to global handler
+      syncHandler = syncRemote(db, remoteDB);
+    })
     .catch(err => {
       // TODO: send error over port
       if (err.name === 'unauthorized') {
@@ -117,10 +152,13 @@ app.ports.sendLogin.subscribe(user => {
 app.ports.sendLogout.subscribe(_ => {
   console.log('Got message to log out');
 
+  // Cancel sync before logging out, otherwise we odn't have auth
+  console.info('Stopping sync');
+  cancelSync(syncHandler);
+
   remoteDB
     .logout()
     .then(res => {
-      // NOTE: Could send info for a redirect
       // res: {"ok": true}
       console.log('Logging user out');
       app.ports.logOut.send(res);
@@ -138,7 +176,7 @@ app.ports.checkAuthState.subscribe(data => {
     .then(res => {
       if (!res.userCtx.name) {
         // res: {"ok": true}
-        console.log('No user logged in, notifying UI', res);
+        console.log('No user logged in, logging user out', res);
         let { ok } = res;
         app.ports.logOut.send({ ok: ok });
       } else {
@@ -179,7 +217,6 @@ app.ports.saveEntry.subscribe(data => {
   console.log('Got entry to create', data);
   let meta = { type: 'entry' };
   let doc = Object.assign(data, meta);
-  console.log(doc);
 
   db
     .post(doc)

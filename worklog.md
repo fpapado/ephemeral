@@ -11,12 +11,17 @@
        [X] (UI/UX) "Logging in is optional, just tap" explanation on click
        [X] LogOut -> port LogOut,
        [X] sub LoggedOut -> LoggedOut
-       [] CheckAuth periodically?
        [X] loggedOut port message on checkAuth no user found
+       [] CheckAuth periodically?
   [X] Session storage/retrieval on reload?
     [X] Try getSession on init
     [N/A] Subscribe to cookie/store changes on key?
-  [] Pouchdb-server syncs without login even
+  [X] Pouchdb-server syncs without login even
+  [X] Start sync only when loggedIn ->
+    [X] Factor out syncRemote() function
+    [X] When starting, use checkAuth().then(sync)
+    [X] Else, when logging in, then call syncRemote()
+  [] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
   [] Configure url based on environment
   [] Cloudant remotely
   [] Handle all sync events (e.g. "pull" _deleted_: true)
@@ -108,9 +113,8 @@ Decide between pages
 [] Html.lazy2
 
 # Later
-[] More info on User, getUser() when checking auth
-[] PouchDB Auth
-[] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
+[] More info on User, getUser() when checking auth, with id from getAuth()
+[X] PouchDB Auth
 [] migrations?
 [] Search
 [] Translation Helper
@@ -126,6 +130,7 @@ Decide between pages
 [] Critical CSS
   [] PurifyCSS and Webpack
 [X] Leaflet integration
+[] Redirect on Login/Out
 
 
 # Moonshot
