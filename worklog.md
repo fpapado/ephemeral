@@ -40,6 +40,8 @@
 [] UX
   [] Message on successful login
     [] Ditto on failed
+  [] Place get errors
+  [] Validations
   [] Redirect on Login/Out
 
 [] Use Dict instead of List for entries
