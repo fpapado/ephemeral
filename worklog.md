@@ -12,7 +12,6 @@
        [X] LogOut -> port LogOut,
        [X] sub LoggedOut -> LoggedOut
        [X] loggedOut port message on checkAuth no user found
-       [] CheckAuth periodically?
   [X] Session storage/retrieval on reload?
     [X] Try getSession on init
     [N/A] Subscribe to cookie/store changes on key?
@@ -21,11 +20,30 @@
     [X] Factor out syncRemote() function
     [X] When starting, use checkAuth().then(sync)
     [X] Else, when logging in, then call syncRemote()
-  [] Configure url based on environment
+  [X] Configure url based on environment
+
+  [] Full(er) CRUD
+    [] Delete |> with confirmation message (initDelete, confirmDelete); modal?
+    [] Delete -> port Delete
+    [] sub deletedEntry -> EntryDeleted
+    [] Handle more sync events (e.g. "pull" _deleted_: true)
   [] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
-  [] Handle all sync events (e.g. "pull" _deleted_: true)
   [] Factor things out of Page.Login into Request.Session or something (esp. login/logout and decoders)
 
+[] Add Edit back
+  [] Scroll up on edit
+  [] Cancel button on edit
+  [] Popup for editing?
+  [] Edit location
+  [] Edit time added
+
+[] Use Dict instead of List for entries
+  [X] Could probably merge update and new entry Msg
+  [] Could merge all the entry CRUD into "UpdatedEntry", where we index by id on the Elm side and just put the new thing in?
+  [] Related: Port architecture
+
+[] CheckAuth periodically?
+  [] Or, send "LogOut" over port if unauthorized/unauthenticated error?
 
 [] Routing with pages:
   [] Main page + Login page
@@ -65,25 +83,16 @@
 [X] Merge NewEntry and UpdatedEntry (same functionality, since they both remove the entry with the id)
   |> [] Eventually use Dict for entries
 
-[] Add Edit back
-  [] Scroll up on edit
-  [] Cancel button on edit
-  [] Popup for editing?
-
 [] Full CRUD
-  [] Delete |> with confirmation message
-  [] Edit location
-  [] Edit time added
 [] Port architecture
   [] Single port per responsibility, parse on either side?
   [] For instance, log in /out
+
 [] Errors over ports when creation/deletion fails?
 
 [X] "Fly to": Helsinki, World, My Location
 
 [X] Use entry.id instead of indexed map in entries
-[] Use Dict instead of List for entries
-  |> Could probably merge update and new entry Msg at that point?
 
 [X] Check SW updates
 
