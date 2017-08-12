@@ -4,6 +4,7 @@ import L from 'leaflet';
 import PouchDB from 'pouchdb-browser';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import config from 'config';
+import { string2Hex } from './js/util.js';
 
 require('./assets/css/styles.css');
 
@@ -34,31 +35,53 @@ PouchDB.plugin(require('pouchdb-authentication'));
 
 let db = new PouchDB('ephemeral');
 
-// In case we want to customise, e.g. suffix a name
-let couchUrl = config.couchUrl;
-let remoteDB = new PouchDB(couchUrl, {
-  skip_setup: true
-});
+// Before checking logins, we use the base url to check _users and _sessions
+// After that, we customise using initDB() to include the user's db suffix
+// NOTE: there seems to be a bug(?), where leaving the naked URL in will
+// result in an error. Thus passing an extra path after (_users for convenience)
+// is required. This is fine because the DB url is overwritten afterwards.
+let url = config.couchUrl + '_users';
+let remoteDB = new PouchDB(url, { skip_setup: true });
 
 let syncHandler;
 
 isUserLoggedIn(remoteDB).then(res => {
-  if (res) {
-    console.info('User is logged in, will sync.');
+  if (res.ok) {
+    console.info('User is logged in, will sync.', res);
+    remoteDB = initDB(res.name);
     syncHandler = syncRemote(db, remoteDB);
   } else {
     console.warn('User is not logged in, not syncing.');
   }
 });
 
+function initDB(name) {
+  let suffix;
+
+  /* Using db-per-user in production, so we must figure out the user's db.
+     The couch-per-user plugin makes a DB of the form:
+        userdb-{hex username}
+  */
+  if (config.environment === 'production') {
+    suffix = 'userdb-' + string2Hex(name);
+  } else {
+    suffix = config.dbName;
+  }
+
+  let url = config.couchUrl + suffix;
+  let remote = new PouchDB(url, { skip_setup: true });
+
+  return remote;
+}
+
 function isUserLoggedIn(remote) {
   let loggedIn = remote
     .getSession()
     .then(res => {
       if (!res.userCtx.name) {
-        return false;
+        return { ok: false };
       } else {
-        return true;
+        return { ok: true, name: res.userCtx.name };
       }
     })
     .catch(err => {
@@ -137,10 +160,12 @@ app.ports.sendLogin.subscribe(user => {
       if (res.ok === true) {
         let { name } = res;
         app.ports.logIn.send({ username: name });
+        return name;
       }
     })
-    .then(res => {
-      // Start replication, assign to global handler
+    .then(name => {
+      // Start replication, assign to global remote and handler
+      remoteDB = initDB(name);
       syncHandler = syncRemote(db, remoteDB);
     })
     .catch(err => {

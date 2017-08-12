@@ -22,6 +22,14 @@
     [X] Else, when logging in, then call syncRemote()
   [X] Configure url based on environment
 
+  [] Signup?
+    [X] db-per-user strategy
+    [X] Remove the /ephemeral suffix from url config if so
+    [X] initDB
+
+  [] Bug in pouchdb-authentication? if only url is provided (no path after)
+    then the xhr request goes to http://_users instead of http://dburl/_users
+
   [] Full(er) CRUD
     [] Delete |> with confirmation message (initDelete, confirmDelete); modal?
     [] Delete -> port Delete
@@ -77,10 +85,6 @@
       [] On elm: accept { error: String } on port, display
         [] Dismissable
 
-
-[] Signup?
-  [] Need the db-per-user strategy?
-  [] Remove the /ephemeral suffix from url config if so
 
 [] Handle errors from ports (Entry changes, Login)
   [] How?

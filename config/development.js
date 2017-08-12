@@ -2,8 +2,8 @@ module.exports = {
   name: 'development',
   environment: 'development',
 
-  // TODO: change to db-per-user scheme, then remove /ephemeral
-  couchUrl: 'http://localhost:5984/ephemeral'
+  couchUrl: 'http://localhost:5984/',
+  dbName: 'ephemeral'
 
   // TODO: setting up pouchdb-server locally with these
   // couchUsername: 'fotis',
