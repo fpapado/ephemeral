@@ -177,7 +177,7 @@ if (TARGET_ENV === 'production') {
     ],
     resolve: {
       alias: {
-        config: path.join(__dirname, 'config/development.js')
+        config: path.join(__dirname, 'config/production.js')
       }
     },
     module: {

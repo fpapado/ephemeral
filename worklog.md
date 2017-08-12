@@ -37,6 +37,11 @@
   [] Edit location
   [] Edit time added
 
+[] UX
+  [] Message on successful login
+    [] Ditto on failed
+  [] Redirect on Login/Out
+
 [] Use Dict instead of List for entries
   [X] Could probably merge update and new entry Msg
   [] Could merge all the entry CRUD into "UpdatedEntry", where we index by id on the Elm side and just put the new thing in?
@@ -140,7 +145,6 @@ Decide between pages
 [] Critical CSS
   [] PurifyCSS and Webpack
 [X] Leaflet integration
-[] Redirect on Login/Out
 [] Set up pouchdb-server locally and automatically with dev account
 
 

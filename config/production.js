@@ -3,5 +3,5 @@ module.exports = {
   environment: 'production',
 
   // TODO: change to db-per-user scheme, then remove /ephemeral
-  couchUrl: 'http://ephemeral.fltbx.xyz:6984/ephemeral'
+  couchUrl: 'https://ephemeral.fltbx.xyz:6984/ephemeral'
 };
