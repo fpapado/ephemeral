@@ -21,9 +21,8 @@
     [X] Factor out syncRemote() function
     [X] When starting, use checkAuth().then(sync)
     [X] Else, when logging in, then call syncRemote()
-  [] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
   [] Configure url based on environment
-  [] Cloudant remotely
+  [] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
   [] Handle all sync events (e.g. "pull" _deleted_: true)
   [] Factor things out of Page.Login into Request.Session or something (esp. login/logout and decoders)
 
@@ -56,6 +55,7 @@
 
 [] Signup?
   [] Need the db-per-user strategy?
+  [] Remove the /ephemeral suffix from url config if so
 
 [] Handle errors from ports (Entry changes, Login)
   [] How?
@@ -113,6 +113,7 @@ Decide between pages
 [] Html.lazy2
 
 # Later
+[X] Own CouchDB?
 [] More info on User, getUser() when checking auth, with id from getAuth()
 [X] PouchDB Auth
 [] migrations?
@@ -131,6 +132,7 @@ Decide between pages
   [] PurifyCSS and Webpack
 [X] Leaflet integration
 [] Redirect on Login/Out
+[] Set up pouchdb-server locally and automatically with dev account
 
 
 # Moonshot
@@ -164,3 +166,14 @@ I could "just" wrap PouchDB and treat it as my store, letting it do its thing
 # Request module
 I keeping the Requests for decoding the subs from ports in the Request, accepting a toMsg that will be triggered on the caller.
 This allows some separation of concerns, and isn't unlike how Request keeps the Http requests without doing the actual sending, but allowing to specify which Msg will be generated.
+
+# Setting up CouchDB
+Guide
+IP bind
+Proxy or not?
+  SSL
+Permissions and strategies
+https://github.com/pouchdb-community/pouchdb-authentication#couchdb-authentication-recipes
+http://docs.couchdb.org/en/latest/intro/security.html#authentication-database
+https://www.digitalocean.com/community/tutorials/how-to-install-couchdb-and-futon-on-ubuntu-14-04
+http://verbally.flimzy.com/configuring-couchdb-1-6-1-letsencrypt-free-ssl-certificate-debian-8-jessie/

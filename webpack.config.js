@@ -5,15 +5,12 @@ const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const OfflinePlugin = require('offline-plugin');
-var WebpackPwaManifest = require('webpack-pwa-manifest')
+var WebpackPwaManifest = require('webpack-pwa-manifest');
 
-var TARGET_ENV = process.env.npm_lifecycle_event === 'prod'
-  ? 'production'
-  : 'development';
+var TARGET_ENV =
+  process.env.npm_lifecycle_event === 'prod' ? 'production' : 'development';
 
-var filename = (TARGET_ENV == 'production')
-  ? '[name]-[hash].js'
-  : 'index.js';
+var filename = TARGET_ENV == 'production' ? '[name]-[hash].js' : 'index.js';
 
 // -- Offline Plugin --
 let offlinePlugin = new OfflinePlugin({
@@ -47,7 +44,7 @@ let pwaPlugin = new WebpackPwaManifest({
     {
       src: path.resolve('src/assets/icon.png'),
       sizes: [96, 128, 192, 256, 384, 512] // multiple sizes
-    },
+    }
   ]
 });
 
@@ -55,24 +52,21 @@ let pwaPlugin = new WebpackPwaManifest({
 var common = {
   entry: './src/index.js',
   output: {
-    path: path.join(__dirname, "dist"),
+    path: path.join(__dirname, 'dist'),
     // add hash when building for production
     filename: filename
   },
   plugins: [
     new HTMLWebpackPlugin({
-    // using .ejs prevents other loaders causing errors
-    template: 'src/index.ejs',
-    // inject details of output file at end of body
-    inject: 'body'
+      // using .ejs prevents other loaders causing errors
+      template: 'src/index.ejs',
+      // inject details of output file at end of body
+      inject: 'body'
     }),
     pwaPlugin
   ],
   resolve: {
-    modules: [
-      path.join(__dirname, "src"),
-      "node_modules"
-    ],
+    modules: [path.join(__dirname, 'src'), 'node_modules'],
     extensions: ['.js', '.elm', '.css', '.scss', '.png']
   },
   module: {
@@ -82,7 +76,8 @@ var common = {
         test: /\.html$/,
         exclude: /node_modules/,
         loader: 'file-loader?name=[name].[ext]'
-      }, {
+      },
+      {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
@@ -92,41 +87,38 @@ var common = {
             presets: ['env']
           }
         }
-      }, {
+      },
+      {
         test: /\.scss$/,
-        exclude: [
-          /elm-stuff/, /node_modules/
-        ],
-        loaders: ["style-loader", "css-loader", "sass-loader"]
-      }, {
+        exclude: [/elm-stuff/, /node_modules/],
+        loaders: ['style-loader', 'css-loader', 'sass-loader']
+      },
+      {
         test: /\.css$/,
-        exclude: [
-          /elm-stuff/, /node_modules/
-        ],
-        loaders: ["style-loader", "css-loader"]
-      }, {
+        exclude: [/elm-stuff/, /node_modules/],
+        loaders: ['style-loader', 'css-loader']
+      },
+      {
         test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        exclude: [
-          /elm-stuff/, /node_modules/
-        ],
-        loader: "url-loader",
+        exclude: [/elm-stuff/, /node_modules/],
+        loader: 'url-loader',
         options: {
           limit: 10000,
-          mimetype: "application/font-woff"
+          mimetype: 'application/font-woff'
         }
-      }, {
+      },
+      {
         test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        exclude: [
-          /elm-stuff/, /node_modules/
-        ],
-        loader: "file-loader"
-      }, {
+        exclude: [/elm-stuff/, /node_modules/],
+        loader: 'file-loader'
+      },
+      {
         test: /\.(jpe?g|png|gif|svg)$/i,
         loader: 'file-loader'
       }
     ]
   }
-}
+};
 
 if (TARGET_ENV === 'development') {
   console.log('Building for dev...');
@@ -138,18 +130,22 @@ if (TARGET_ENV === 'development') {
       new webpack.NoEmitOnErrorsPlugin()
       // , offlinePlugin
     ],
+    resolve: {
+      alias: {
+        config: path.join(__dirname, 'config/development.js')
+      }
+    },
     module: {
       rules: [
         {
           test: /\.elm$/,
-          exclude: [
-            /elm-stuff/, /node_modules/
-          ],
+          exclude: [/elm-stuff/, /node_modules/],
           use: [
             {
-              loader: "elm-hot-loader"
-            }, {
-              loader: "elm-webpack-loader",
+              loader: 'elm-hot-loader'
+            },
+            {
+              loader: 'elm-webpack-loader',
               // add Elm's debug overlay to output
               options: {
                 debug: true
@@ -162,7 +158,7 @@ if (TARGET_ENV === 'development') {
     devServer: {
       inline: true,
       stats: 'errors-only',
-      contentBase: path.join(__dirname, "src/assets")
+      contentBase: path.join(__dirname, 'src/assets')
     }
   });
 }
@@ -177,18 +173,21 @@ if (TARGET_ENV === 'production') {
         }
       ]),
       new webpack.optimize.UglifyJsPlugin(),
-      offlinePlugin,
+      offlinePlugin
     ],
+    resolve: {
+      alias: {
+        config: path.join(__dirname, 'config/development.js')
+      }
+    },
     module: {
       rules: [
         {
           test: /\.elm$/,
-          exclude: [
-            /elm-stuff/, /node_modules/
-          ],
+          exclude: [/elm-stuff/, /node_modules/],
           use: [
             {
-              loader: "elm-webpack-loader"
+              loader: 'elm-webpack-loader'
             }
           ]
         }

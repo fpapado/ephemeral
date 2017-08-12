@@ -3,6 +3,7 @@
 import L from 'leaflet';
 import PouchDB from 'pouchdb-browser';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
+import config from 'config';
 
 require('./assets/css/styles.css');
 
@@ -32,7 +33,10 @@ window.PouchDB = PouchDB;
 PouchDB.plugin(require('pouchdb-authentication'));
 
 let db = new PouchDB('ephemeral');
-let remoteDB = new PouchDB('http://localhost:5984/ephemeral', {
+
+// In case we want to customise, e.g. suffix a name
+let couchUrl = config.couchUrl;
+let remoteDB = new PouchDB(couchUrl, {
   skip_setup: true
 });
 
