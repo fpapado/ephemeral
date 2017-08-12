@@ -1,4 +1,4 @@
-module Page.Login exposing (ExternalMsg(..), Model, User, Msg, initialModel, update, view, decodeLogin)
+module Page.Login exposing (ExternalMsg(..), Model, User, Msg, initialModel, update, view, decodeLogin, decodeLogout, logout)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -8,7 +8,7 @@ import Views exposing (formField, epButton)
 import Util exposing (viewIf)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
-import Json.Decode.Pipeline as Pipeline exposing (decode, required)
+import Json.Decode.Pipeline as P exposing (decode, required)
 import Pouch.Ports
 
 
@@ -58,6 +58,11 @@ login config =
         Pouch.Ports.sendLogin login
 
 
+logout : Cmd msg
+logout =
+    Pouch.Ports.sendLogout ""
+
+
 decodeLogin : (Result String User -> msg) -> Value -> msg
 decodeLogin toMsg user =
     let
@@ -67,10 +72,23 @@ decodeLogin toMsg user =
         toMsg result
 
 
+decodeLogout : (Result String Bool -> msg) -> Value -> msg
+decodeLogout toMsg res =
+    let
+        decodeRes =
+            decode identity
+                |> P.required "ok" Decode.bool
+
+        result =
+            Decode.decodeValue decodeRes res
+    in
+        toMsg result
+
+
 decodeUser : Decoder User
 decodeUser =
     decode User
-        |> Pipeline.required "username" Decode.string
+        |> P.required "username" Decode.string
 
 
 

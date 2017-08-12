@@ -9,17 +9,18 @@
        [X] sub LoggedIn -> LoggedIn,
        [X] Show "log out" if user
        [X] (UI/UX) "Logging in is optional, just tap" explanation on click
-       [] LogOut -> port LogOut,
-       [] sub LoggedOut -> LoggedOut
+       [X] LogOut -> port LogOut,
+       [X] sub LoggedOut -> LoggedOut
        [] CheckAuth periodically?
-       [] loggedOut port message on checkAuth no user found
+       [X] loggedOut port message on checkAuth no user found
   [X] Session storage/retrieval on reload?
     [X] Try getSession on init
     [N/A] Subscribe to cookie/store changes on key?
+  [] Pouchdb-server syncs without login even
   [] Configure url based on environment
   [] Cloudant remotely
   [] Handle all sync events (e.g. "pull" _deleted_: true)
-  [] Factor things out of Page.Login into Request.Session or something
+  [] Factor things out of Page.Login into Request.Session or something (esp. login/logout and decoders)
 
 
 [] Routing with pages:
@@ -70,6 +71,7 @@
   [] Edit time added
 [] Port architecture
   [] Single port per responsibility, parse on either side?
+  [] For instance, log in /out
 [] Errors over ports when creation/deletion fails?
 
 [X] "Fly to": Helsinki, World, My Location
@@ -124,6 +126,10 @@ Decide between pages
 [] Critical CSS
   [] PurifyCSS and Webpack
 [X] Leaflet integration
+
+
+# Moonshot
+[] Have shared "channels" (db with group-write/group-red)
 
 # Dev
 [X] NPM scripts for building, starting elm-live

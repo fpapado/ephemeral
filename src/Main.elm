@@ -31,8 +31,11 @@ subscriptions model =
         , Pouch.Ports.newEntry (decodePouchEntry NewEntry)
         , Pouch.Ports.updatedEntry (decodePouchEntry NewEntry)
 
-        -- Not a huge fan of this; I should be mapping the subs
+        -- Not a huge fan of this; I should be mapping the subs for Page.login
         , Pouch.Ports.logIn (Login.decodeLogin LoginCompleted)
+
+        -- Should be in a Session module or so
+        , Pouch.Ports.logOut (Login.decodeLogout LogOutCompleted)
         ]
 
 
@@ -85,6 +88,8 @@ type Msg
     | NewEntries (Result String (List Entry))
     | NewEntry (Result String Entry)
     | LoginCompleted (Result String User)
+    | LogOut
+    | LogOutCompleted (Result String Bool)
     | EntryMsg Entry.Msg
     | LoginMsg Login.Msg
     | MapMsg Map.Msg
@@ -133,6 +138,9 @@ update msg model =
             in
                 { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarker entry) ]
 
+        LogOut ->
+            ( model, Login.logout )
+
         LoginCompleted (Err err) ->
             model ! []
 
@@ -140,6 +148,12 @@ update msg model =
             -- TODO: should be handled as messageToPage in updatePage below
             -- once subs are mapped
             { model | loggedIn = Just user } ! []
+
+        LogOutCompleted (Err err) ->
+            model ! []
+
+        LogOutCompleted (Ok ok) ->
+            { model | loggedIn = Nothing } ! []
 
         LoadEntries ->
             ( model, Pouch.Ports.listEntries "entry" )
@@ -288,7 +302,7 @@ viewLoginLogout loggedIn subModel =
         Just user ->
             div [ class "mt2 measure center" ]
                 [ p [ class "lh-copy f5 mb3 black-80" ] [ text "Note that logging out does not delete your local files. If you log in again, then the database will attempt to synchronise with the remote. This may or may not be what you intend." ]
-                , epButton [ class "w-100 white bg-deep-blue" ] [ text "Log Out" ]
+                , epButton [ class "w-100 white bg-deep-blue", onClick LogOut ] [ text "Log Out" ]
                 ]
 
         Nothing ->

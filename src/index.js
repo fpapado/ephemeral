@@ -114,15 +114,33 @@ app.ports.sendLogin.subscribe(user => {
     });
 });
 
+app.ports.sendLogout.subscribe(_ => {
+  console.log('Got message to log out');
+
+  remoteDB
+    .logout()
+    .then(res => {
+      // NOTE: Could send info for a redirect
+      // res: {"ok": true}
+      console.log('Logging user out');
+      app.ports.logOut.send(res);
+    })
+    .catch(err => {
+      console.log('Something went wrong logging user out', err);
+    });
+});
+
 app.ports.checkAuthState.subscribe(data => {
   console.log('Checking Auth');
+
   remoteDB
     .getSession()
     .then(res => {
       if (!res.userCtx.name) {
-        console.log('No user logged in', res);
-        // TODO
-        // app.ports.logOut.send({});
+        // res: {"ok": true}
+        console.log('No user logged in, notifying UI', res);
+        let { ok } = res;
+        app.ports.logOut.send({ ok: ok });
       } else {
         console.log('User is logged in', res);
         let { name } = res.userCtx;
