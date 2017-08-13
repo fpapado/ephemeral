@@ -105,10 +105,13 @@ function syncRemote(local, remote) {
 
       if (direction === 'pull') {
         change.docs.forEach(doc => {
-          // TODO: find whether the document is new or not
-          // TODO: handle deletion
-          // might want to do this on the elm-side?
-          app.ports.updatedEntry.send(doc);
+          // TODO: might want to do this on the elm-side, and send things on single port?
+          if (doc._deleted) {
+            console.log('Deleted doc');
+            app.ports.deletedEntry.send({_id: doc._id});
+          } else {
+            app.ports.updatedEntry.send(doc);
+          }
         });
       }
     })

@@ -32,7 +32,7 @@
       |> [] remove marker
     [X] Delete -> port Delete
     [X] sub deletedEntry -> EntryDeleted
-    [] Handle more sync events (e.g. "pull" _deleted_: true)
+    [X] Handle more sync events (e.g. "pull" _deleted_: true)
   [] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
 
 [] Use Dict instead of List for entries
