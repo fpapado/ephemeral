@@ -4,7 +4,7 @@ import L from 'leaflet';
 import PouchDB from 'pouchdb-browser';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import config from 'config';
-import { string2Hex } from './js/util.js';
+import {string2Hex} from './js/util.js';
 
 require('./assets/css/styles.css');
 
@@ -41,7 +41,7 @@ let db = new PouchDB('ephemeral');
 // result in an error. Thus passing an extra path after (_users for convenience)
 // is required. This is fine because the DB url is overwritten afterwards.
 let url = config.couchUrl + '_users';
-let remoteDB = new PouchDB(url, { skip_setup: true });
+let remoteDB = new PouchDB(url, {skip_setup: true});
 
 let syncHandler;
 
@@ -69,7 +69,7 @@ function initDB(name) {
   }
 
   let url = config.couchUrl + suffix;
-  let remote = new PouchDB(url, { skip_setup: true });
+  let remote = new PouchDB(url, {skip_setup: true});
 
   return remote;
 }
@@ -79,9 +79,9 @@ function isUserLoggedIn(remote) {
     .getSession()
     .then(res => {
       if (!res.userCtx.name) {
-        return { ok: false };
+        return {ok: false};
       } else {
-        return { ok: true, name: res.userCtx.name };
+        return {ok: true, name: res.userCtx.name};
       }
     })
     .catch(err => {
@@ -101,7 +101,7 @@ function syncRemote(local, remote) {
       // something changed
       console.info('Something changed!', info);
 
-      let { change, direction } = info;
+      let {change, direction} = info;
 
       if (direction === 'pull') {
         change.docs.forEach(doc => {
@@ -150,7 +150,7 @@ let markers = {};
 app.ports.sendLogin.subscribe(user => {
   console.log('Got user to log in', user);
 
-  let { username, password } = user;
+  let {username, password} = user;
 
   remoteDB
     .login(username, password)
@@ -158,8 +158,8 @@ app.ports.sendLogin.subscribe(user => {
       console.log('Logged in!', res);
 
       if (res.ok === true) {
-        let { name } = res;
-        app.ports.logIn.send({ username: name });
+        let {name} = res;
+        app.ports.logIn.send({username: name});
         return name;
       }
     })
@@ -206,13 +206,13 @@ app.ports.checkAuthState.subscribe(data => {
       if (!res.userCtx.name) {
         // res: {"ok": true}
         console.log('No user logged in, logging user out', res);
-        let { ok } = res;
-        app.ports.logOut.send({ ok: ok });
+        let {ok} = res;
+        app.ports.logOut.send({ok: ok});
       } else {
         console.log('User is logged in', res);
-        let { name } = res.userCtx;
+        let {name} = res.userCtx;
         // TODO: in the future, will need to add more info
-        app.ports.logIn.send({ username: name });
+        app.ports.logIn.send({username: name});
       }
     })
     .catch(err => {
@@ -244,7 +244,7 @@ app.ports.setMarkers.subscribe(data => {
 
 app.ports.saveEntry.subscribe(data => {
   console.log('Got entry to create', data);
-  let meta = { type: 'entry' };
+  let meta = {type: 'entry'};
   let doc = Object.assign(data, meta);
 
   db
@@ -264,14 +264,14 @@ app.ports.saveEntry.subscribe(data => {
 app.ports.updateEntry.subscribe(data => {
   console.log('Got entry to update', data);
 
-  let { _id } = data;
+  let {_id} = data;
   console.log(_id);
 
   db
     .get(_id)
     .then(doc => {
       // NOTE: We disregard the _rev from Elm, to be safe
-      let { _rev } = doc;
+      let {_rev} = doc;
 
       let newDoc = Object.assign(doc, data);
       newDoc._rev = _rev;
@@ -300,7 +300,7 @@ app.ports.deleteEntry.subscribe(_id => {
     })
     .then(res => {
       console.log('Successfully deleted', _id);
-      app.ports.deletedEntry.send({ _id: _id });
+      app.ports.deletedEntry.send({_id: _id});
     })
     .catch(err => {
       console.error('Failed to delete', err);
@@ -310,7 +310,7 @@ app.ports.deleteEntry.subscribe(_id => {
 
 app.ports.listEntries.subscribe(str => {
   console.log('Will list entries');
-  let docs = db.allDocs({ include_docs: true }).then(docs => {
+  let docs = db.allDocs({include_docs: true}).then(docs => {
     let entries = docs.rows.map(row => row.doc);
     console.log('Listing entries', entries);
 
