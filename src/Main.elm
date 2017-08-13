@@ -345,7 +345,7 @@ viewEntry entry =
         [ class "dw-panel" ]
         [ div
             [ class "dw-panel__content bg-muted-blue mw5 center br4 pa4 shadow-card" ]
-            [ a [ onClick <| DeleteEntry entry.id, class "close black-80 hover-white" ] [ text "×" ]
+            [ a [ onClick <| DeleteEntry entry.id, class "close handwriting black-70 hover-white" ] [ text "×" ]
             , div [ class "white tl" ]
                 [ h2
                     [ class "mt0 mb2 f5 f4-ns fw6 overflow-hidden" ]
