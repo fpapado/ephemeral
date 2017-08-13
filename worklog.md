@@ -54,6 +54,7 @@
   [] Place get errors
   [] Validations
   [] Redirect on Login/Out
+  [] Replication status
 
 [] Signup?
 

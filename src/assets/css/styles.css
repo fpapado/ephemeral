@@ -81,17 +81,25 @@
 }
 
 /* Quasi-component things */
-.close {
+a.close {
+  float: right;
+  display: inline-block;
   margin-top: -25px;
   margin-right: -25px;
+  text-decoration: none;
+  height: 25px;
+  width: 25px;
   border-radius: 25px;
-  font-size: 25px;
-  line-height: 0px;
-  padding: 11px 3px;
+  font-size: 22px;
+  line-height: 21px;
+  background-color: #e3e2e4;
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
 }
 
-.close:before {
-  content: "×";
+a.close:hover{
+  background-color: #db8972;
 }
 
 /*!
