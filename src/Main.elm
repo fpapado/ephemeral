@@ -4,14 +4,13 @@ import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
 import Views exposing (epButton, avatar)
-import Data.Entry exposing (Entry)
-import Request.Entry exposing (decodePouchEntries, decodePouchEntry)
+import Data.Entry exposing (Entry, EntryId)
+import Request.Entry exposing (decodePouchEntries, decodePouchEntry, decodeDeletedEntry)
 import Page.Entry as Entry
 import Page.Login as Login exposing (User)
 import Map as Map
 import Util exposing (viewDate, viewIf)
 import Pouch.Ports
-import Json.Encode as Encode
 
 
 main : Program Never Model Msg
@@ -30,6 +29,7 @@ subscriptions model =
         [ Pouch.Ports.getEntries (decodePouchEntries NewEntries)
         , Pouch.Ports.newEntry (decodePouchEntry NewEntry)
         , Pouch.Ports.updatedEntry (decodePouchEntry NewEntry)
+        , Pouch.Ports.deletedEntry (decodeDeletedEntry DeletedEntry)
 
         -- Not a huge fan of this; I should be mapping the subs for Page.login
         , Pouch.Ports.logIn (Login.decodeLogin LoginCompleted)
@@ -85,8 +85,10 @@ type Msg
     | LoadEntries
     | SetPage Page
     | TogglePage
+    | DeleteEntry EntryId
     | NewEntries (Result String (List Entry))
     | NewEntry (Result String Entry)
+    | DeletedEntry (Result String EntryId)
     | LoginCompleted (Result String User)
     | LogOut
     | LogOutCompleted (Result String Bool)
@@ -120,6 +122,9 @@ update msg model =
             in
                 update (SetPage nextPage) model
 
+        DeleteEntry entryId ->
+            model ! [ Request.Entry.delete entryId ]
+
         NewEntries (Err err) ->
             model ! []
 
@@ -137,6 +142,18 @@ update msg model =
                         :: List.filter (\e -> e.id /= entry.id) model.entries
             in
                 { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarker entry) ]
+
+        DeletedEntry (Err err) ->
+            model ! []
+
+        DeletedEntry (Ok entryId) ->
+            let
+                -- TODO: would be better if we had a dict
+                newEntries =
+                    List.filter (\e -> e.id /= entryId) model.entries
+            in
+                -- TODO: remove marker
+                { model | entries = newEntries } ! []
 
         LogOut ->
             ( model, Login.logout )
@@ -329,7 +346,8 @@ viewEntry entry =
         [ div
             [ class "dw-panel__content bg-muted-blue mw5 center br4 pa4 shadow-card" ]
             [ div [ class "white tl" ]
-                [ h2
+                [ a [ onClick <| DeleteEntry entry.id, class "close fr pointer dib white bg-pale-red" ] []
+                , h2
                     [ class "mt0 mb2 f5 f4-ns fw6 overflow-hidden" ]
                     [ text entry.content ]
                 , h2

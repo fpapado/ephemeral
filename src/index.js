@@ -124,7 +124,7 @@ function syncRemote(local, remote) {
     })
     .on('error', err => {
       if (err.error === 'unauthorized') {
-        console.warn(err.message);
+        console.error(err.message);
       } else {
         console.error('Unhandled error', err);
       }
@@ -171,9 +171,9 @@ app.ports.sendLogin.subscribe(user => {
     .catch(err => {
       // TODO: send error over port
       if (err.name === 'unauthorized') {
-        console.log('Unauthorized');
+        console.warn('Unauthorized');
       } else {
-        console.log('Other error', err);
+        console.error('Other error', err);
       }
     });
 });
@@ -193,7 +193,7 @@ app.ports.sendLogout.subscribe(_ => {
       app.ports.logOut.send(res);
     })
     .catch(err => {
-      console.log('Something went wrong logging user out', err);
+      console.error('Something went wrong logging user out', err);
     });
 });
 
@@ -216,7 +216,7 @@ app.ports.checkAuthState.subscribe(data => {
       }
     })
     .catch(err => {
-      console.log('Error checking Auth', err);
+      console.error('Error checking Auth', err);
     });
 });
 
@@ -256,7 +256,7 @@ app.ports.saveEntry.subscribe(data => {
       });
     })
     .catch(err => {
-      console.log('Failed to create', err);
+      console.error('Failed to create', err);
       // TODO: Send back over port that Err error?
     });
 });
@@ -285,7 +285,25 @@ app.ports.updateEntry.subscribe(data => {
       });
     })
     .catch(err => {
-      console.log('Failed to update', err);
+      console.error('Failed to update', err);
+      // TODO: Send back over port that Err error
+    });
+});
+
+app.ports.deleteEntry.subscribe(_id => {
+  console.log('Got entry to delete', _id);
+
+  db
+    .get(_id)
+    .then(doc => {
+      return db.remove(doc);
+    })
+    .then(res => {
+      console.log('Successfully deleted', _id);
+      app.ports.deletedEntry.send({ _id: _id });
+    })
+    .catch(err => {
+      console.error('Failed to delete', err);
       // TODO: Send back over port that Err error
     });
 });

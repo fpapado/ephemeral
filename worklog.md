@@ -27,11 +27,18 @@
   [X] initDB
 
   [] Full(er) CRUD
-    [] Delete |> with confirmation message (initDelete, confirmDelete); modal?
-    [] Delete -> port Delete
-    [] sub deletedEntry -> EntryDeleted
+    [] Delete message
+      |> [] with confirmation message (initDelete, confirmDelete); modal?
+      |> [] remove marker
+    [X] Delete -> port Delete
+    [X] sub deletedEntry -> EntryDeleted
     [] Handle more sync events (e.g. "pull" _deleted_: true)
   [] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
+
+[] Use Dict instead of List for entries
+  [X] Could probably merge update and new entry Msg
+  [] Could merge all the entry CRUD into "UpdatedEntry", where we index by id on the Elm side and just put the new thing in?
+  [] Related: Port architecture
   [] Factor things out of Page.Login into Request.Session or something (esp. login/logout and decoders)
 
 [] Add Edit back
@@ -49,11 +56,6 @@
   [] Redirect on Login/Out
 
 [] Signup?
-
-[] Use Dict instead of List for entries
-  [X] Could probably merge update and new entry Msg
-  [] Could merge all the entry CRUD into "UpdatedEntry", where we index by id on the Elm side and just put the new thing in?
-  [] Related: Port architecture
 
 [] CheckAuth periodically?
   [] Or, send "LogOut" over port if unauthorized/unauthenticated error?

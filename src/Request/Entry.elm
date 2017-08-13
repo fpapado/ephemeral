@@ -3,9 +3,11 @@ module Request.Entry
         ( list
         , create
         , update
+        , delete
         , decodeEntryList
         , decodePouchEntries
         , decodePouchEntry
+        , decodeDeletedEntry
         )
 
 import Data.Entry as Entry
@@ -21,6 +23,7 @@ import Data.Entry as Entry
 import Date exposing (Date)
 import Date.Extra.Format exposing (utcIsoString)
 import Json.Decode as Decode
+import Json.Decode.Pipeline as P exposing (decode, required)
 import Json.Encode as Encode exposing (Value)
 import Pouch.Ports
 
@@ -84,6 +87,15 @@ update entryId rev config =
         Pouch.Ports.updateEntry entry
 
 
+delete : EntryId -> Cmd msg
+delete entryId =
+    let
+        id_ =
+            idToString entryId
+    in
+        Pouch.Ports.deleteEntry id_
+
+
 
 -- Called from subscriptions --
 
@@ -109,3 +121,16 @@ decodePouchEntry toMsg entry =
 decodeEntryList : Decode.Decoder (List Entry)
 decodeEntryList =
     Decode.list (Entry.decodeEntry)
+
+
+decodeDeletedEntry : (Result String EntryId -> msg) -> Value -> msg
+decodeDeletedEntry toMsg val =
+    let
+        decodeVal =
+            decode identity
+                |> P.required "_id" Decode.string
+
+        result =
+            Decode.decodeValue decodeVal val
+    in
+        toMsg (Result.map (Entry.EntryId) result)
