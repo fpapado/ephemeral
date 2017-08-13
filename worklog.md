@@ -22,13 +22,9 @@
     [X] Else, when logging in, then call syncRemote()
   [X] Configure url based on environment
 
-  [] Signup?
-    [X] db-per-user strategy
-    [X] Remove the /ephemeral suffix from url config if so
-    [X] initDB
-
-  [] Bug in pouchdb-authentication? if only url is provided (no path after)
-    then the xhr request goes to http://_users instead of http://dburl/_users
+  [X] db-per-user strategy
+  [X] Remove the /ephemeral suffix from url config if so
+  [X] initDB
 
   [] Full(er) CRUD
     [] Delete |> with confirmation message (initDelete, confirmDelete); modal?
@@ -51,6 +47,8 @@
   [] Place get errors
   [] Validations
   [] Redirect on Login/Out
+
+[] Signup?
 
 [] Use Dict instead of List for entries
   [X] Could probably merge update and new entry Msg
@@ -134,6 +132,8 @@ Decide between pages
 
 # Later
 [X] Own CouchDB?
+[] Bug in pouchdb-authentication? if only url is provided (no path after)
+  then the xhr request goes to http://_users instead of http://dburl/_users
 [] More info on User, getUser() when checking auth, with id from getAuth()
 [X] PouchDB Auth
 [] migrations?
