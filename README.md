@@ -1,18 +1,22 @@
-# Ephemeral
+# Ephemeral 🍃
 
-TODO: Description
+Ephemeral is a progressive web app for writing down cards, tracking time added and location.
+The original motivation was writing down words and their translations as I encounter them, when travelling or moving to a new city.
+I also wanted to be able to access my notes easily, see relevant data, and be able to extend visualisations programatically.
 
-Elm app for taking notes of words, tracking time added and location.
-Also includes offline functionality and syncing.
+Ephemeral is mostly written in [Elm](http://elm-lang.org), with maps from [Leaflet](http://http://leafletjs.com/) and storage via [PouchDB](https://pouchdb.com/).
+It works offline and can synchronise your data!
 
-TODO: Features: PWA offline, sync
+![Ephemeral Demo](docs/media/demo_frontpage.png)
 
-TODO: Screenshot
-
-TODO: Motivation
+## Features
+- Write down notes
+- Works offline
+- You can add it to your home screen on Android
+- Notes can be synchronised to a remote database, and across devices
 
 ## Development: Frontend
-Webpack is used to handle everything on the front-end. You can run it with:
+Webpack is used to bundle everything on the front-end. You can run it with:
 ```shell
 npm install
 npm run dev
@@ -22,7 +26,7 @@ Change files in `src/` as appropriate
 
 Generally, if you need to handle PouchDB and Leaflet maps, use the Javascript side.
 For UI rendering and logic, prefer Elm and synchronise over ports as appropriate
-There is a mix of JS (used to handle PouchDB, Leaflet maps
+There is a mix of JS (used to handle PouchDB, Leaflet maps) in `src/index.js`, which should probably be restructured soon.
 
 ## Production: Frontend
 ```shell
@@ -33,18 +37,18 @@ Deploy `dist/` with your favourite static vendor.
 
 Webpack PWA and Webpack offline customisation
 
-
 ## PWA, Offline Data
-TODO: PWA
+TODO: A PWA is...
+
 TODO: Links
-Webpack Plugins
+
+In order to handle ... use webpack Plugins
 
 TODO: Using PouchDB, a local database that saves data to IndexedDB/WebSQL on your browser, persisted betwen sessions.
 It can also sync to other PouchDB/CouchDB instances, for syncing between devices and backup.
 By default, if a user is not logged in, the local PouchDB does not synchronise anywhere.
 
 TODO: Links
-
 
 ## Development DB
 You can either use a local CouchDB, but perhaps it is *simpler if you use the node `pouchdb-server` in development*.
