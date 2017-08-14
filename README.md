@@ -10,10 +10,12 @@ It works offline and can synchronise your data!
 ![Ephemeral Demo](docs/media/demo_frontpage.png)
 
 ## Features
-- Write down notes
-- Works offline
-- You can add it to your home screen on Android
-- Notes can be synchronised to a remote database, and across devices
+- [X] Write down notes
+- [X] Works offline
+- [X] You can add it to your home screen on Android
+- [X] Notes can be synchronised to a remote database, and across devices
+- [ ] Export to Anki deck
+- [ ] Bring-your-own DB
 
 ## Development: Frontend
 Webpack is used to bundle everything on the front-end. You can run it with:
@@ -38,17 +40,21 @@ Deploy `dist/` with your favourite static vendor.
 Webpack PWA and Webpack offline customisation
 
 ## PWA, Offline Data
-TODO: A PWA is...
+A Progressive Web App works offline via a Service Worker, which caches assets and scripts.
+- Currently, Service Workers do not work in Safari, so the app won't load offline :/
+- If you are on Chrome or Firefox, then the app will load offline
+- Furthermore, if you are on Android, you can add the app to your home screen, and it will launch independently
 
-TODO: Links
+For storage, Ephemeral uses PouchDB, which is a local, persisted database in your browser.
+PouchDB can sync to a remote database for backup, since the local IndexedDB/WebSQL (which PouchDB uses) can still be cleared on occasion.
+**By default, if a user is not logged in, the local PouchDB does not synchronise anywhere.**
 
-In order to handle ... use webpack Plugins
+Service workers are generated with the [webpack-offline plugin](https://github.com/NekR/offline-plugin)
 
-TODO: Using PouchDB, a local database that saves data to IndexedDB/WebSQL on your browser, persisted betwen sessions.
-It can also sync to other PouchDB/CouchDB instances, for syncing between devices and backup.
-By default, if a user is not logged in, the local PouchDB does not synchronise anywhere.
+An app manifest is generated with [webpack-manifest-plugin](https://github.com/danethurber/webpack-manifest-plugin)
 
-TODO: Links
+If you want to learn more about Progressive Webapps, [here is an intro by
+Google](https://developers.google.com/web/progressive-web-apps/).
 
 ## Development DB
 You can either use a local CouchDB, but perhaps it is *simpler if you use the node `pouchdb-server` in development*.
@@ -76,7 +82,7 @@ You can manually create an admin user by creating and editing `pouchdb-server/co
 Note that the file will be overwritten with a hash by the server once run.
 
 #### Via Fauxton
-Alternatively (perhaps easier), you can navigate to [http://localhost:5984/_utils](http://localhost:5984/_utils) (or whatever the pouchdb-server URL is), to access the management interface.
+Alternatively (perhaps easier), you can navigate to `http://localhost:5984/_utils` (or whatever the pouchdb-server URL is), to access the management interface.
 - Click on `Admin Party`
 - You will be prompted to create an admin user
 - You can then add users as you wish via the _users table.
@@ -94,15 +100,13 @@ If you can't locate your CouchDB plugin folder, then check `/etc/couchdb/default
 Couch-per-user creates datbases of the kind userdb-{hex of username}, so `index.js` has `initDB()` to make this transformation.
 If you use a different scheme, change the code in `initDB()` as appropriate!
 
-More info on authentication recipes:
-TODO: LINK
+[More info on authentication recipes](https://github.com/pouchdb-community/pouchdb-authentication#couchdb-authentication-recipes)
 
 ### Self-hosting CouchDB
 #### Nutshell
 In case you want to self-host with SSL, here are the basic steps:
 
-Basics
-  [Guide]()
+[Basics Guide](https://www.digitalocean.com/community/tutorials/how-to-install-couchdb-and-futon-on-ubuntu-14-04)
   - Get a VPS, I went with Ubuntu 16.04 on Digital Ocean
   - Install CouchDB (Ubuntu has a ppa)
   - Secure installation with custom user
@@ -113,17 +117,18 @@ Open to the world
   - You can no longer access over the tunnel but `http://ipaddress:5984/_utils` should do it
   - Try `http://ipaddress:5984/_utils/fauxton/` if you want a cleaner interface
 
-DNS, SSL
-  [Guide]() (you will have to change the addresses as appropriate)
+DNS, [Letsencrypt, SSL listening](http://verbally.flimzy.com/configuring-couchdb-1-6-1-letsencrypt-free-ssl-certificate-debian-8-jessie/) (you will have to change the addresses as appropriate)
   - Configure DNS to point to your server
   - Provision certificate; letsEncrypt needs a web server to verify ownership
-  - Set up CouchDB's SSL termination (see guide)
-  - (Optionally) disable http access [Link](TODO)
+  - Set up CouchDB's SSL termination
+  - (Optionally) disable http access
+  - Try `https://domain:6984/_utils/` and see if you're good
 
-Couch-per-user
-[Follow the guide](LINK), and it should be simple.
-If you can't locate your CouchDB plugin folder, then check `/etc/couchdb/default.ini`.
+[Couchperuser setup](https://github.com/etrepum/couchperuser)
+- If you can't locate your CouchDB plugin folder, then check `/etc/couchdb/default.ini`.
 
-Docker
-There is also a docker option, which I haven't tried, but seems good:
-  - ... (also comes with couch-per-user installed!)
+[Docker](https://github.com/apache/couchdb-docker)
+ - There is also a docker option, which I haven't tried, but seems good
+  - ... also comes with couch-per-user installed!
+
+

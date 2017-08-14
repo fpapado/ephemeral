@@ -1,200 +1,194 @@
 # TODO
-[X] PouchDB replication
-  [X] PouchDB-server locally
-  [X] Send changes on change
-  [X] PouchDB-auth
-  [X] Integrate login/logout and tracking in Elm
-    |> View on top
-    |> [X] LogIn -> port LogIn,
-       [X] sub LoggedIn -> LoggedIn,
-       [X] Show "log out" if user
-       [X] (UI/UX) "Logging in is optional, just tap" explanation on click
-       [X] LogOut -> port LogOut,
-       [X] sub LoggedOut -> LoggedOut
-       [X] loggedOut port message on checkAuth no user found
-  [X] Session storage/retrieval on reload?
-    [X] Try getSession on init
-    [N/A] Subscribe to cookie/store changes on key?
-  [X] Pouchdb-server syncs without login even
-  [X] Start sync only when loggedIn ->
-    [X] Factor out syncRemote() function
-    [X] When starting, use checkAuth().then(sync)
-    [X] Else, when logging in, then call syncRemote()
-  [X] Configure url based on environment
+- [X] PouchDB replication
+  - [X] PouchDB-server locally
+  - [X] Send changes on change
+  - [X] PouchDB-auth
+  - [X] Integrate login/logout and tracking in Elm
+    - [X] LogIn -> port LogIn,
+    - [X] sub LoggedIn -> LoggedIn,
+    - [X] Show "log out" if user
+    - [X] (UI/UX) "Logging in is optional, just tap" explanation on click
+    - [X] LogOut -> port LogOut,
+    - [X] sub LoggedOut -> LoggedOut
+    - [X] loggedOut port message on checkAuth no user found
+  - [X] Session storage/retrieval on reload?
+    - [X] Try getSession on init
+    - [N/A] Subscribe to cookie/store changes on key?
+  - [X] Pouchdb-server syncs without login even
+  - [X] Start sync only when loggedIn ->
+    - [X] Factor out syncRemote() function
+    - [X] When starting, use checkAuth().then(sync)
+    - [X] Else, when logging in, then call syncRemote()
+  - [X] Configure url based on environment
 
-  [X] db-per-user strategy
-  [X] Remove the /ephemeral suffix from url config if so
-  [X] initDB
+  - [X] db-per-user strategy
+  - [X] Remove the /ephemeral suffix from url config if so
+  - [X] initDB
 
-  [X] Use Dict instead of List for entries
-  [] Html.lazy
-  [] Html.keyed
-    |> There is a visual bug when clicking to delete that keeps the button highlighted
-  [X] Batch marker addition when bulk entries
-    |> [X] Send AddMarkers directly
-    |> [] What happens on NewEntry from sync? is it NewEntry or NewEntries?
-      |> [] If many smaller NewEntry, probably update to batch, or stagger Map AddMarker
-    |> [] Clean up AddMarker etc.
-    |> [] Add separate updateMarker port (for now)
-      |> This is an issue because we always update all markers via Object.assign in js, when it exists in array, such that we can catch updates
-      |> [] Eventually move to single port (see 'Port architecture')
+  - [X] Use Dict instead of List for entries
+  - [ ] Html.lazy
+  - [ ] Html.keyed
+    There is a visual bug when clicking to delete that keeps the button highlighted
+  - [X] Batch marker addition when bulk entries
+    - [X] Send AddMarkers directly
+    - [ ] What happens on NewEntry from sync? is it NewEntry or NewEntries?
+    - [ ] If many smaller NewEntry, probably update to batch, or stagger Map AddMarker
+    - [ ] Clean up AddMarker etc.
+    - [ ] Add separate updateMarker port (for now)
+      This is an issue because we always update all markers via Object.assign in js, when it exists in array, such that we can catch updates
+      - [ ] Eventually move to single port (see 'Port architecture')
 
-  [] Full(er) CRUD
-    [] Delete message
-      |> [] with confirmation message (initDelete, confirmDelete); modal?
-      |> [] remove marker
-    [X] Delete -> port Delete
-    [X] sub deletedEntry -> EntryDeleted
-    [X] Handle more sync events (e.g. "pull" _deleted_: true)
-  [] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
+  - [ ] Full(er) CRUD
+    - [ ] Delete message
+      - [ ] with confirmation message (initDelete, confirmDelete); modal?
+      - [ ] remove marker
+    - [X] Delete -> port Delete
+    - [X] sub deletedEntry -> EntryDeleted
+    - [X] Handle more sync events (e.g. "pull" _deleted_: true)
+  - [ ] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
 
-  [N/A] Could merge all the entry CRUD into "UpdatedEntry", where we index by id on the Elm side and just put the new thing in?
-    |> Perhaps keep the deletion separate after all
-  [] Related: Port architecture, merging ports
-    [] e.g. could have:
-      (maybe 'decode' is not the best word here. Translate?)
-      decodePouchUpdate : (Result String Entry -> msg) -> (Result Sting String -> msg) -> Value -> msg
+  - [N/A] Could merge all the entry CRUD into "UpdatedEntry", where we index by id on the Elm side and just put the new thing in?
+    Perhaps keep the deletion separate after all
+  - [ ] Related: Port architecture, merging ports
+    - [ ] e.g. could have:
+      translatePouchUpdate : (Result String Entry -> msg) -> (Result Sting String -> msg) -> Value -> msg
       decodePouchUpdate updateMsg  deleteMsg fromPort = ...
 
-  [] Factor things out of Page.Login into Request.Session or something (esp. login/logout and decoders)
-  [] Debatable whether to propagate error in Request.Entry or return empty Dict
+  - [ ] Factor things out of Page.Login into Request.Session or something (esp. login/logout and decoders)
+  - [ ] Debatable whether to propagate error in Request.Entry or return empty Dict
 
-[] Add Edit back
-  [] Scroll up on edit
-  [] Cancel button on edit
-  [] Popup for editing?
-  [] Edit location
-  [] Edit time added
+- [ ] Add Edit back
+  - [ ] Scroll up on edit
+  - [ ] Cancel button on edit
+  - [ ] Popup for editing?
+  - [ ] Edit location
+  - [ ] Edit time added
 
-[] UX
-  [] Message on successful login
-    [] Ditto on failed
-  [] Place get errors
-  [] Validations
-  [] Redirect on Login/Out
-  [] Replication status
+- [ ] UX
+  - [ ] Message on successful login
+    - [ ] Ditto on failed
+  - [ ] Place get errors
+  - [ ] Validations
+  - [ ] Redirect on Login/Out
+  - [ ] Replication status
 
-[] Signup?
+- [ ] Signup?
 
-[] CheckAuth periodically?
-  [] Or, send "LogOut" over port if unauthorized/unauthenticated error?
+- [ ] CheckAuth periodically?
+  - [ ] Or, send "LogOut" over port if unauthorized/unauthenticated error?
 
-[] Routing with pages:
-  [] Main page + Login page
-  [] Map subs for subpages etc.
-  [] Extra, if needed:
-    [] List (map + items; current Main)
-    [] Entry.Editor
-    [] Entry.New
-
-
-[] Organise JS
-  [] Clean console logs
-  [X] Prettier for JS
-  [] Split/organise JS
+- [ ] Routing with pages:
+  - [ ] Main page + Login page
+  - [ ] Map subs for subpages etc.
+  - [ ] Extra, if needed:
+    - [ ] List (map + items; current Main)
+    - [ ] Entry.Editor
+    - [ ] Entry.New
 
 
-[] Better Pouch
-  [] API for Pouch access in JS
-  [] Upsert https://pouchdb.com/guides/conflicts.html
-  [] Conflict resolution
-  [] Error handling for Pouch
-    [] Particularly, replication errors over ports
-      [] On JS: filter, send on port
-      [] On elm: accept { error: String } on port, display
-        [] Dismissable
+- [ ] Organise JS
+  - [ ] Clean console logs
+  - [X] Prettier for JS
+  - [ ] Split/organise JS
 
 
-[] Handle errors from ports (Entry changes, Login)
-  [] How?
+- [ ] Better Pouch
+  - [ ] API for Pouch access in JS
+  - [ ] Upsert https://pouchdb.com/guides/conflicts.html
+  - [ ] Conflict resolution
+  - [ ] Error handling for Pouch
+    - [ ] Particularly, replication errors over ports
+      - [ ] On JS filter, send on port
+      - [ ] On Elm accept { error: String } on port, display
+        - [ ] Dismissable
 
-[] update README
 
-[X] Merge NewEntry and UpdatedEntry (same functionality, since they both remove the entry with the id)
-  |> [] Eventually use Dict for entries
+- [ ] Handle errors from ports (Entry changes, Login)
+  - [ ] How?
 
-[] Full CRUD
-[] Port architecture
-  [] Single port per responsibility, parse on either side?
-  [] For instance, log in /out
+- [ ] update README
 
-[] Errors over ports when creation/deletion fails?
+- [X] Merge NewEntry and UpdatedEntry (same functionality, since they both remove the entry with the id)
+   - [ ] Eventually use Dict for entries
 
-[X] "Fly to": Helsinki, World, My Location
+- [ ] Full CRUD
+- [ ] Port architecture
+  - [ ] Single port per responsibility, parse on either side?
+  - [ ] For instance, log in /out
 
-[X] Use entry.id instead of indexed map in entries
+- [ ] Errors over ports when creation/deletion fails?
 
-[X] Check SW updates
+- [X] "Fly to": Helsinki, World, My Location
+
+- [X] Use entry.id instead of indexed map in entries
+
+- [X] Check SW updates
 
 
 # Base
-Decide which fields are editable
-Decide between pages
- |> Routing
+- Decide which fields are editable
+- Decide between pages / routing
 
 # UI/UX
-[] UI/UX Pass
-  [] Error view, English
-  [] Show message on Geolocation error, that a default position was used
-  [] Dismiss errors
-  [] "Success" message
-  [] Flexbox for flight buttons
-  [] Packery with 4 items and 3 columns can be wonky
+- [ ] UI/UX Pass
+  - [ ] Error view, English
+  - [ ] Show message on Geolocation error, that a default position was used
+  - [ ] Dismiss errors
+  - [ ] "Success" message
+  - [ ] Flexbox for flight buttons
+  - [ ] Packery with 4 items and 3 columns can be wonky
 
-[] Refresh/cleanup
-  [X] 'Card' view for cards
-    [X] Grid?
-    [] Horizontal scroll?
-  [LATER] Flip view for cards
-  [LATER] Show/collapse information for cards etc.
+- [ ] Refresh/cleanup
+  - [X] 'Card' view for cards
+    - [X] Grid?
+    - [ ] Horizontal scroll?
+  - [LATER] Flip view for cards
+  - [LATER] Show/collapse information for cards etc.
 
-[] About page
-[] Spider spread for map
-[] Html.lazy check further
+- [ ] About page
+- [ ] Spider spread for map
+- [ ] Html.lazy check further
 
 # Later
-[] Large sync updates; markers?
-[X] Own CouchDB?
-[] Bug in pouchdb-authentication? if only url is provided (no path after)
+- [ ] Export to Anki
+- [ ] Translation Helper
+- [ ] Large sync updates; markers?
+- [X] Own CouchDB?
+- [ ] Bug in pouchdb-authentication? if only url is provided (no path after)
   then the xhr request goes to http://_users instead of http://dburl/_users
-[] More info on User, getUser() when checking auth, with id from getAuth()
-[X] PouchDB Auth
-[] migrations?
-[] Search
-[] Translation Helper
-[] Filtering on PouchDB messages
-[] Save revision of Entry; used for updates
-[] Timestamp for ID?
-[] Full CRUD
-[] Authorization & Authentication
-[] Location picker
-[] Export to Anki
-[] Merge markers and Entries?
-[] Filter based on date, range
-[] Critical CSS
-  [] PurifyCSS and Webpack
-[X] Leaflet integration
-[] Set up pouchdb-server locally and automatically with dev account
+- [ ] More info on User, getUser() when checking auth, with id from getAuth()
+- [X] PouchDB Auth
+- [ ] migrations?
+- [ ] Search
+- [ ] Translation Helper
+- [ ] Filtering on PouchDB messages
+- [ ] Save revision of Entry; used for updates
+- [ ] Timestamp for ID?
+- [ ] Full CRUD
+- [ ] Authorization & Authentication
+- [ ] Location picker
+- [ ] Merge markers and Entries?
+- [ ] Filter based on date, range
+- [ ] Critical CSS
+  - [ ] PurifyCSS and Webpack
+- [X] Leaflet integration
+- [ ] Set up pouchdb-server locally and automatically with dev account
 
 
 # Moonshot
-[] Have shared "channels" (db with group-write/group-red)
+- [ ] Have shared "channels" (db with group-write/group-red)
 
 # Dev
-[X] NPM scripts for building, starting elm-live
+- [X] NPM scripts for building, starting elm-live
 
 # Refactoring
-[] View.elm signatures
-[] Figure out where to put encodeEntry, especially b/c of "config" construct (duplicated atm)
+- [ ] View.elm signatures
+- [ ] Figure out where to put encodeEntry, especially b/c of "config" construct (duplicated atm)
 NOTE: A bit redundant to have "pages" atm. It is more like separating the updates, views etc. rather than routes (hence sharing a view in Main)
-[] When doing put(), I disregard the rev from the Elm side, since the get() has the latest already
+- [ ] When doing put(), I disregard the rev from the Elm side, since the get() has the latest already
 
 // TODO: get info from cancelReplication Port (or listen for logout event), pause replication
 // syncHandler.cancel();
-
-
-# Real Data
-Might need to change ordering of id, encoding of floats
 
 # How to work offline
 ## Manual / optimistic
@@ -210,11 +204,8 @@ I keeping the Requests for decoding the subs from ports in the Request, acceptin
 This allows some separation of concerns, and isn't unlike how Request keeps the Http requests without doing the actual sending, but allowing to specify which Msg will be generated.
 
 # Setting up CouchDB
-Guide
-IP bind
-Proxy or not?
-  SSL
-Permissions and strategies
+Links:
+
 https://github.com/pouchdb-community/pouchdb-authentication#couchdb-authentication-recipes
 http://docs.couchdb.org/en/latest/intro/security.html#authentication-database
 https://www.digitalocean.com/community/tutorials/how-to-install-couchdb-and-futon-on-ubuntu-14-04
