@@ -31,8 +31,10 @@
   - [X] Batch marker addition when bulk entries
     - [X] Send AddMarkers directly
 
-  - [ ] updateMarker Port architecture
-  - [ ] remove marker
+  - [X] toLeaflet Port architecture
+  - [X] remove marker
+  - [ ] Move other marker operations to toLeaflet
+  - [ ] Check marker removal in batch updates
 
   - [ ] Full(er) CRUD
     - [ ] Delete message

@@ -231,7 +231,12 @@ app.ports.setView.subscribe(data => {
 });
 
 app.ports.setMarkers.subscribe(data => {
+  setMarkers(data);
+});
+
+function setMarkers(data) {
   data.forEach((data, index) => {
+    // TODO: change to {...}?
     let [id, latLng, markerOptions, popupText] = data;
 
     markerOptions.icon = new L.Icon(markerOptions.icon);
@@ -243,11 +248,34 @@ app.ports.setMarkers.subscribe(data => {
       marker.addTo(mymap);
       markers[id] = marker;
     } else {
-      // NOTE: This is unnecessary if we know that a marker hasn't changed
-      // add a separate updateMarker port for this
       Object.assign(markers[id], marker);
     }
   });
+}
+
+function removeMarker(data) {
+  let id = data;
+  if (markers.hasOwnProperty(id)) {
+    let marker = markers[id];
+    mymap.removeLayer(marker);
+  }
+}
+
+app.ports.toLeaflet.subscribe(msg => {
+  switch (msg.action) {
+    case 'setMarkers':
+      console.log('Message to set markers');
+      setMarkers(msg.data);
+      break;
+
+    case 'removeMarker':
+      console.log('Message to remove marker');
+      removeMarker(msg.data);
+      break;
+
+    default:
+      console.warn('Leaflet Port command not recognised');
+  }
 });
 
 app.ports.saveEntry.subscribe(data => {

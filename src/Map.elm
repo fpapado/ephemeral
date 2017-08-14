@@ -12,8 +12,9 @@ module Map
 
 import Geolocation exposing (Location)
 import Dict exposing (Dict)
-import Data.Entry exposing (Entry, idToString)
+import Data.Entry exposing (Entry, EntryId, idToString)
 import Task
+import Json.Encode
 import Util exposing (viewDate)
 import Leaflet.Types exposing (LatLng, ZoomPanOptions, defaultZoomPanOptions, MarkerOptions, defaultMarkerOptions)
 import Leaflet.Ports
@@ -50,6 +51,7 @@ type Msg
     | GoToCurrentLocation
     | GetCenter LatLng
     | AddMarkers (List ( String, LatLng, String ))
+    | RemoveMarker EntryId
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -66,6 +68,13 @@ update msg model =
                     addMarkersToModel markers model
             in
                 ( newModel, Leaflet.Ports.setMarkers <| markersAsOutboundType newModel.markers )
+
+        RemoveMarker entryId ->
+            let
+                newMarkers =
+                    Dict.remove (idToString entryId) model.markers
+            in
+                ( { model | markers = newMarkers }, Leaflet.Ports.toLeaflet <| encodeRemoveMarker entryId )
 
         GetCenter latLng ->
             { model | latLng = latLng } ! []
@@ -142,3 +151,11 @@ markersAsOutboundType : Dict String ( LatLng, String ) -> List ( String, LatLng,
 markersAsOutboundType markers =
     Dict.toList markers
         |> List.map (\( id, ( latLng, popupText ) ) -> ( id, latLng, defaultMarkerOptions, popupText ))
+
+
+encodeRemoveMarker : EntryId -> Json.Encode.Value
+encodeRemoveMarker entryId =
+    Json.Encode.object
+        [ ( "action", Json.Encode.string "removeMarker" )
+        , ( "data", Json.Encode.string <| idToString entryId )
+        ]

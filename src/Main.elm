@@ -154,9 +154,16 @@ update msg model =
             let
                 newEntries =
                     Dict.remove (idToString entryId) model.entries
+
+                ( newMapState, newMapCmd ) =
+                    Map.update (Map.RemoveMarker entryId) model.mapState
             in
-                -- TODO: remove marker
-                { model | entries = newEntries } ! []
+                ( { model
+                    | entries = newEntries
+                    , mapState = newMapState
+                  }
+                , Cmd.map MapMsg newMapCmd
+                )
 
         LogOut ->
             ( model, Login.logout )
