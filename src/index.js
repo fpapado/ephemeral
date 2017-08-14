@@ -4,6 +4,7 @@ import L from 'leaflet';
 import PouchDB from 'pouchdb-browser';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import config from 'config';
+import {string2Hex} from './js/util.js';
 
 require('./assets/css/styles.css');
 
@@ -34,31 +35,53 @@ PouchDB.plugin(require('pouchdb-authentication'));
 
 let db = new PouchDB('ephemeral');
 
-// In case we want to customise, e.g. suffix a name
-let couchUrl = config.couchUrl;
-let remoteDB = new PouchDB(couchUrl, {
-  skip_setup: true
-});
+// Before checking logins, we use the base url to check _users and _sessions
+// After that, we customise using initDB() to include the user's db suffix
+// NOTE: there seems to be a bug(?), where leaving the naked URL in will
+// result in an error. Thus passing an extra path after (_users for convenience)
+// is required. This is fine because the DB url is overwritten afterwards.
+let url = config.couchUrl + '_users';
+let remoteDB = new PouchDB(url, {skip_setup: true});
 
 let syncHandler;
 
 isUserLoggedIn(remoteDB).then(res => {
-  if (res) {
-    console.info('User is logged in, will sync.');
+  if (res.ok) {
+    console.info('User is logged in, will sync.', res);
+    remoteDB = initDB(res.name);
     syncHandler = syncRemote(db, remoteDB);
   } else {
     console.warn('User is not logged in, not syncing.');
   }
 });
 
+function initDB(name) {
+  let suffix;
+
+  /* Using db-per-user in production, so we must figure out the user's db.
+     The couch-per-user plugin makes a DB of the form:
+        userdb-{hex username}
+  */
+  if (config.environment === 'production') {
+    suffix = 'userdb-' + string2Hex(name);
+  } else {
+    suffix = config.dbName;
+  }
+
+  let url = config.couchUrl + suffix;
+  let remote = new PouchDB(url, {skip_setup: true});
+
+  return remote;
+}
+
 function isUserLoggedIn(remote) {
   let loggedIn = remote
     .getSession()
     .then(res => {
       if (!res.userCtx.name) {
-        return false;
+        return {ok: false};
       } else {
-        return true;
+        return {ok: true, name: res.userCtx.name};
       }
     })
     .catch(err => {
@@ -78,14 +101,17 @@ function syncRemote(local, remote) {
       // something changed
       console.info('Something changed!', info);
 
-      let { change, direction } = info;
+      let {change, direction} = info;
 
       if (direction === 'pull') {
         change.docs.forEach(doc => {
-          // TODO: find whether the document is new or not
-          // TODO: handle deletion
-          // might want to do this on the elm-side?
-          app.ports.updatedEntry.send(doc);
+          // TODO: might want to do this on the elm-side, and send things on single port?
+          if (doc._deleted) {
+            console.log('Deleted doc');
+            app.ports.deletedEntry.send({_id: doc._id});
+          } else {
+            app.ports.updatedEntry.send(doc);
+          }
         });
       }
     })
@@ -101,7 +127,7 @@ function syncRemote(local, remote) {
     })
     .on('error', err => {
       if (err.error === 'unauthorized') {
-        console.warn(err.message);
+        console.error(err.message);
       } else {
         console.error('Unhandled error', err);
       }
@@ -114,20 +140,22 @@ function cancelSync(handler) {
   return true;
 }
 
-let mymap = L.map('mapid').setView([60.1719, 24.9414], 12);
+let mymap = L.map('mapid', {
+  preferCanvas: true
+}).setView([60.1719, 24.9414], 12);
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mymap);
 
 let root = document.getElementById('root');
 let app = Elm.Main.embed(root);
 
 // -- Port Subscriptions --
-let center;
 let markers = {};
 
 app.ports.sendLogin.subscribe(user => {
   console.log('Got user to log in', user);
 
-  let { username, password } = user;
+  let {username, password} = user;
 
   remoteDB
     .login(username, password)
@@ -135,20 +163,22 @@ app.ports.sendLogin.subscribe(user => {
       console.log('Logged in!', res);
 
       if (res.ok === true) {
-        let { name } = res;
-        app.ports.logIn.send({ username: name });
+        let {name} = res;
+        app.ports.logIn.send({username: name});
+        return name;
       }
     })
-    .then(res => {
-      // Start replication, assign to global handler
+    .then(name => {
+      // Start replication, assign to global remote and handler
+      remoteDB = initDB(name);
       syncHandler = syncRemote(db, remoteDB);
     })
     .catch(err => {
       // TODO: send error over port
       if (err.name === 'unauthorized') {
-        console.log('Unauthorized');
+        console.warn('Unauthorized');
       } else {
-        console.log('Other error', err);
+        console.error('Other error', err);
       }
     });
 });
@@ -168,7 +198,7 @@ app.ports.sendLogout.subscribe(_ => {
       app.ports.logOut.send(res);
     })
     .catch(err => {
-      console.log('Something went wrong logging user out', err);
+      console.error('Something went wrong logging user out', err);
     });
 });
 
@@ -181,17 +211,17 @@ app.ports.checkAuthState.subscribe(data => {
       if (!res.userCtx.name) {
         // res: {"ok": true}
         console.log('No user logged in, logging user out', res);
-        let { ok } = res;
-        app.ports.logOut.send({ ok: ok });
+        let {ok} = res;
+        app.ports.logOut.send({ok: ok});
       } else {
         console.log('User is logged in', res);
-        let { name } = res.userCtx;
+        let {name} = res.userCtx;
         // TODO: in the future, will need to add more info
-        app.ports.logIn.send({ username: name });
+        app.ports.logIn.send({username: name});
       }
     })
     .catch(err => {
-      console.log('Error checking Auth', err);
+      console.error('Error checking Auth', err);
     });
 });
 
@@ -212,6 +242,8 @@ app.ports.setMarkers.subscribe(data => {
       marker.addTo(mymap);
       markers[id] = marker;
     } else {
+      // NOTE: This is unnecessary if we know that a marker hasn't changed
+      // add a separate updateMarker port for this
       Object.assign(markers[id], marker);
     }
   });
@@ -219,7 +251,7 @@ app.ports.setMarkers.subscribe(data => {
 
 app.ports.saveEntry.subscribe(data => {
   console.log('Got entry to create', data);
-  let meta = { type: 'entry' };
+  let meta = {type: 'entry'};
   let doc = Object.assign(data, meta);
 
   db
@@ -231,7 +263,7 @@ app.ports.saveEntry.subscribe(data => {
       });
     })
     .catch(err => {
-      console.log('Failed to create', err);
+      console.error('Failed to create', err);
       // TODO: Send back over port that Err error?
     });
 });
@@ -239,14 +271,14 @@ app.ports.saveEntry.subscribe(data => {
 app.ports.updateEntry.subscribe(data => {
   console.log('Got entry to update', data);
 
-  let { _id } = data;
+  let {_id} = data;
   console.log(_id);
 
   db
     .get(_id)
     .then(doc => {
       // NOTE: We disregard the _rev from Elm, to be safe
-      let { _rev } = doc;
+      let {_rev} = doc;
 
       let newDoc = Object.assign(doc, data);
       newDoc._rev = _rev;
@@ -260,14 +292,32 @@ app.ports.updateEntry.subscribe(data => {
       });
     })
     .catch(err => {
-      console.log('Failed to update', err);
+      console.error('Failed to update', err);
+      // TODO: Send back over port that Err error
+    });
+});
+
+app.ports.deleteEntry.subscribe(_id => {
+  console.log('Got entry to delete', _id);
+
+  db
+    .get(_id)
+    .then(doc => {
+      return db.remove(doc);
+    })
+    .then(res => {
+      console.log('Successfully deleted', _id);
+      app.ports.deletedEntry.send({_id: _id});
+    })
+    .catch(err => {
+      console.error('Failed to delete', err);
       // TODO: Send back over port that Err error
     });
 });
 
 app.ports.listEntries.subscribe(str => {
   console.log('Will list entries');
-  let docs = db.allDocs({ include_docs: true }).then(docs => {
+  let docs = db.allDocs({include_docs: true}).then(docs => {
     let entries = docs.rows.map(row => row.doc);
     console.log('Listing entries', entries);
 

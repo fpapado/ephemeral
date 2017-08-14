@@ -5,7 +5,8 @@ const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const OfflinePlugin = require('offline-plugin');
-var WebpackPwaManifest = require('webpack-pwa-manifest');
+const WebpackPwaManifest = require('webpack-pwa-manifest');
+const DashboardPlugin = require('webpack-dashboard/plugin');
 
 var TARGET_ENV =
   process.env.npm_lifecycle_event === 'prod' ? 'production' : 'development';
@@ -63,7 +64,8 @@ var common = {
       // inject details of output file at end of body
       inject: 'body'
     }),
-    pwaPlugin
+    pwaPlugin,
+    new DashboardPlugin()
   ],
   resolve: {
     modules: [path.join(__dirname, 'src'), 'node_modules'],

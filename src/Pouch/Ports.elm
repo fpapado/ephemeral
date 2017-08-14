@@ -2,12 +2,14 @@ port module Pouch.Ports
     exposing
         ( saveEntry
         , updateEntry
+        , deleteEntry
         , listEntries
         , sendLogin
         , sendLogout
         , getEntries
         , newEntry
         , updatedEntry
+        , deletedEntry
         , logIn
         , logOut
         , checkAuthState
@@ -23,6 +25,9 @@ port saveEntry : Json.Encode.Value -> Cmd msg
 
 
 port updateEntry : Json.Encode.Value -> Cmd msg
+
+
+port deleteEntry : String -> Cmd msg
 
 
 port sendLogin : Json.Encode.Value -> Cmd msg
@@ -41,6 +46,9 @@ port newEntry : (Value -> msg) -> Sub msg
 
 
 port updatedEntry : (Value -> msg) -> Sub msg
+
+
+port deletedEntry : (Value -> msg) -> Sub msg
 
 
 port logIn : (Value -> msg) -> Sub msg

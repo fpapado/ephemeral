@@ -1,13 +1,10 @@
-/*#mapid {
-  height: 400px
-}*/
 .h6 {
- height:24rem
+  height: 24rem;
 }
-@media screen and (min-width:30em) {
- .h6-ns {
-  height:24rem
- }
+@media screen and (min-width: 30em) {
+  .h6-ns {
+    height: 24rem;
+  }
 }
 
 .handwriting {
@@ -26,28 +23,33 @@
   box-shadow: 0px -2px 0px rgba(0, 0, 0, 0.2);
 }
 
-.bg-beige-gray  {
-  background-color: #EDE4DF;
+.bg-beige-gray {
+  background-color: #ede4df;
 }
 
-.bg-beige-gray-2  {
-  background-color: #E3E2E4;
+.bg-beige-gray-2 {
+  background-color: #e3e2e4;
+}
+
+.bg-pale-red {
+  background-color: #db8972;
 }
 
 .bg-main-blue {
-  background-color: #A5DBF7;
+  background-color: #a5dbf7;
 }
 
 .bg-deep-blue {
-  background-color: #1556A3;
+  background-color: #1556a3;
 }
 
 .bg-sharp-blue {
-  background-color: #37A4D5;
+  background-color: #37a4d5;
 }
 
 .bg-muted-blue {
   background-color: rgb(72, 122, 172);
+  /* #487aac */
 }
 
 .bg-gray-blue {
@@ -55,7 +57,7 @@
 }
 
 .main-blue {
-  color: #A5DBF7;
+  color: #a5dbf7;
 }
 
 .muted-blue {
@@ -63,19 +65,41 @@
 }
 
 .sharp-blue {
-  color: #37A4D5;
+  color: #37a4d5;
 }
 
 .deep-blue {
-  color: #1556A3;
+  color: #1556a3;
 }
 
-.beige-gray  {
-  color: #EDE4DF;
+.beige-gray {
+  color: #ede4df;
 }
 
-.beige-gray-2  {
-  color: #E3E2E4;
+.beige-gray-2 {
+  color: #e3e2e4;
+}
+
+/* Quasi-component things */
+a.close {
+  float: right;
+  display: inline-block;
+  margin-top: -25px;
+  margin-right: -25px;
+  text-decoration: none;
+  height: 25px;
+  width: 25px;
+  border-radius: 25px;
+  font-size: 22px;
+  line-height: 19px;
+  background-color: #e3e2e4;
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+}
+
+a.close:hover{
+  background-color: #db8972;
 }
 
 /*!
@@ -86,15 +110,15 @@
 */
 .dw {
   -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   -webkit-column-gap: 0;
-     -moz-column-gap: 0;
-          column-gap: 0;
+  -moz-column-gap: 0;
+  column-gap: 0;
   position: relative;
 }
 .dw * {
   -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
 }
 .dw__focus-curtain {
   background-color: #000;
@@ -110,22 +134,22 @@
 @media (min-width: 768px) {
   .dw {
     -webkit-column-count: 1;
-       -moz-column-count: 1;
-            column-count: 1;
+    -moz-column-count: 1;
+    column-count: 1;
   }
 }
 @media (min-width: 992px) {
   .dw {
     -webkit-column-count: 2;
-       -moz-column-count: 2;
-            column-count: 2;
+    -moz-column-count: 2;
+    column-count: 2;
   }
 }
 @media (min-width: 1500px) {
   .dw {
     -webkit-column-count: 3;
-       -moz-column-count: 3;
-            column-count: 3;
+    -moz-column-count: 3;
+    column-count: 3;
   }
 }
 .dw-panel {
@@ -143,9 +167,9 @@
 }
 .dw-panel--pulse {
   -webkit-transform-style: preserve-3d;
-          transform-style: preserve-3d;
+  transform-style: preserve-3d;
   -webkit-perspective: 1000;
-          perspective: 1000;
+  perspective: 1000;
   -webkit-transition: -webkit-transform 0.25s ease 0s;
   transition: -webkit-transform 0.25s ease 0s;
   transition: transform 0.25s ease 0s;
@@ -153,8 +177,8 @@
 }
 .dw-panel--pulse:hover {
   -webkit-transform: scale(1.02);
-      -ms-transform: scale(1.02);
-          transform: scale(1.02);
+  -ms-transform: scale(1.02);
+  transform: scale(1.02);
 }
 .dw-panel__content {
   border-radius: 10px;
@@ -165,17 +189,17 @@
 @media (min-width: 768px) {
   .dw-panel {
     -webkit-column-break-inside: avoid;
-       page-break-inside: avoid;
-            break-inside: avoid;
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 }
 .dw-flip {
   -webkit-perspective: 1000;
-          perspective: 1000;
+  perspective: 1000;
 }
 .dw-flip:hover .dw-flip__content {
   -webkit-transform: rotateY(180deg);
-          transform: rotateY(180deg);
+  transform: rotateY(180deg);
 }
 .dw-flip--sm {
   height: 200px;
@@ -188,7 +212,7 @@
 }
 .dw-flip__panel {
   -webkit-backface-visibility: hidden;
-          backface-visibility: hidden;
+  backface-visibility: hidden;
   border-radius: 10px;
   height: 100%;
   left: 0;
@@ -200,19 +224,19 @@
 }
 .dw-flip__panel--front {
   -webkit-transform: rotateY(0deg);
-          transform: rotateY(0deg);
+  transform: rotateY(0deg);
   z-index: 2;
 }
 .dw-flip__panel--back {
   -webkit-transform: rotateY(180deg);
-          transform: rotateY(180deg);
+  transform: rotateY(180deg);
 }
 .dw-flip__content {
   height: 100%;
   overflow: visible;
   position: relative;
   -webkit-transform-style: preserve-3d;
-          transform-style: preserve-3d;
+  transform-style: preserve-3d;
   -webkit-transition: 0.25s;
   transition: 0.25s;
 }
@@ -228,16 +252,16 @@
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
     -webkit-flex-direction: column;
-        -ms-flex-direction: column;
-            flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
   }
 }
 .dw-cluster--horizontal {
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
   -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
 }
 .dw-cluster__segment {
   display: -webkit-box;
@@ -246,8 +270,8 @@
   display: flex;
   -webkit-box-flex: 1;
   -webkit-flex: 1 1 auto;
-      -ms-flex: 1 1 auto;
-          flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
 }
 .dw-cluster__segment--row {
   display: -webkit-box;
@@ -260,26 +284,26 @@
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
     -webkit-flex-direction: column;
-        -ms-flex-direction: column;
-            flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
   }
 }
 .dw-cluster__segment--col {
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
   -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
 }
 @media (min-width: 430px) {
   .dw-cluster__segment--half {
     -webkit-flex-basis: 50%;
-        -ms-flex-preferred-size: 50%;
-            flex-basis: 50%;
+    -ms-flex-preferred-size: 50%;
+    flex-basis: 50%;
   }
   .dw-cluster__segment--quart {
     -webkit-flex-basis: 25%;
-        -ms-flex-preferred-size: 25%;
-            flex-basis: 25%;
+    -ms-flex-preferred-size: 25%;
+    flex-basis: 25%;
   }
 }

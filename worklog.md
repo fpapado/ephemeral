@@ -22,13 +22,42 @@
     [X] Else, when logging in, then call syncRemote()
   [X] Configure url based on environment
 
+  [X] db-per-user strategy
+  [X] Remove the /ephemeral suffix from url config if so
+  [X] initDB
+
+  [X] Use Dict instead of List for entries
+  [] Html.lazy
+  [] Html.keyed
+    |> There is a visual bug when clicking to delete that keeps the button highlighted
+  [X] Batch marker addition when bulk entries
+    |> [X] Send AddMarkers directly
+    |> [] What happens on NewEntry from sync? is it NewEntry or NewEntries?
+      |> [] If many smaller NewEntry, probably update to batch, or stagger Map AddMarker
+    |> [] Clean up AddMarker etc.
+    |> [] Add separate updateMarker port (for now)
+      |> This is an issue because we always update all markers via Object.assign in js, when it exists in array, such that we can catch updates
+      |> [] Eventually move to single port (see 'Port architecture')
+
   [] Full(er) CRUD
-    [] Delete |> with confirmation message (initDelete, confirmDelete); modal?
-    [] Delete -> port Delete
-    [] sub deletedEntry -> EntryDeleted
-    [] Handle more sync events (e.g. "pull" _deleted_: true)
+    [] Delete message
+      |> [] with confirmation message (initDelete, confirmDelete); modal?
+      |> [] remove marker
+    [X] Delete -> port Delete
+    [X] sub deletedEntry -> EntryDeleted
+    [X] Handle more sync events (e.g. "pull" _deleted_: true)
   [] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
+
+  [N/A] Could merge all the entry CRUD into "UpdatedEntry", where we index by id on the Elm side and just put the new thing in?
+    |> Perhaps keep the deletion separate after all
+  [] Related: Port architecture, merging ports
+    [] e.g. could have:
+      (maybe 'decode' is not the best word here. Translate?)
+      decodePouchUpdate : (Result String Entry -> msg) -> (Result Sting String -> msg) -> Value -> msg
+      decodePouchUpdate updateMsg  deleteMsg fromPort = ...
+
   [] Factor things out of Page.Login into Request.Session or something (esp. login/logout and decoders)
+  [] Debatable whether to propagate error in Request.Entry or return empty Dict
 
 [] Add Edit back
   [] Scroll up on edit
@@ -43,11 +72,9 @@
   [] Place get errors
   [] Validations
   [] Redirect on Login/Out
+  [] Replication status
 
-[] Use Dict instead of List for entries
-  [X] Could probably merge update and new entry Msg
-  [] Could merge all the entry CRUD into "UpdatedEntry", where we index by id on the Elm side and just put the new thing in?
-  [] Related: Port architecture
+[] Signup?
 
 [] CheckAuth periodically?
   [] Or, send "LogOut" over port if unauthorized/unauthenticated error?
@@ -77,10 +104,6 @@
       [] On elm: accept { error: String } on port, display
         [] Dismissable
 
-
-[] Signup?
-  [] Need the db-per-user strategy?
-  [] Remove the /ephemeral suffix from url config if so
 
 [] Handle errors from ports (Entry changes, Login)
   [] How?
@@ -116,6 +139,7 @@ Decide between pages
   [] Dismiss errors
   [] "Success" message
   [] Flexbox for flight buttons
+  [] Packery with 4 items and 3 columns can be wonky
 
 [] Refresh/cleanup
   [X] 'Card' view for cards
@@ -126,10 +150,13 @@ Decide between pages
 
 [] About page
 [] Spider spread for map
-[] Html.lazy2
+[] Html.lazy check further
 
 # Later
+[] Large sync updates; markers?
 [X] Own CouchDB?
+[] Bug in pouchdb-authentication? if only url is provided (no path after)
+  then the xhr request goes to http://_users instead of http://dburl/_users
 [] More info on User, getUser() when checking auth, with id from getAuth()
 [X] PouchDB Auth
 [] migrations?
