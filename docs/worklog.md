@@ -26,22 +26,17 @@
   - [X] initDB
 
   - [X] Use Dict instead of List for entries
-  - [ ] Html.lazy
-  - [ ] Html.keyed
-    There is a visual bug when clicking to delete that keeps the button highlighted
+  - [X] Html.lazy
+  - [X] Html.keyed
   - [X] Batch marker addition when bulk entries
     - [X] Send AddMarkers directly
-    - [ ] What happens on NewEntry from sync? is it NewEntry or NewEntries?
-    - [ ] If many smaller NewEntry, probably update to batch, or stagger Map AddMarker
-    - [ ] Clean up AddMarker etc.
-    - [ ] Add separate updateMarker port (for now)
-      This is an issue because we always update all markers via Object.assign in js, when it exists in array, such that we can catch updates
-      - [ ] Eventually move to single port (see 'Port architecture')
+
+  - [ ] updateMarker Port architecture
+  - [ ] remove marker
 
   - [ ] Full(er) CRUD
     - [ ] Delete message
       - [ ] with confirmation message (initDelete, confirmDelete); modal?
-      - [ ] remove marker
     - [X] Delete -> port Delete
     - [X] sub deletedEntry -> EntryDeleted
     - [X] Handle more sync events (e.g. "pull" _deleted_: true)
@@ -49,13 +44,17 @@
 
   - [N/A] Could merge all the entry CRUD into "UpdatedEntry", where we index by id on the Elm side and just put the new thing in?
     Perhaps keep the deletion separate after all
+
+
+# After "replication" branch
   - [ ] Related: Port architecture, merging ports
     - [ ] e.g. could have:
       translatePouchUpdate : (Result String Entry -> msg) -> (Result Sting String -> msg) -> Value -> msg
       decodePouchUpdate updateMsg  deleteMsg fromPort = ...
-
-  - [ ] Factor things out of Page.Login into Request.Session or something (esp. login/logout and decoders)
   - [ ] Debatable whether to propagate error in Request.Entry or return empty Dict
+    - [ ] Generally, errors from Ports
+
+- [ ] Factor things out of Page.Login into Request.Session or something (esp. login/logout and decoders)
 
 - [ ] Add Edit back
   - [ ] Scroll up on edit
