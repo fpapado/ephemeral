@@ -57,6 +57,7 @@
     - [ ] Generally, errors from Ports
 
 - [ ] Factor things out of Page.Login into Request.Session or something (esp. login/logout and decoders)
+- [ ] Ditto for Leaflet, move port encoders to Port?
 
 - [ ] Add Edit back
   - [ ] Scroll up on edit
