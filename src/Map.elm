@@ -93,10 +93,10 @@ addMarkerToModel ( id, latLng, popupText ) model =
     { model | markers = Dict.insert id ( latLng, popupText ) model.markers }
 
 
-addMarkers : List Entry -> Cmd Msg
+addMarkers : Dict String Entry -> Cmd Msg
 addMarkers entries =
     Cmd.batch <|
-        List.map addMarker entries
+        List.map addMarker (List.map (Tuple.second) (Dict.toList entries))
 
 
 addMarker : Entry -> Cmd Msg

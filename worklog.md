@@ -26,6 +26,15 @@
   [X] Remove the /ephemeral suffix from url config if so
   [X] initDB
 
+  [X] Use Dict instead of List for entries
+  [] Html.lazy
+  [] Html.keyed
+    |> There is a visual bug when clicking to delete that keeps the button highlighted
+  [] Batch marker addition when bulk entries
+    |> [] Change input from single marker to array
+    |> [] Send [ marker ] on single [ markers ] on many
+    |> [] Just have a forEach in js
+
   [] Full(er) CRUD
     [] Delete message
       |> [] with confirmation message (initDelete, confirmDelete); modal?
@@ -35,11 +44,16 @@
     [X] Handle more sync events (e.g. "pull" _deleted_: true)
   [] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
 
-[] Use Dict instead of List for entries
-  [X] Could probably merge update and new entry Msg
-  [] Could merge all the entry CRUD into "UpdatedEntry", where we index by id on the Elm side and just put the new thing in?
-  [] Related: Port architecture
+  [N/A] Could merge all the entry CRUD into "UpdatedEntry", where we index by id on the Elm side and just put the new thing in?
+    |> Perhaps keep the deletion separate after all
+  [] Related: Port architecture, merging ports
+    [] e.g. could have:
+      (maybe 'decode' is not the best word here. Translate?)
+      decodePouchUpdate : (Result String Entry -> msg) -> (Result Sting String -> msg) -> Value -> msg
+      decodePouchUpdate updateMsg  deleteMsg fromPort = ...
+
   [] Factor things out of Page.Login into Request.Session or something (esp. login/logout and decoders)
+  [] Debatable whether to propagate error in Request.Entry or return empty Dict
 
 [] Add Edit back
   [] Scroll up on edit
@@ -121,6 +135,7 @@ Decide between pages
   [] Dismiss errors
   [] "Success" message
   [] Flexbox for flight buttons
+  [] Packery with 4 items and 3 columns can be wonky
 
 [] Refresh/cleanup
   [X] 'Card' view for cards
@@ -131,9 +146,10 @@ Decide between pages
 
 [] About page
 [] Spider spread for map
-[] Html.lazy2
+[] Html.lazy check further
 
 # Later
+[] Large sync updates; markers?
 [X] Own CouchDB?
 [] Bug in pouchdb-authentication? if only url is provided (no path after)
   then the xhr request goes to http://_users instead of http://dburl/_users

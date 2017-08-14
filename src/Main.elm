@@ -1,10 +1,13 @@
 module Main exposing (..)
 
 import Html exposing (..)
+import Html.Keyed
+import Html.Lazy exposing (lazy, lazy2)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
 import Views exposing (epButton, avatar)
-import Data.Entry exposing (Entry, EntryId)
+import Data.Entry exposing (Entry, EntryId, idToString)
+import Dict exposing (Dict)
 import Request.Entry exposing (decodePouchEntries, decodePouchEntry, decodeDeletedEntry)
 import Page.Entry as Entry
 import Page.Login as Login exposing (User)
@@ -17,7 +20,7 @@ main : Program Never Model Msg
 main =
     Html.program
         { init = init
-        , view = view
+        , view = lazy view
         , update = update
         , subscriptions = subscriptions
         }
@@ -50,7 +53,7 @@ type Page
 
 
 type alias Model =
-    { entries : List Entry
+    { entries : Dict String Entry
     , pageState : Page
     , mapState : Map.Model
     , loggedIn : Maybe User
@@ -59,7 +62,7 @@ type alias Model =
 
 emptyModel : Model
 emptyModel =
-    { entries = []
+    { entries = Dict.empty
     , pageState = Entry Entry.initNew
     , mapState = Map.initModel
     , loggedIn = Nothing
@@ -86,7 +89,7 @@ type Msg
     | SetPage Page
     | TogglePage
     | DeleteEntry EntryId
-    | NewEntries (Result String (List Entry))
+    | NewEntries (Dict String Entry)
     | NewEntry (Result String Entry)
     | DeletedEntry (Result String EntryId)
     | LoginCompleted (Result String User)
@@ -125,10 +128,7 @@ update msg model =
         DeleteEntry entryId ->
             model ! [ Request.Entry.delete entryId ]
 
-        NewEntries (Err err) ->
-            model ! []
-
-        NewEntries (Ok entries) ->
+        NewEntries entries ->
             { model | entries = entries } ! [ Cmd.map MapMsg (Map.addMarkers entries) ]
 
         NewEntry (Err err) ->
@@ -136,10 +136,8 @@ update msg model =
 
         NewEntry (Ok entry) ->
             let
-                -- TODO: would be better if we had a dict
                 newEntries =
-                    entry
-                        :: List.filter (\e -> e.id /= entry.id) model.entries
+                    Dict.insert (idToString entry.id) entry model.entries
             in
                 { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarker entry) ]
 
@@ -148,9 +146,8 @@ update msg model =
 
         DeletedEntry (Ok entryId) ->
             let
-                -- TODO: would be better if we had a dict
                 newEntries =
-                    List.filter (\e -> e.id /= entryId) model.entries
+                    Dict.remove (idToString entryId) model.entries
             in
                 -- TODO: remove marker
                 { model | entries = newEntries } ! []
@@ -239,10 +236,10 @@ view model =
             [ div [ class "mw7-ns center" ]
                 [ div [ class "mb2 mb4-ns" ]
                     [ viewFlight
-                    , viewPage model model.pageState
+                    , lazy2 viewPage model model.pageState
                     ]
                 , div [ class "pt3" ]
-                    [ viewEntries model.entries
+                    [ lazy viewEntries (Dict.toList model.entries)
                     ]
                 ]
             , viewFooter
@@ -327,10 +324,10 @@ viewLoginLogout loggedIn subModel =
                 |> Html.map LoginMsg
 
 
-viewEntries : List Entry -> Html Msg
-viewEntries entries =
-    if entries /= [] then
-        div [ class "dw" ] <| List.map viewEntry entries
+viewEntries : List ( String, Entry ) -> Html Msg
+viewEntries keyedEntries =
+    if keyedEntries /= [] then
+        Html.Keyed.node "div" [ class "dw" ] <| List.map (\( id, entry ) -> ( id, lazy viewEntry entry )) keyedEntries
     else
         div [ class "pa4 mb3 bg-main-blue br1 tc f5" ]
             [ p [ class "dark-gray lh-copy" ]
