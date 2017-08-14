@@ -4,7 +4,6 @@ module Map
         , Msg
         , update
         , addMarkers
-        , addMarker
         , initModel
         , Msg(..)
         , helsinkiLatLng
@@ -50,7 +49,6 @@ type Msg
     | SetToCurrent (Result Geolocation.Error Location)
     | GoToCurrentLocation
     | GetCenter LatLng
-    | AddMarker ( String, LatLng, String )
     | AddMarkers (List ( String, LatLng, String ))
 
 
@@ -61,15 +59,6 @@ update msg model =
             ( { model | latLng = latLng }
             , Leaflet.Ports.setView ( latLng, zoom, model.zoomPanOptions )
             )
-
-        AddMarker ( id, latLng, popupText ) ->
-            let
-                newModel =
-                    addMarkerToModel ( id, latLng, popupText ) model
-            in
-                ( newModel
-                , Leaflet.Ports.setMarkers <| markersAsOutboundType newModel.markers
-                )
 
         AddMarkers markers ->
             let
@@ -96,11 +85,6 @@ update msg model =
                 model ! [ geoTask ]
 
 
-addMarkerToModel : ( String, LatLng, String ) -> Model -> Model
-addMarkerToModel ( id, latLng, popupText ) model =
-    { model | markers = Dict.insert id ( latLng, popupText ) model.markers }
-
-
 addMarkersToModel : List ( String, LatLng, String ) -> Model -> Model
 addMarkersToModel markers model =
     let
@@ -113,30 +97,15 @@ addMarkersToModel markers model =
         { model | markers = newMarkers }
 
 
-addMarkers : Dict String Entry -> Cmd Msg
+addMarkers : List Entry -> Cmd Msg
 addMarkers entries =
     let
         markers =
-            List.map (\( id, entry ) -> entryToMarker entry) (Dict.toList entries)
+            List.map entryToMarker entries
     in
         Task.perform
             (always
                 (AddMarkers markers)
-            )
-            (Task.succeed ())
-
-
-addMarker : Entry -> Cmd Msg
-addMarker entry =
-    let
-        marker =
-            entryToMarker entry
-    in
-        Task.perform
-            (always
-                (AddMarker
-                    marker
-                )
             )
             (Task.succeed ())
 

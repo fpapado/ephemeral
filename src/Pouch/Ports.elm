@@ -7,7 +7,6 @@ port module Pouch.Ports
         , sendLogin
         , sendLogout
         , getEntries
-        , newEntry
         , updatedEntry
         , deletedEntry
         , logIn
@@ -40,9 +39,6 @@ port checkAuthState : String -> Cmd msg
 
 
 port getEntries : (Value -> msg) -> Sub msg
-
-
-port newEntry : (Value -> msg) -> Sub msg
 
 
 port updatedEntry : (Value -> msg) -> Sub msg

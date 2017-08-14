@@ -30,7 +30,6 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Pouch.Ports.getEntries (decodePouchEntries NewEntries)
-        , Pouch.Ports.newEntry (decodePouchEntry NewEntry)
         , Pouch.Ports.updatedEntry (decodePouchEntry NewEntry)
         , Pouch.Ports.deletedEntry (decodeDeletedEntry DeletedEntry)
 
@@ -89,7 +88,7 @@ type Msg
     | SetPage Page
     | TogglePage
     | DeleteEntry EntryId
-    | NewEntries (Dict String Entry)
+    | NewEntries (List Entry)
     | NewEntry (Result String Entry)
     | DeletedEntry (Result String EntryId)
     | LoginCompleted (Result String User)
@@ -129,7 +128,14 @@ update msg model =
             model ! [ Request.Entry.delete entryId ]
 
         NewEntries entries ->
-            { model | entries = entries } ! [ Cmd.map MapMsg (Map.addMarkers entries) ]
+            let
+                assocList =
+                    List.map (\e -> ( idToString e.id, e )) entries
+
+                newEntries =
+                    Dict.fromList (assocList)
+            in
+                { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarkers entries) ]
 
         NewEntry (Err err) ->
             model ! []
@@ -139,7 +145,7 @@ update msg model =
                 newEntries =
                     Dict.insert (idToString entry.id) entry model.entries
             in
-                { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarker entry) ]
+                { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarkers [ entry ]) ]
 
         DeletedEntry (Err err) ->
             model ! []

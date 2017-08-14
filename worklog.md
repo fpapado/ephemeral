@@ -27,25 +27,28 @@
   [X] initDB
 
   [X] Use Dict instead of List for entries
-  [] Html.lazy
-  [] Html.keyed
+  [X] Html.lazy
+  [X] Html.keyed
     |> There is a visual bug when clicking to delete that keeps the button highlighted
   [X] Batch marker addition when bulk entries
     |> [X] Send AddMarkers directly
-    |> [] What happens on NewEntry from sync? is it NewEntry or NewEntries?
-      |> [] If many smaller NewEntry, probably update to batch, or stagger Map AddMarker
-    |> [] Clean up AddMarker etc.
+    |> [X] What happens on NewEntry from sync? is it NewEntry or NewEntries?
+    |> [X] Clean up AddMarker etc.
+      |> [] Move AddMarkers to take List Entry; no need for the dict since Entry has the id already
+      |> [] Similarly, pass entries right from decodePouchResult in NewEntries, and insert into Dict, while passing the list to AddMarkers
+      |> Saves pointless conversions to dicts
     |> [] Add separate updateMarker port (for now)
       |> This is an issue because we always update all markers via Object.assign in js, when it exists in array, such that we can catch updates
+      |> [] "Remove marker" Port/message
       |> [] Eventually move to single port (see 'Port architecture')
 
   [] Full(er) CRUD
     [] Delete message
       |> [] with confirmation message (initDelete, confirmDelete); modal?
-      |> [] remove marker
     [X] Delete -> port Delete
     [X] sub deletedEntry -> EntryDeleted
     [X] Handle more sync events (e.g. "pull" _deleted_: true)
+
   [] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
 
   [N/A] Could merge all the entry CRUD into "UpdatedEntry", where we index by id on the Elm side and just put the new thing in?
@@ -53,8 +56,10 @@
   [] Related: Port architecture, merging ports
     [] e.g. could have:
       (maybe 'decode' is not the best word here. Translate?)
-      decodePouchUpdate : (Result String Entry -> msg) -> (Result Sting String -> msg) -> Value -> msg
-      decodePouchUpdate updateMsg  deleteMsg fromPort = ...
+      decodePouchUpdate : -> (Result String (List Entry) -> (Result Sting String -> msg) -> Value -> msg
+      decodePouchUpdate updateMsg deleteMsg fromPort = ...
+    [] Batch updates on "pull" changes (use same integration as above)
+      [] Mostly an optimisation with many messages on syncing after offline, also allows the map to batch its own marker updates, since we'd be using some new UpdatedEntries message
 
   [] Factor things out of Page.Login into Request.Session or something (esp. login/logout and decoders)
   [] Debatable whether to propagate error in Request.Entry or return empty Dict

@@ -101,7 +101,7 @@ delete entryId =
 -- Called from subscriptions --
 
 
-decodePouchEntries : (Dict String Entry -> msg) -> Value -> msg
+decodePouchEntries : (List Entry -> msg) -> Value -> msg
 decodePouchEntries toMsg val =
     let
         result =
@@ -110,17 +110,10 @@ decodePouchEntries toMsg val =
         entries =
             case result of
                 Err err ->
-                    Dict.empty
+                    []
 
                 Ok entryList ->
-                    let
-                        entryDict =
-                            {}
-
-                        assocList =
-                            List.map (\e -> ( idToString e.id, e )) entryList
-                    in
-                        Dict.fromList (assocList)
+                    entryList
     in
         toMsg entries
 

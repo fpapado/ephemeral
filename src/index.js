@@ -104,8 +104,9 @@ function syncRemote(local, remote) {
       let {change, direction} = info;
 
       if (direction === 'pull') {
+        // TODO: might want to do this on the elm-side, and send things on single port?
+        // TODO: might want to batch things into one big updatedEntries ...
         change.docs.forEach(doc => {
-          // TODO: might want to do this on the elm-side, and send things on single port?
           if (doc._deleted) {
             console.log('Deleted doc');
             app.ports.deletedEntry.send({_id: doc._id});
@@ -259,7 +260,7 @@ app.ports.saveEntry.subscribe(data => {
     .then(res => {
       db.get(res.id).then(doc => {
         console.log('Successfully created', doc);
-        app.ports.newEntry.send(doc);
+        app.ports.updatedEntry.send(doc);
       });
     })
     .catch(err => {
