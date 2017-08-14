@@ -240,6 +240,8 @@ app.ports.setMarkers.subscribe(data => {
       marker.addTo(mymap);
       markers[id] = marker;
     } else {
+      // NOTE: This is unnecessary if we know that a marker hasn't changed
+      // add a separate updateMarker port for this
       Object.assign(markers[id], marker);
     }
   });

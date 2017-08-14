@@ -51,6 +51,7 @@ type Msg
     | GoToCurrentLocation
     | GetCenter LatLng
     | AddMarker ( String, LatLng, String )
+    | AddMarkers (List ( String, LatLng, String ))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -69,6 +70,13 @@ update msg model =
                 ( newModel
                 , Leaflet.Ports.setMarkers <| markersAsOutboundType newModel.markers
                 )
+
+        AddMarkers markers ->
+            let
+                newModel =
+                    addMarkersToModel markers model
+            in
+                ( newModel, Leaflet.Ports.setMarkers <| markersAsOutboundType newModel.markers )
 
         GetCenter latLng ->
             { model | latLng = latLng } ! []
@@ -93,14 +101,48 @@ addMarkerToModel ( id, latLng, popupText ) model =
     { model | markers = Dict.insert id ( latLng, popupText ) model.markers }
 
 
+addMarkersToModel : List ( String, LatLng, String ) -> Model -> Model
+addMarkersToModel markers model =
+    let
+        addMarker ( id, latLng, popupText ) dict =
+            Dict.insert id ( latLng, popupText ) dict
+
+        newMarkers =
+            List.foldl addMarker model.markers markers
+    in
+        { model | markers = newMarkers }
+
+
 addMarkers : Dict String Entry -> Cmd Msg
 addMarkers entries =
-    Cmd.batch <|
-        List.map addMarker (List.map (Tuple.second) (Dict.toList entries))
+    let
+        markers =
+            List.map (\( id, entry ) -> entryToMarker entry) (Dict.toList entries)
+    in
+        Task.perform
+            (always
+                (AddMarkers markers)
+            )
+            (Task.succeed ())
 
 
 addMarker : Entry -> Cmd Msg
 addMarker entry =
+    let
+        marker =
+            entryToMarker entry
+    in
+        Task.perform
+            (always
+                (AddMarker
+                    marker
+                )
+            )
+            (Task.succeed ())
+
+
+entryToMarker : Entry -> ( String, LatLng, String )
+entryToMarker entry =
     let
         { latitude, longitude } =
             entry.location
@@ -108,16 +150,10 @@ addMarker entry =
         popupText =
             makePopup entry
     in
-        Task.perform
-            (always
-                (AddMarker
-                    ( idToString entry.id
-                    , ( latitude, longitude )
-                    , popupText
-                    )
-                )
-            )
-            (Task.succeed ())
+        ( idToString entry.id
+        , ( latitude, longitude )
+        , popupText
+        )
 
 
 makePopup : Entry -> String

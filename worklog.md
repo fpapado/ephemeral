@@ -30,10 +30,14 @@
   [] Html.lazy
   [] Html.keyed
     |> There is a visual bug when clicking to delete that keeps the button highlighted
-  [] Batch marker addition when bulk entries
-    |> [] Change input from single marker to array
-    |> [] Send [ marker ] on single [ markers ] on many
-    |> [] Just have a forEach in js
+  [X] Batch marker addition when bulk entries
+    |> [X] Send AddMarkers directly
+    |> [] What happens on NewEntry from sync? is it NewEntry or NewEntries?
+      |> [] If many smaller NewEntry, probably update to batch, or stagger Map AddMarker
+    |> [] Clean up AddMarker etc.
+    |> [] Add separate updateMarker port (for now)
+      |> This is an issue because we always update all markers via Object.assign in js, when it exists in array, such that we can catch updates
+      |> [] Eventually move to single port (see 'Port architecture')
 
   [] Full(er) CRUD
     [] Delete message
