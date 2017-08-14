@@ -140,14 +140,16 @@ function cancelSync(handler) {
   return true;
 }
 
-let mymap = L.map('mapid').setView([60.1719, 24.9414], 12);
+let mymap = L.map('mapid', {
+  preferCanvas: true
+}).setView([60.1719, 24.9414], 12);
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mymap);
 
 let root = document.getElementById('root');
 let app = Elm.Main.embed(root);
 
 // -- Port Subscriptions --
-let center;
 let markers = {};
 
 app.ports.sendLogin.subscribe(user => {
