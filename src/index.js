@@ -5,6 +5,7 @@ import PouchDB from 'pouchdb-browser';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import config from 'config';
 import {string2Hex} from './js/util.js';
+import {exportCards} from './js/export.js';
 
 require('./assets/css/styles.css');
 
@@ -322,5 +323,14 @@ app.ports.listEntries.subscribe(str => {
     console.log('Listing entries', entries);
 
     app.ports.getEntries.send(entries);
+  });
+});
+
+app.ports.exportCards.subscribe(str => {
+  console.log('Will export');
+  let docs = db.allDocs({include_docs: true}).then(docs => {
+    let entries = docs.rows.map(row => row.doc);
+      console.log('Exporting', entries);
+      exportCards(entries);
   });
 });

@@ -33,11 +33,9 @@ subscriptions model =
         , Pouch.Ports.newEntry (decodePouchEntry NewEntry)
         , Pouch.Ports.updatedEntry (decodePouchEntry NewEntry)
         , Pouch.Ports.deletedEntry (decodeDeletedEntry DeletedEntry)
-
-        -- Not a huge fan of this; I should be mapping the subs for Page.login
+          -- Not a huge fan of this; I should be mapping the subs for Page.login
         , Pouch.Ports.logIn (Login.decodeLogin LoginCompleted)
-
-        -- Should be in a Session module or so
+          -- Should be in a Session module or so
         , Pouch.Ports.logOut (Login.decodeLogout LogOutCompleted)
         ]
 
@@ -86,6 +84,7 @@ init =
 type Msg
     = NoOp
     | LoadEntries
+    | ExportCards
     | SetPage Page
     | TogglePage
     | DeleteEntry EntryId
@@ -109,6 +108,9 @@ update msg model =
 
         SetPage pageState ->
             { model | pageState = pageState } ! []
+
+        ExportCards ->
+            model ! [ Pouch.Ports.exportCards "Export pls" ]
 
         TogglePage ->
             let
@@ -237,6 +239,9 @@ view model =
                 [ div [ class "mb2 mb4-ns" ]
                     [ viewFlight
                     , lazy2 viewPage model model.pageState
+                    , div [ class "measure center mt3" ]
+                        [ epButton [ class "w-100 white bg-deep-blue", onClick ExportCards ] [ text "Export" ]
+                        ]
                     ]
                 , div [ class "pt3" ]
                     [ lazy viewEntries (Dict.toList model.entries)

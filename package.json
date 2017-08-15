@@ -4,6 +4,8 @@
   "description": "An Elm front-end for note-taking",
   "main": "elm.js",
   "dependencies": {
+    "csv-stringify": "^1.0.4",
+    "file-saver": "^1.3.3",
     "leaflet": "^1.2.0",
     "pouchdb-authentication": "^0.5.5",
     "pouchdb-browser": "^6.3.4",
@@ -38,7 +40,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack-dashboard -- webpack-dev-server --hot --inline --port 3000",
+    "dev": "webpack-dev-server --hot --inline --port 3000",
     "build": "webpack",
     "prod": "rimraf dist/ && webpack-dashboard -- webpack -p",
     "postinstall": "elm-package install -y",
