@@ -33,7 +33,6 @@
 
   - [X] toLeaflet Port architecture
   - [X] remove marker
-  - [ ] Move other marker operations to toLeaflet
   - [ ] Check marker removal in batch updates
 
   - [ ] Full(er) CRUD
@@ -47,17 +46,16 @@
   - [N/A] Could merge all the entry CRUD into "UpdatedEntry", where we index by id on the Elm side and just put the new thing in?
     Perhaps keep the deletion separate after all
 
-
 # After "replication" branch
-  - [ ] Related: Port architecture, merging ports
-    - [ ] e.g. could have:
-      translatePouchUpdate : (Result String Entry -> msg) -> (Result Sting String -> msg) -> Value -> msg
-      decodePouchUpdate updateMsg  deleteMsg fromPort = ...
-  - [ ] Debatable whether to propagate error in Request.Entry or return empty Dict
-    - [ ] Generally, errors from Ports
+- [ ] Routing with pages:
+  - [ ] Main page + Login page
+  - [ ] Map subs for subpages etc.
+  - [ ] Extra, if needed:
+    - [ ] List (map + items; current Main)
+    - [ ] Entry.Editor
+    - [ ] Entry.New
 
-- [ ] Factor things out of Page.Login into Request.Session or something (esp. login/logout and decoders)
-- [ ] Ditto for Leaflet, move port encoders to Port?
+  - [] Navigation at the bottom
 
 - [ ] Add Edit back
   - [ ] Scroll up on edit
@@ -65,6 +63,17 @@
   - [ ] Popup for editing?
   - [ ] Edit location
   - [ ] Edit time added
+
+- [ ] Port architecture, merging ports
+  - [ ] e.g. could have:
+    translatePouchUpdate : (Result String Entry -> msg) -> (Result Sting String -> msg) -> Value -> msg
+    decodePouchUpdate updateMsg  deleteMsg fromPort = ...
+- [] toLeaflet; would require encoders for Leaflet.Types
+  - [ ] move port encoders to Port?
+- [ ] Debatable whether to propagate error in Request.Entry or return empty Dict
+  - [ ] Generally, errors from Ports
+
+- [ ] Factor things out of Page.Login into Request.Session or something (esp. login/logout and decoders)
 
 - [ ] UX
   - [ ] Message on successful login
@@ -78,14 +87,6 @@
 
 - [ ] CheckAuth periodically?
   - [ ] Or, send "LogOut" over port if unauthorized/unauthenticated error?
-
-- [ ] Routing with pages:
-  - [ ] Main page + Login page
-  - [ ] Map subs for subpages etc.
-  - [ ] Extra, if needed:
-    - [ ] List (map + items; current Main)
-    - [ ] Entry.Editor
-    - [ ] Entry.New
 
 
 - [ ] Organise JS
@@ -155,6 +156,8 @@
 - [ ] Export to Anki
 - [ ] Translation Helper
 - [ ] Large sync updates; markers?
+- [ ] Move other marker operations to toLeaflet
+  - Quite the effort atm, especially encoding everything manually
 - [X] Own CouchDB?
 - [ ] Bug in pouchdb-authentication? if only url is provided (no path after)
   then the xhr request goes to http://_users instead of http://dburl/_users
