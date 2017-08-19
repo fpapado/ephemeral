@@ -151,6 +151,11 @@
 - [ ] Html.lazy check further
 
 # Later
+- [ ] Bring-your-own DB
+  - [ ] Generally, host-your-own option
+  - [ ] Guide for this
+  - [ ] "Deploy micro-anki to now" guide
+  - [ ] Configurable micro-anki url
 - [X] Export to Anki
 - [ ] Translation Helper
 - [ ] Large sync updates; markers?
