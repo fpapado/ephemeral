@@ -51,7 +51,7 @@ let pwaPlugin = new WebpackPwaManifest({
 
 // -- Common Config --
 var common = {
-  entry: './src/index.js',
+  entry: ['whatwg-fetch', './src/index.js'],
   output: {
     path: path.join(__dirname, 'dist'),
     // add hash when building for production

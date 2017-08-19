@@ -1,5 +1,6 @@
 import {saveAs} from 'file-saver';
 import stringify from 'csv-stringify';
+import 'whatwg-fetch';
 
 export {exportCardsCSV, exportCardsAnki};
 

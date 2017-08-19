@@ -1,11 +1,16 @@
 'use strict';
 
+import Promise from 'promise-polyfill';
 import L from 'leaflet';
 import PouchDB from 'pouchdb-browser';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import config from 'config';
 import {string2Hex} from './js/util.js';
 import {exportCardsCSV, exportCardsAnki} from './js/export.js';
+
+if (!window.Promise) {
+  window.Promise = Promise;
+}
 
 require('./assets/css/styles.css');
 
