@@ -1,52 +1,6 @@
-# TODO
-- [X] PouchDB replication
-  - [X] PouchDB-server locally
-  - [X] Send changes on change
-  - [X] PouchDB-auth
-  - [X] Integrate login/logout and tracking in Elm
-    - [X] LogIn -> port LogIn,
-    - [X] sub LoggedIn -> LoggedIn,
-    - [X] Show "log out" if user
-    - [X] (UI/UX) "Logging in is optional, just tap" explanation on click
-    - [X] LogOut -> port LogOut,
-    - [X] sub LoggedOut -> LoggedOut
-    - [X] loggedOut port message on checkAuth no user found
-  - [X] Session storage/retrieval on reload?
-    - [X] Try getSession on init
-    - [N/A] Subscribe to cookie/store changes on key?
-  - [X] Pouchdb-server syncs without login even
-  - [X] Start sync only when loggedIn ->
-    - [X] Factor out syncRemote() function
-    - [X] When starting, use checkAuth().then(sync)
-    - [X] Else, when logging in, then call syncRemote()
-  - [X] Configure url based on environment
-
-  - [X] db-per-user strategy
-  - [X] Remove the /ephemeral suffix from url config if so
-  - [X] initDB
-
-  - [X] Use Dict instead of List for entries
-  - [X] Html.lazy
-  - [X] Html.keyed
-  - [X] Batch marker addition when bulk entries
-    - [X] Send AddMarkers directly
-
-  - [X] toLeaflet Port architecture
-  - [X] remove marker
-  - [ ] Check marker removal in batch updates
-
-  - [ ] Full(er) CRUD
-    - [ ] Delete message
-      - [ ] with confirmation message (initDelete, confirmDelete); modal?
-    - [X] Delete -> port Delete
-    - [X] sub deletedEntry -> EntryDeleted
-    - [X] Handle more sync events (e.g. "pull" _deleted_: true)
-  - [ ] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
-
-  - [N/A] Could merge all the entry CRUD into "UpdatedEntry", where we index by id on the Elm side and just put the new thing in?
-    Perhaps keep the deletion separate after all
-
 # After "replication" branch
+- [ ] Merge Anki branch
+- [ ] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
 - [ ] Routing with pages:
   - [ ] Main page + Login page
   - [ ] Map subs for subpages etc.
@@ -56,6 +10,11 @@
     - [ ] Entry.New
 
   - [] Navigation at the bottom
+
+- [ ] Full(er) CRUD
+  - [ ] Delete message
+    - [ ] with confirmation message (initDelete, confirmDelete); modal?
+  - [ ] Check marker removal in batch updates
 
 - [ ] Add Edit back
   - [ ] Scroll up on edit
