@@ -64,6 +64,10 @@
   - [ ] Edit location
   - [ ] Edit time added
 
+- Export:
+  - [] CSV (in-browser)
+  - [] Anki (remote/micro)
+
 - [ ] Port architecture, merging ports
   - [ ] e.g. could have:
     translatePouchUpdate : (Result String Entry -> msg) -> (Result Sting String -> msg) -> Value -> msg
