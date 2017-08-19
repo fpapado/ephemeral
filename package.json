@@ -47,5 +47,8 @@
     "pouchdb-server": "pouchdb-server --config pouchdb-server/config.json --dir pouchdb-server"
   },
   "author": "fpapado <fotis@fpapado.com>",
-  "license": "ISC"
+  "license": "ISC",
+  "xo": {
+    "space": true
+  }
 }

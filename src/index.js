@@ -5,7 +5,7 @@ import PouchDB from 'pouchdb-browser';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import config from 'config';
 import {string2Hex} from './js/util.js';
-import {exportCards} from './js/export.js';
+import {exportCardsCSV, exportCardsAnki} from './js/export.js';
 
 require('./assets/css/styles.css');
 
@@ -326,11 +326,17 @@ app.ports.listEntries.subscribe(str => {
   });
 });
 
-app.ports.exportCards.subscribe(str => {
-  console.log('Will export');
-  let docs = db.allDocs({include_docs: true}).then(docs => {
-    let entries = docs.rows.map(row => row.doc);
-      console.log('Exporting', entries);
-      exportCards(entries);
-  });
+app.ports.exportCards.subscribe(version => {
+  if (version === 'offline') {
+    console.log('Will export');
+    db.allDocs({include_docs: true}).then(docs => {
+      let entries = docs.rows.map(row => row.doc);
+      exportCardsCSV(entries);
+    });
+  } else if (version === 'online') {
+    db.allDocs({include_docs: true}).then(docs => {
+      let entries = docs.rows.map(row => row.doc);
+      exportCardsAnki(entries);
+    });
+  }
 });

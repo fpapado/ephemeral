@@ -90,6 +90,7 @@
   - [ ] Clean console logs
   - [X] Prettier for JS
   - [ ] Split/organise JS
+  - [ ] Add XO
 
 
 - [ ] Better Pouch
@@ -150,7 +151,7 @@
 - [ ] Html.lazy check further
 
 # Later
-- [ ] Export to Anki
+- [X] Export to Anki
 - [ ] Translation Helper
 - [ ] Large sync updates; markers?
 - [X] Own CouchDB?

@@ -33,9 +33,11 @@ subscriptions model =
         , Pouch.Ports.newEntry (decodePouchEntry NewEntry)
         , Pouch.Ports.updatedEntry (decodePouchEntry NewEntry)
         , Pouch.Ports.deletedEntry (decodeDeletedEntry DeletedEntry)
-          -- Not a huge fan of this; I should be mapping the subs for Page.login
+
+        -- Not a huge fan of this; I should be mapping the subs for Page.login
         , Pouch.Ports.logIn (Login.decodeLogin LoginCompleted)
-          -- Should be in a Session module or so
+
+        -- Should be in a Session module or so
         , Pouch.Ports.logOut (Login.decodeLogout LogOutCompleted)
         ]
 
@@ -84,7 +86,8 @@ init =
 type Msg
     = NoOp
     | LoadEntries
-    | ExportCards
+    | ExportCardsOffline
+    | ExportCardsOnline
     | SetPage Page
     | TogglePage
     | DeleteEntry EntryId
@@ -109,8 +112,11 @@ update msg model =
         SetPage pageState ->
             { model | pageState = pageState } ! []
 
-        ExportCards ->
-            model ! [ Pouch.Ports.exportCards "Export pls" ]
+        ExportCardsOffline ->
+            model ! [ Pouch.Ports.exportCards "offline" ]
+
+        ExportCardsOnline ->
+            model ! [ Pouch.Ports.exportCards "online" ]
 
         TogglePage ->
             let
@@ -240,7 +246,8 @@ view model =
                     [ viewFlight
                     , lazy2 viewPage model model.pageState
                     , div [ class "measure center mt3" ]
-                        [ epButton [ class "w-100 white bg-deep-blue", onClick ExportCards ] [ text "Export" ]
+                        [ epButton [ class "db mb3 w-100 white bg-deep-blue", onClick ExportCardsOffline ] [ text "Export CSV (offline)" ]
+                        , epButton [ class "db w-100 white bg-deep-blue", onClick ExportCardsOnline ] [ text "Export Anki (online)" ]
                         ]
                     ]
                 , div [ class "pt3" ]
