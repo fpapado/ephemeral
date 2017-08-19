@@ -14,8 +14,7 @@ It works offline and can synchronise your data!
 - [X] Works offline
 - [X] You can add it to your home screen on Android
 - [X] Notes can be synchronised to a remote database, and across devices
-- [ ] Export to Anki deck
-- [ ] Bring-your-own DB
+- [X] Export to Anki deck
 
 ## Development: Frontend
 Webpack is used to bundle everything on the front-end. You can run it with:

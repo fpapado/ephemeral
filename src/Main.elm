@@ -85,6 +85,8 @@ init =
 type Msg
     = NoOp
     | LoadEntries
+    | ExportCardsOffline
+    | ExportCardsOnline
     | SetPage Page
     | TogglePage
     | DeleteEntry EntryId
@@ -108,6 +110,12 @@ update msg model =
 
         SetPage pageState ->
             { model | pageState = pageState } ! []
+
+        ExportCardsOffline ->
+            model ! [ Pouch.Ports.exportCards "offline" ]
+
+        ExportCardsOnline ->
+            model ! [ Pouch.Ports.exportCards "online" ]
 
         TogglePage ->
             let
@@ -250,6 +258,10 @@ view model =
                 [ div [ class "mb2 mb4-ns" ]
                     [ viewFlight
                     , lazy2 viewPage model model.pageState
+                    , div [ class "measure center mt3" ]
+                        [ epButton [ class "db mb3 w-100 white bg-deep-blue", onClick ExportCardsOffline ] [ text "Export CSV (offline)" ]
+                        , epButton [ class "db w-100 white bg-deep-blue", onClick ExportCardsOnline ] [ text "Export Anki (online)" ]
+                        ]
                     ]
                 , div [ class "pt3" ]
                     [ lazy viewEntries (Dict.toList model.entries)

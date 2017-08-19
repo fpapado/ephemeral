@@ -6,6 +6,7 @@ port module Pouch.Ports
         , listEntries
         , sendLogin
         , sendLogout
+        , exportCards
         , getEntries
         , updatedEntry
         , deletedEntry
@@ -18,6 +19,9 @@ import Json.Encode exposing (Value)
 
 
 port listEntries : String -> Cmd msg
+
+
+port exportCards : String -> Cmd msg
 
 
 port saveEntry : Json.Encode.Value -> Cmd msg
