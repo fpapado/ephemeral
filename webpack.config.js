@@ -192,7 +192,6 @@ if (TARGET_ENV === 'production') {
             {
               loader: 'elm-webpack-loader',
               options: {
-                debug: true,
                 pathToMake: './bin/unbuffered-elm-make'
               }
             }

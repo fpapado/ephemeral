@@ -1,6 +1,6 @@
 # After "replication" branch
-- [ ] Merge Anki branch
 - [ ] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
+
 - [ ] Routing with pages:
   - [ ] Main page + Login page
   - [ ] Map subs for subpages etc.
@@ -24,8 +24,11 @@
   - [ ] Edit time added
 
 - Export:
-  - [] CSV (in-browser)
-  - [] Anki (remote/micro)
+  - [X] CSV (in-browser)
+  - [X] Anki (remote/micro)
+  - [ ] Specify deck name?
+    - [ ] `micro-anki` extension
+    - [ ] deck name would be important for import syncing, I think
 
 - [ ] Port architecture, merging ports
   - [ ] e.g. could have:
