@@ -84,7 +84,7 @@ Note that the file will be overwritten with a hash by the server once run.
 Alternatively (perhaps easier), you can navigate to `http://localhost:5984/_utils` (or whatever the pouchdb-server URL is), to access the management interface.
 - Click on `Admin Party`
 - You will be prompted to create an admin user
-- You can then add users as you wish via the _users table.
+- You can then add users as you wish via the `_users` table.
 
 ## Production DB
 It is best if you use CouchDB for production. You have the option of self-installing or using a service like Cloudant. I went with self-hosting; see below for pointers.
@@ -131,3 +131,6 @@ DNS, [Letsencrypt, SSL listening](http://verbally.flimzy.com/configuring-couchdb
   - ... also comes with couch-per-user installed!
 
 
+## License
+
+MIT © Fotis Papadogeorgopoulos
