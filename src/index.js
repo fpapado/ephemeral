@@ -160,7 +160,7 @@ let app = Elm.Main.embed(root);
 let markers = {};
 
 app.ports.sendLogin.subscribe(user => {
-  console.log('Got user to log in', user);
+  console.log('Got user to log in', user.username);
 
   let {username, password} = user;
 

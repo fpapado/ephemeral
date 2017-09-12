@@ -1,10 +1,11 @@
-module Page.Login exposing (ExternalMsg(..), Model, User, Msg, initialModel, update, view, decodeLogin, decodeLogout, logout)
+module Page.Login exposing (ExternalMsg(..), Model, Msg, initialModel, update, view, decodeLogin, decodeLogout, logout)
 
+import Data.User as User exposing (User)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Validate exposing (..)
-import Views exposing (formField, epButton)
+import Views.General as Views exposing (formField, epButton)
 import Util exposing (viewIf)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
@@ -21,10 +22,6 @@ type alias Model =
     , username : String
     , password : String
     }
-
-
-type alias User =
-    { username : String }
 
 
 initialModel : Model

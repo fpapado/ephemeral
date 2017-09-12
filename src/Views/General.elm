@@ -1,4 +1,4 @@
-module Views exposing (formField, epButton, avatar)
+module Views.General exposing (formField, epButton, avatar)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)

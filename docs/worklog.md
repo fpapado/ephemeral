@@ -1,15 +1,32 @@
 # After "replication" branch
-- [ ] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
 
 - [ ] Routing with pages:
-  - [ ] Main page + Login page
+  - [X] Main page + Login page
   - [ ] Map subs for subpages etc.
+  - [ ] Make models work for subpages
+  - [ ] Log in / Log out
+  - [] Navigation at the bottom
+
+  - [ ] Hide map where not needed (load dynamically, even?)
   - [ ] Extra, if needed:
-    - [ ] List (map + items; current Main)
     - [ ] Entry.Editor
     - [ ] Entry.New
 
-  - [] Navigation at the bottom
+
+- [ ] Port architecture, merging ports
+  - [ ] e.g. could have:
+    translatePouchUpdate : (Result String Entry -> msg) -> (Result Sting String -> msg) -> Value -> msg
+    decodePouchUpdate updateMsg  deleteMsg fromPort = ...
+
+  - [ ] pouchToElm, pouchFromElm
+    -> API with cases etc there.
+- [] toLeaflet; would require encoders for Leaflet.Types
+  - [ ] move port encoders to Port?
+- [ ] Debatable whether to propagate error in Request.Entry or return empty Dict
+  - [ ] Generally, errors from Ports
+
+
+- [ ] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
 
 - [ ] Full(er) CRUD
   - [ ] Delete message
@@ -29,15 +46,6 @@
   - [ ] Specify deck name?
     - [ ] `micro-anki` extension
     - [ ] deck name would be important for import syncing, I think
-
-- [ ] Port architecture, merging ports
-  - [ ] e.g. could have:
-    translatePouchUpdate : (Result String Entry -> msg) -> (Result Sting String -> msg) -> Value -> msg
-    decodePouchUpdate updateMsg  deleteMsg fromPort = ...
-- [] toLeaflet; would require encoders for Leaflet.Types
-  - [ ] move port encoders to Port?
-- [ ] Debatable whether to propagate error in Request.Entry or return empty Dict
-  - [ ] Generally, errors from Ports
 
 - [ ] Factor things out of Page.Login into Request.Session or something (esp. login/logout and decoders)
 

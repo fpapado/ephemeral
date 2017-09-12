@@ -1,16 +1,17 @@
-module Page.Entry exposing (Model, initNew, update, view, Msg(..))
+module Page.Entry exposing (Model, init, update, view, Msg(..))
 
 import Data.Entry as Entry exposing (Entry, EntryLocation, EntryId)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onSubmit)
 import Http
-import Views exposing (formField, epButton)
+import Views.General exposing (formField, epButton)
 import Request.Entry
 import Date exposing (Date)
 import Task
 import Geolocation exposing (Location)
 import Util exposing (viewIf)
+import Data.Session exposing (Session)
 
 
 -- MODEL --
@@ -26,8 +27,8 @@ type alias Model =
     }
 
 
-initNew : Model
-initNew =
+init : Model
+init =
     { errors = []
     , content = ""
     , translation = ""
@@ -73,8 +74,8 @@ type Msg
     | EditCompleted (Result Http.Error Entry)
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Session -> Msg -> Model -> ( Model, Cmd Msg )
+update session msg model =
     case msg of
         Save ->
             case model.editingEntry of
@@ -96,15 +97,15 @@ update msg model =
                         ( model, seq )
 
                 Just ( entryId, rev ) ->
-                    update Commit model
+                    update session Commit model
 
         Commit ->
             case model.editingEntry of
                 Nothing ->
-                    ( initNew, Request.Entry.create model )
+                    ( init, Request.Entry.create model )
 
                 Just ( eid, rev ) ->
-                    ( initNew, Request.Entry.update eid rev model )
+                    ( init, Request.Entry.update eid rev model )
 
         Edit entry ->
             { model
@@ -141,7 +142,7 @@ update msg model =
                         , addedAt = addedAt
                     }
             in
-                update Commit newModel
+                update session Commit newModel
 
         SetLocationTime (Err error) ->
             { model | errors = model.errors ++ [ ( Form, viewGeoError error ) ] } ! []
@@ -154,16 +155,16 @@ update msg model =
                         , addedAt = addedAt
                     }
             in
-                update Commit newModel
+                update session Commit newModel
 
         CreateCompleted (Ok entry) ->
-            initNew ! []
+            init ! []
 
         CreateCompleted (Err error) ->
             { model | errors = model.errors ++ [ ( Form, "Server error while attempting to save note" ) ] } ! []
 
         EditCompleted (Ok entry) ->
-            initNew ! []
+            init ! []
 
         EditCompleted (Err error) ->
             { model | errors = model.errors ++ [ ( Form, "Server error while attempting to edit note" ) ] } ! []
