@@ -1,16 +1,11 @@
 module Views.Page exposing (ActivePage(..), frame)
 
 import Html exposing (..)
-import Html.Keyed
 import Html.Lazy exposing (lazy, lazy2)
-import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
 import Data.User exposing (User)
-import Page.Login as Login
 import Views.General exposing (epButton, avatar)
-
-
--- TODO: use for viewMenu
+import Route exposing (Route)
 
 
 type ActivePage
@@ -24,14 +19,50 @@ type ActivePage
 frame : Maybe User -> ActivePage -> Html msg -> Html msg
 frame user page content =
     div []
-        [ viewHeader user
-
-        -- , viewMenu page # TODO: manages which link is active
+        [ viewMenu page user
+        , viewHeader user
         , div [ class "pa3 pt0 ph5-ns bg-white" ]
             [ div [ class "mw7-ns center" ] [ content ]
             , viewFooter
             ]
         ]
+
+
+viewMenu : ActivePage -> Maybe User -> Html msg
+viewMenu page user =
+    nav [ class "pv3 flex flex-row justify-center items-center space-around black-80" ]
+        [ navbarLink (page == Home) Route.Home [ text "Home" ]
+        , navbarLink (page == NewEntry) Route.NewEntry [ text "Add" ]
+        , navbarLink (page == Settings) Route.Settings [ text "Settings" ]
+        , navbarLink (page == Login) Route.Login [ text "Log In" ]
+        ]
+
+
+navbarLink : Bool -> Route -> List (Html msg) -> Html msg
+navbarLink isActive route linkContent =
+    div [ classList [ ( "pa3", True ) ] ]
+        [ a [ classList [ ( "dim link", True ), ( "deep-blue", isActive ), ( "black-80", not isActive ) ], Route.href route ] linkContent ]
+
+
+
+-- viewSignIn : ActivePage -> Maybe User -> List (Html msg)
+-- viewSignIn page user =
+-- case user of
+-- Nothing ->
+-- [ navbarLink (page == Login) Route.Login [ text "Sign in" ]
+-- , navbarLink (page == Register) Route.Register [ text "Sign up" ]
+-- ]
+-- Just user ->
+-- [ navbarLink (page == NewArticle) Route.NewArticle [ i [ class "ion-compose" ] [], text " New Post" ]
+-- , navbarLink (page == Settings) Route.Settings [ i [ class "ion-gear-a" ] [], text " Settings" ]
+-- , navbarLink
+-- (page == Profile user.username)
+-- (Route.Profile user.username)
+-- [ img [ class "user-pic", UserPhoto.src user.image ] []
+-- , User.usernameToHtml user.username
+-- ]
+-- , navbarLink False Route.Logout [ text "Sign out" ]
+-- ]
 
 
 viewHeader : Maybe User -> Html msg
