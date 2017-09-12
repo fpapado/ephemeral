@@ -30,7 +30,7 @@ frame user page content =
 
 viewMenu : ActivePage -> Maybe User -> Html msg
 viewMenu page user =
-    div [ class "fixed bottom-0 left-0 w-100" ]
+    div [ class "fixed bottom-0 left-0 w-100 z-1" ]
         [ nav [ class "pv2 mw7-ns center flex flex-row justify-center items-center space-around black-80 bg-beige-gray-2" ]
             [ navbarLink (page == Home) Route.Home [ text "Home" ]
             , navbarLink (page == NewEntry) Route.NewEntry [ text "Add" ]
