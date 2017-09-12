@@ -6,7 +6,8 @@
   - [X] Make models work for subpages
   - [ ] Log in / Log out
   - [X] Basic Menu
-  - [ ] Navigation at the bottom
+  - [ ] Login State in nav
+  - [X] Navigation at the bottom
 
   - [ ] Hide map where not needed (load dynamically, even?)
   - [ ] Extra, if needed:

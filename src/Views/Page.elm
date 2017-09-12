@@ -30,18 +30,20 @@ frame user page content =
 
 viewMenu : ActivePage -> Maybe User -> Html msg
 viewMenu page user =
-    nav [ class "pv3 flex flex-row justify-center items-center space-around black-80" ]
-        [ navbarLink (page == Home) Route.Home [ text "Home" ]
-        , navbarLink (page == NewEntry) Route.NewEntry [ text "Add" ]
-        , navbarLink (page == Settings) Route.Settings [ text "Settings" ]
-        , navbarLink (page == Login) Route.Login [ text "Log In" ]
+    div [ class "fixed bottom-0 left-0 w-100" ]
+        [ nav [ class "pv2 mw7-ns center flex flex-row justify-center items-center space-around black-80 bg-beige-gray-2" ]
+            [ navbarLink (page == Home) Route.Home [ text "Home" ]
+            , navbarLink (page == NewEntry) Route.NewEntry [ text "Add" ]
+            , navbarLink (page == Settings) Route.Settings [ text "Settings" ]
+            , navbarLink (page == Login) Route.Login [ text "Log In" ]
+            ]
         ]
 
 
 navbarLink : Bool -> Route -> List (Html msg) -> Html msg
 navbarLink isActive route linkContent =
     div [ classList [ ( "pa3", True ) ] ]
-        [ a [ classList [ ( "dim link", True ), ( "deep-blue", isActive ), ( "black-80", not isActive ) ], Route.href route ] linkContent ]
+        [ a [ classList [ ( "dim link f6 b", True ), ( "deep-blue", isActive ), ( "black-80", not isActive ) ], Route.href route ] linkContent ]
 
 
 
