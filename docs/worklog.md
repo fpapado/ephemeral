@@ -2,8 +2,8 @@
 
 - [ ] Routing with pages:
   - [X] Main page + Login page
-  - [ ] Map subs for subpages etc.
-  - [ ] Make models work for subpages
+  - [~] Map subs for subpages etc.
+  - [X] Make models work for subpages
   - [ ] Log in / Log out
   - [] Navigation at the bottom
 

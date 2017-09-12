@@ -13,7 +13,6 @@ import Page.Login as Login
 import Page.NotFound as NotFound
 import Page.Errored as Errored exposing (PageLoadError)
 import Util exposing ((=>))
-import Pouch.Ports
 import Navigation exposing (Location)
 
 
@@ -204,7 +203,7 @@ setRoute maybeRoute model =
             Just Route.Home ->
                 -- transition HomeLoaded (Home.init model.session)
                 -- TODO: could send LoadEntries cmd here?
-                { model | pageState = Loaded (Home Home.init) } => Cmd.none
+                { model | pageState = Loaded (Home Home.init) } => Request.Entry.list
 
             Just Route.Login ->
                 { model | pageState = Loaded (Login Login.initialModel) } => Cmd.none
@@ -300,17 +299,12 @@ updatePage page msg model =
         errored =
             pageErrored model
     in
-        -- = SetRoute (Maybe Route)
-        -- | HomeLoaded (Result PageLoadError Home.Model)
-        -- | HomeMsg Home.Msg
-        -- | EntryMsg Entry.Msg
-        -- | LoginMsg Login.Msg
         case ( msg, page ) of
             ( SetRoute route, _ ) ->
                 setRoute route model
 
             ( HomeLoaded (Ok subModel), _ ) ->
-                { model | pageState = Loaded (Home subModel) } => Cmd.none
+                { model | pageState = Loaded (Home subModel) } => Request.Entry.list
 
             ( HomeLoaded (Err error), _ ) ->
                 { model | pageState = Loaded (Errored error) } => Cmd.none
