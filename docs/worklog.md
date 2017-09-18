@@ -13,6 +13,8 @@
     - [X] Update user on logging in
     - [X] Delete user on logging out
 
+- [ ] Style nav bar
+
 - [ ] Investigate Save/Commit and Geolocation
 
 - [ ] Hide map where not needed (load dynamically, even?)
