@@ -1,20 +1,28 @@
-# After "replication" branch
+# Routing branch
 
-- [ ] Routing with pages:
+- [X] Routing with pages:
   - [X] Main page + Login page
   - [~] Map subs for subpages etc.
   - [X] Make models work for subpages
-  - [ ] Log in / Log out
   - [X] Basic Menu
-  - [ ] Login State in nav
   - [X] Navigation at the bottom
 
-  - [ ] Hide map where not needed (load dynamically, even?)
-  - [ ] Extra, if needed:
-    - [ ] Entry.Editor
-    - [ ] Entry.New
+  - [X] Log in / Log out
+    - [X] Routeto home / send message
+  - [X] Login State in nav
+    - [X] Update user on logging in
+    - [X] Delete user on logging out
 
+- [ ] Investigate Save/Commit and Geolocation
 
+- [ ] Hide map where not needed (load dynamically, even?)
+- [ ] Make map additions directly in JS from the DB stream?
+  - As in, make DB the single source of truth
+
+- [] Entry Page: Confirmation on success
+  - [] In general, messaging service
+
+# Port branch
 - [ ] Port architecture, merging ports
   - [ ] e.g. could have:
     translatePouchUpdate : (Result String Entry -> msg) -> (Result Sting String -> msg) -> Value -> msg
@@ -27,6 +35,13 @@
 - [ ] Debatable whether to propagate error in Request.Entry or return empty Dict
   - [ ] Generally, errors from Ports
 
+# Settings Page
+- [ ] DB url
+- [ ] Default location
+
+# Other ideas
+- Page.initData Cmd convention? Would avoid having to send Request.listEntries directly on Main.elm etc.
+- Style-elements?
 
 - [ ] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
 

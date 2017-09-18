@@ -1,7 +1,6 @@
 module Views.Page exposing (ActivePage(..), frame)
 
 import Html exposing (..)
-import Html.Lazy exposing (lazy, lazy2)
 import Html.Attributes exposing (..)
 import Data.User exposing (User)
 import Views.General exposing (epButton, avatar)
@@ -31,40 +30,25 @@ frame user page content =
 viewMenu : ActivePage -> Maybe User -> Html msg
 viewMenu page user =
     div [ class "fixed bottom-0 left-0 w-100 z-1" ]
-        [ nav [ class "pv2 mw7-ns center flex flex-row justify-center items-center space-around black-80 bg-beige-gray-2" ]
+        [ nav [ class "pv2 mw7-ns center flex flex-row justify-center items-center space-around black-80 bg-beige-gray-2" ] <|
             [ navbarLink (page == Home) Route.Home [ text "Home" ]
             , navbarLink (page == NewEntry) Route.NewEntry [ text "Add" ]
             , navbarLink (page == Settings) Route.Settings [ text "Settings" ]
-            , navbarLink (page == Login) Route.Login [ text "Log In" ]
             ]
+                ++ viewSignIn page user
         ]
 
 
-navbarLink : Bool -> Route -> List (Html msg) -> Html msg
-navbarLink isActive route linkContent =
-    div [ classList [ ( "pa3", True ) ] ]
-        [ a [ classList [ ( "dim link f6 b", True ), ( "deep-blue", isActive ), ( "black-80", not isActive ) ], Route.href route ] linkContent ]
+viewSignIn : ActivePage -> Maybe User -> List (Html msg)
+viewSignIn page user =
+    case user of
+        Nothing ->
+            [ navbarLink (page == Login) Route.Login [ text "Log in" ]
+            ]
 
-
-
--- viewSignIn : ActivePage -> Maybe User -> List (Html msg)
--- viewSignIn page user =
--- case user of
--- Nothing ->
--- [ navbarLink (page == Login) Route.Login [ text "Sign in" ]
--- , navbarLink (page == Register) Route.Register [ text "Sign up" ]
--- ]
--- Just user ->
--- [ navbarLink (page == NewArticle) Route.NewArticle [ i [ class "ion-compose" ] [], text " New Post" ]
--- , navbarLink (page == Settings) Route.Settings [ i [ class "ion-gear-a" ] [], text " Settings" ]
--- , navbarLink
--- (page == Profile user.username)
--- (Route.Profile user.username)
--- [ img [ class "user-pic", UserPhoto.src user.image ] []
--- , User.usernameToHtml user.username
--- ]
--- , navbarLink False Route.Logout [ text "Sign out" ]
--- ]
+        Just user ->
+            [ navbarLink False Route.Logout [ text "Sign out" ]
+            ]
 
 
 viewHeader : Maybe User -> Html msg
@@ -99,16 +83,7 @@ viewFooter =
         ]
 
 
-
--- TODO: Add to Page.Login
--- viewLoginLogout : Maybe User -> Login.Model -> Html Msg
--- viewLoginLogout loggedIn subModel =
--- case loggedIn of
--- Just user ->
--- div [ class "mt2 measure center" ]
--- [ p [ class "lh-copy f5 mb3 black-80" ] [ text "Note that logging out does not delete your local files. If you log in again, then the database will attempt to synchronise with the remote. This may or may not be what you intend." ]
--- , epButton [ class "w-100 white bg-deep-blue", onClick LogOut ] [ text "Log Out" ]
--- ]
--- Nothing ->
--- Login.view subModel
--- |> Html.map LoginMsg
+navbarLink : Bool -> Route -> List (Html msg) -> Html msg
+navbarLink isActive route linkContent =
+    div [ classList [ ( "pa3", True ) ] ]
+        [ a [ classList [ ( "dim link f6 b", True ), ( "deep-blue", isActive ), ( "black-80", not isActive ) ], Route.href route ] linkContent ]

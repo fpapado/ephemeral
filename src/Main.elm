@@ -3,17 +3,17 @@ module Main exposing (..)
 import Task
 import Html exposing (..)
 import Data.Session exposing (Session)
-import Data.User exposing (User)
 import Request.Entry exposing (decodePouchEntries, decodePouchEntry, decodeDeletedEntry)
 import Route exposing (Route)
 import Views.Page as Page exposing (ActivePage)
 import Page.Entry as Entry
 import Page.Home as Home
-import Page.Login as Login
+import Page.Login as Login exposing (logout)
 import Page.NotFound as NotFound
 import Page.Errored as Errored exposing (PageLoadError)
 import Util exposing ((=>))
 import Navigation exposing (Location)
+import Pouch.Ports
 
 
 type Page
@@ -131,9 +131,11 @@ getPage pageState =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    -- TODO: add login/logout sub here
+    -- Combine page-specific subs plus global ones (namely, session)
     Sub.batch
-        [ pageSubscriptions (getPage model.pageState) ]
+        [ pageSubscriptions (getPage model.pageState)
+        , Pouch.Ports.logOut (Login.decodeLogout LogOutCompleted)
+        ]
 
 
 pageSubscriptions : Page -> Sub Msg
@@ -156,8 +158,8 @@ pageSubscriptions page =
         Entry _ ->
             Sub.none
 
-        Login _ ->
-            Sub.none
+        Login subModel ->
+            Sub.map (\msg -> LoginMsg msg) (Login.subscriptions subModel)
 
 
 
@@ -167,19 +169,10 @@ pageSubscriptions page =
 type Msg
     = SetRoute (Maybe Route)
     | HomeLoaded (Result PageLoadError Home.Model)
+    | LogOutCompleted (Result String Bool)
     | HomeMsg Home.Msg
     | EntryMsg Entry.Msg
     | LoginMsg Login.Msg
-
-
-
--- TODO: move to Login
-
-
-type LogMSg
-    = LoginCompleted (Result String User)
-    | LogOut
-    | LogOutCompleted (Result String Bool)
 
 
 
@@ -202,36 +195,23 @@ setRoute maybeRoute model =
 
             Just Route.Home ->
                 -- transition HomeLoaded (Home.init model.session)
-                -- TODO: could send LoadEntries cmd here?
                 { model | pageState = Loaded (Home Home.init) } => Request.Entry.list
 
             Just Route.Login ->
                 { model | pageState = Loaded (Login Login.initialModel) } => Cmd.none
 
             Just Route.Logout ->
-                let
-                    session =
-                        model.session
-                in
-                    { model | session = { session | user = Nothing } }
-                        => Cmd.batch
-                            -- [ Ports.rtoreSession Nothing
-                            [ Route.modifyUrl Route.Home
-                            ]
+                -- Login.logout gets back on a port in subscriptions
+                -- Handling of it (deleting user, routing home) is handled in
+                -- Main.update
+                model
+                    => Cmd.batch [ Login.logout ]
 
             Just Route.NewEntry ->
                 { model | pageState = Loaded (Entry Entry.init) } => Cmd.none
 
             Just Route.Settings ->
                 errored Page.Other "Settings WIP"
-
-
-
--- case model.session.user of
--- Just user ->
--- { model | pageState = Loaded (Settings (Settings.init user)) } => Cmd.none
--- Nothing ->
--- errored Page.Settings "You must be signed in to access your settings."
 
 
 pageErrored : Model -> ActivePage -> String -> ( Model, Cmd msg )
@@ -250,37 +230,6 @@ pageErrored model activePage errorMessage =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     updatePage (getPage model.pageState) msg model
-
-
-
--- Messages that exist for all "pages"
--- case msg of
--- LogOut ->
--- -- ( model, Login.logout )
--- model ! []
--- LoginCompleted (Err err) ->
--- model => Cmd.none
--- LoginCompleted (Ok user) ->
--- -- TODO: should be handled as messageToPage in updatePage below
--- -- once subs are mapped
--- let
--- session =
--- model.session
--- newSession =
--- { session | user = Just user }
--- in
--- { model | session = newSession } => Cmd.none
--- LogOutCompleted (Err err) ->
--- model ! []
--- LogOutCompleted (Ok ok) ->
--- let
--- session =
--- model.session
--- newSession =
--- { session | user = Nothing }
--- in
--- { model | session = newSession } ! []
--- Messages for another page
 
 
 updatePage : Page -> Msg -> Model -> ( Model, Cmd Msg )
@@ -302,6 +251,17 @@ updatePage page msg model =
         case ( msg, page ) of
             ( SetRoute route, _ ) ->
                 setRoute route model
+
+            ( LogOutCompleted (Ok user), _ ) ->
+                let
+                    session =
+                        model.session
+                in
+                    { model | session = { session | user = Nothing } }
+                        => Cmd.batch [ Route.modifyUrl Route.Home ]
+
+            ( LogOutCompleted (Err error), _ ) ->
+                model => Cmd.none
 
             ( HomeLoaded (Ok subModel), _ ) ->
                 { model | pageState = Loaded (Home subModel) } => Request.Entry.list
