@@ -7,11 +7,12 @@ const HTMLWebpackPlugin = require('html-webpack-plugin');
 const OfflinePlugin = require('offline-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const DashboardPlugin = require('webpack-dashboard/plugin');
+var BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+  .BundleAnalyzerPlugin;
 
-var TARGET_ENV =
-  process.env.npm_lifecycle_event === 'prod' ? 'production' : 'development';
+var isProd = process.env.NODE_ENV === 'production';
 
-var filename = TARGET_ENV == 'production' ? '[name]-[hash].js' : 'index.js';
+var filename = isProd ? '[name]-[hash].js' : 'index.js';
 
 // -- Offline Plugin --
 let offlinePlugin = new OfflinePlugin({
@@ -49,6 +50,13 @@ let pwaPlugin = new WebpackPwaManifest({
   ]
 });
 
+// Bundle analyzer config
+let bundlePlugin = new BundleAnalyzerPlugin({
+  analyzerMode: 'static',
+  openAnalyzer: false,
+  reportFilename: 'bundle-analysis.html'
+});
+
 // -- Common Config --
 var common = {
   entry: ['whatwg-fetch', './src/index.js'],
@@ -64,8 +72,7 @@ var common = {
       // inject details of output file at end of body
       inject: 'body'
     }),
-    pwaPlugin,
-    new DashboardPlugin()
+    pwaPlugin
   ],
   resolve: {
     modules: [path.join(__dirname, 'src'), 'node_modules'],
@@ -122,15 +129,16 @@ var common = {
   }
 };
 
-if (TARGET_ENV === 'development') {
+if (!isProd) {
   console.log('Building for dev...');
   module.exports = merge(common, {
     plugins: [
       // Suggested for hot-loading
       new webpack.NamedModulesPlugin(),
       // Prevents compilation errors causing the hot loader to lose state
-      new webpack.NoEmitOnErrorsPlugin()
+      new webpack.NoEmitOnErrorsPlugin(),
       // , offlinePlugin
+      new DashboardPlugin()
     ],
     resolve: {
       alias: {
@@ -166,7 +174,7 @@ if (TARGET_ENV === 'development') {
   });
 }
 
-if (TARGET_ENV === 'production') {
+if (isProd) {
   console.log('Building for prod...');
   module.exports = merge(common, {
     plugins: [
@@ -176,7 +184,13 @@ if (TARGET_ENV === 'production') {
         }
       ]),
       new webpack.optimize.UglifyJsPlugin(),
-      offlinePlugin
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify('production')
+        }
+      }),
+      offlinePlugin,
+      bundlePlugin
     ],
     resolve: {
       alias: {

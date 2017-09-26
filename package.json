@@ -11,6 +11,7 @@
     "pouchdb-browser": "^6.3.4",
     "promise-polyfill": "6.0.2",
     "tachyons": "^4.7.4",
+    "webpack-bundle-analyzer": "^2.9.0",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
@@ -42,11 +43,12 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack-dev-server --hot --inline --port 3000",
-    "build": "webpack",
-    "prod": "rimraf dist/ && webpack-dashboard -- webpack -p",
+    "dev": "webpack-dashboard -- webpack-dev-server --hot --inline --port 3000",
+    "production:build":
+      "rimraf dist/ && NODE_ENV=production webpack --progress",
     "postinstall": "elm-package install -y",
-    "pouchdb-server": "pouchdb-server --config pouchdb-server/config.json --dir pouchdb-server"
+    "pouchdb-server":
+      "pouchdb-server --config pouchdb-server/config.json --dir pouchdb-server"
   },
   "author": "fpapado <fotis@fpapado.com>",
   "license": "ISC",
