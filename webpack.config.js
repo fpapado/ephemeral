@@ -65,6 +65,7 @@ var common = {
     // add hash when building for production
     filename: filename
   },
+  devtool: '#source-map',
   plugins: [
     new HTMLWebpackPlugin({
       // using .ejs prevents other loaders causing errors
@@ -202,6 +203,7 @@ if (isProd) {
       }),
       offlinePlugin,
       new UglifyJsPlugin({
+        sourceMap: true,
         uglifyOptions: {
           compress: {
             warnings: false
