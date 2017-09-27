@@ -1,6 +1,7 @@
 elm-stuff/
 repl-temp-*
 node_modules/
+yarn-error.log
 
 elm.js
 dist
@@ -8,3 +9,4 @@ dist
 # PouchDB
 /db
 /pouchdb-server
+log.txt

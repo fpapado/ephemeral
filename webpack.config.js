@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 const merge = require('webpack-merge');
 
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
@@ -67,6 +68,7 @@ var common = {
   },
   devtool: '#source-map',
   plugins: [
+    new CleanWebpackPlugin(['dist']),
     new HTMLWebpackPlugin({
       // using .ejs prevents other loaders causing errors
       template: 'src/index.ejs',
