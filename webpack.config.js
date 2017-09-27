@@ -1,19 +1,19 @@
 const webpack = require('webpack');
 const path = require('path');
 const merge = require('webpack-merge');
+const md5 = require('md5');
 
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const NameAllModulesPlugin = require('name-all-modules-plugin');
 const OfflinePlugin = require('offline-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const DashboardPlugin = require('webpack-dashboard/plugin');
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 
 var isProd = process.env.NODE_ENV === 'production';
-
-var filename = isProd ? '[name]-[hash].js' : 'index.js';
 
 // -- Offline Plugin --
 let offlinePlugin = new OfflinePlugin({
@@ -61,21 +61,58 @@ let bundlePlugin = new BundleAnalyzerPlugin({
 
 // -- Common Config --
 var common = {
-  entry: ['whatwg-fetch', './src/index.js'],
+  entry: {
+    main: './src/index.js',
+    vendor: ['pouchdb-browser', 'pouchdb-authentication', 'leaflet']
+  },
   output: {
     path: path.join(__dirname, 'dist'),
-    // add hash when building for production
-    filename: filename
+
+    // Hash as appropriate for production; based on chunks etc.
+    filename: isProd ? '[name]-[chunkhash].js' : 'index.js'
   },
   devtool: '#source-map',
   plugins: [
     new CleanWebpackPlugin(['dist']),
+
+    // Give modules a deterministic name for better long-term caching:
+    // https://github.com/webpack/webpack.js.org/issues/652#issuecomment-273023082
+    new webpack.NamedModulesPlugin(),
+
+    // Give dynamically `import()`-ed scripts a deterministic name for better
+    // long-term caching. Solution adapted from:
+    new webpack.NamedChunksPlugin(
+      chunk =>
+        chunk.name
+          ? chunk.name
+          : md5(chunk.mapModules(m => m.identifier()).join()).slice(0, 10)
+    ),
+
     new HTMLWebpackPlugin({
       // using .ejs prevents other loaders causing errors
       template: 'src/index.ejs',
       // inject details of output file at end of body
       inject: 'body'
     }),
+
+    new webpack.optimize.CommonsChunkPlugin({
+      name: ['vendor'],
+      minChunks: Infinity
+      // (with more entries, this ensures that no other module
+      // goes into the vendor chunk)
+      // TODO: add a common entry point if needed
+    }),
+
+    //// Extract runtime code so updates don't affect app-code caching:
+    // https://webpack.js.org/guides/caching
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'runtime'
+    }),
+
+    // Give deterministic names to all webpacks non-"normal" modules
+    // https://medium.com/webpack/predictable-long-term-caching-with-webpack-d3eee1d3fa31
+    new NameAllModulesPlugin(),
+
     pwaPlugin
   ],
   resolve: {
@@ -109,7 +146,8 @@ var common = {
                   }
                 }
               ]
-            ]
+            ],
+            plugins: ['syntax-dynamic-import']
           }
         }
       },
@@ -149,8 +187,6 @@ if (!isProd) {
   console.log('Building for dev...');
   module.exports = merge(common, {
     plugins: [
-      // Suggested for hot-loading
-      new webpack.NamedModulesPlugin(),
       // Prevents compilation errors causing the hot loader to lose state
       new webpack.NoEmitOnErrorsPlugin(),
       new DashboardPlugin()

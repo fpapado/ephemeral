@@ -1,0 +1,16 @@
+- [X] Compile separate modules and nomodules
+  - Tested, not much difference (I guess leaflet and Pouchdb-browser already compiled)
+    - [] Check later if we can recompile them
+- [ ] Separate index.js
+- [ ] babel-polyfill and runtime
+- [ ] Promise polyfill (or use lie, since pouchdb uses it)
+- [ ] Webpack separate runtime
+- [X] Vendor bundle
+- [ ] whatwg-fetch polyfill separately / webpack
+- [ ] Analyse bundle size
+- [ ] Update readme with new npm scripts
+- [ ] SW script compression
+- [X] lazy-load anki stuff
+- [ ] lazy-load leaflet on shouldshowmap?
+- [ ] Are the name plugins necessary?
+- [ ] Caching considerations
