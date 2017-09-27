@@ -32,7 +32,8 @@ let offlinePlugin = new OfflinePlugin({
 
   ServiceWorker: {
     navigateFallbackURL: '/',
-    events: true
+    events: true,
+    minify: true
   }
 });
 
@@ -152,7 +153,6 @@ if (!isProd) {
       new webpack.NamedModulesPlugin(),
       // Prevents compilation errors causing the hot loader to lose state
       new webpack.NoEmitOnErrorsPlugin(),
-      // , offlinePlugin
       new DashboardPlugin()
     ],
     resolve: {
@@ -203,7 +203,6 @@ if (isProd) {
           NODE_ENV: JSON.stringify('production')
         }
       }),
-      offlinePlugin,
       new UglifyJsPlugin({
         sourceMap: true,
         uglifyOptions: {
@@ -218,6 +217,7 @@ if (isProd) {
           }
         }
       }),
+      offlinePlugin,
       bundlePlugin
     ],
     resolve: {

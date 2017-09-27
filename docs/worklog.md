@@ -44,6 +44,7 @@
 # Other ideas
 - Page.initData Cmd convention? Would avoid having to send Request.listEntries directly on Main.elm etc.
 - Style-elements?
+- offline indicator
 
 - [ ] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
 
