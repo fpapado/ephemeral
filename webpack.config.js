@@ -4,11 +4,11 @@ const merge = require('webpack-merge');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const OfflinePlugin = require('offline-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const DashboardPlugin = require('webpack-dashboard/plugin');
-var BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
-  .BundleAnalyzerPlugin;
+const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 
 var isProd = process.env.NODE_ENV === 'production';
 
@@ -92,8 +92,20 @@ var common = {
         use: {
           loader: 'babel-loader',
           options: {
-            // env: automatically determines the Babel plugins you need based on your supported environments
-            presets: ['env']
+            cacheDirectory: true,
+            presets: [
+              [
+                'env',
+                {
+                  debug: true,
+                  modules: false,
+                  useBuiltIns: true,
+                  targets: {
+                    browsers: ['> 1%', 'last 2 versions', 'Firefox ESR']
+                  }
+                }
+              ]
+            ]
           }
         }
       },
@@ -183,13 +195,25 @@ if (isProd) {
           from: 'src/assets'
         }
       ]),
-      new webpack.optimize.UglifyJsPlugin(),
       new webpack.DefinePlugin({
         'process.env': {
           NODE_ENV: JSON.stringify('production')
         }
       }),
       offlinePlugin,
+      new UglifyJsPlugin({
+        uglifyOptions: {
+          compress: {
+            warnings: false
+          },
+          mangle: {
+            safari10: true
+          },
+          output: {
+            comments: false
+          }
+        }
+      }),
       bundlePlugin
     ],
     resolve: {

@@ -4,6 +4,8 @@
   "description": "An Elm front-end for note-taking",
   "main": "elm.js",
   "dependencies": {
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-runtime": "^6.26.0",
     "csv-stringify": "^1.0.4",
     "file-saver": "^1.3.3",
     "leaflet": "^1.2.0",
@@ -11,7 +13,6 @@
     "pouchdb-browser": "^6.3.4",
     "promise-polyfill": "6.0.2",
     "tachyons": "^4.7.4",
-    "webpack-bundle-analyzer": "^2.9.0",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
@@ -34,8 +35,10 @@
     "rimraf": "^2.6.1",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.18.2",
+    "uglifyjs-webpack-plugin": "^1.0.0-beta.2",
     "url-loader": "^0.5.9",
     "webpack": "^3.3.0",
+    "webpack-bundle-analyzer": "^2.9.0",
     "webpack-dashboard": "^0.4.0",
     "webpack-dev-server": "^2.5.1",
     "webpack-merge": "^4.1.0",
@@ -44,11 +47,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack-dashboard -- webpack-dev-server --hot --inline --port 3000",
-    "production:build":
-      "rimraf dist/ && NODE_ENV=production webpack --progress",
+    "production:build": "rimraf dist/ && NODE_ENV=production webpack --progress",
     "postinstall": "elm-package install -y",
-    "pouchdb-server":
-      "pouchdb-server --config pouchdb-server/config.json --dir pouchdb-server"
+    "pouchdb-server": "pouchdb-server --config pouchdb-server/config.json --dir pouchdb-server"
   },
   "author": "fpapado <fotis@fpapado.com>",
   "license": "ISC",
