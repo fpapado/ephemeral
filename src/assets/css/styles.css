@@ -307,3 +307,7 @@ a.close:hover{
     flex-basis: 25%;
   }
 }
+
+.elm-overlay {
+  z-index: 2
+}

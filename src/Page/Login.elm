@@ -1,14 +1,16 @@
-module Page.Login exposing (ExternalMsg(..), Model, User, Msg, initialModel, update, view, decodeLogin, decodeLogout, logout)
+module Page.Login exposing (ExternalMsg(..), Model, Msg, initialModel, update, view, subscriptions, decodeLogin, decodeLogout, logout)
 
+import Data.User as User exposing (User)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Validate exposing (..)
-import Views exposing (formField, epButton)
-import Util exposing (viewIf)
+import Views.General as Views exposing (formField, epButton)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
 import Json.Decode.Pipeline as P exposing (decode, required)
+import Route exposing (Route)
+import Util exposing ((=>), viewIf)
+import Validate exposing (..)
 import Pouch.Ports
 
 
@@ -21,10 +23,6 @@ type alias Model =
     , username : String
     , password : String
     }
-
-
-type alias User =
-    { username : String }
 
 
 initialModel : Model
@@ -113,28 +111,49 @@ update msg model =
         SubmitForm ->
             case validate model of
                 [] ->
-                    ( ( { model | errors = [] }
-                      , login model
-                      )
-                    , NoOp
-                    )
+                    { model | errors = [] }
+                        => login model
+                        => NoOp
 
                 errors ->
-                    ( ( { model | errors = errors }, Cmd.none ), NoOp )
+                    { model | errors = errors }
+                        => Cmd.none
+                        => NoOp
 
         SetUsername username ->
-            ( ( { model | username = username }, Cmd.none ), NoOp )
+            { model | username = username }
+                => Cmd.none
+                => NoOp
 
         SetPassword password ->
-            ( ( { model | password = password }, Cmd.none ), NoOp )
+            { model | password = password }
+                => Cmd.none
+                => NoOp
 
         LoginCompleted (Err error) ->
-            ( ( { model | errors = [ ( Form, error ) ] }, Cmd.none ), NoOp )
+            { model | errors = [ ( Form, error ) ] }
+                => Cmd.none
+                => NoOp
 
         LoginCompleted (Ok user) ->
-            ( ( model, Cmd.none )
-            , SetUser user
-            )
+            model
+                => Cmd.batch [ Route.modifyUrl Route.Home ]
+                => SetUser user
+
+
+
+-- SUBSCRIPTIONS --
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ Pouch.Ports.logIn (decodeLogin LoginCompleted)
+        ]
+
+
+
+-- VIEW --
 
 
 view : Model -> Html Msg

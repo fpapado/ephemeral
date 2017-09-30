@@ -1,225 +1,279 @@
 module Main exposing (..)
 
+import Task
 import Html exposing (..)
-import Html.Keyed
-import Html.Lazy exposing (lazy, lazy2)
-import Html.Events exposing (onClick, onInput)
-import Html.Attributes exposing (..)
-import Views exposing (epButton, avatar)
-import Data.Entry exposing (Entry, EntryId, idToString)
-import Dict exposing (Dict)
+import Data.Session exposing (Session)
 import Request.Entry exposing (decodePouchEntries, decodePouchEntry, decodeDeletedEntry)
+import Route exposing (Route)
+import Views.Page as Page exposing (ActivePage)
 import Page.Entry as Entry
-import Page.Login as Login exposing (User)
-import Map as Map
-import Util exposing (viewDate, viewIf)
+import Page.Home as Home
+import Page.Login as Login exposing (logout)
+import Page.NotFound as NotFound
+import Page.Errored as Errored exposing (PageLoadError)
+import Util exposing ((=>))
+import Navigation exposing (Location)
 import Pouch.Ports
-
-
-main : Program Never Model Msg
-main =
-    Html.program
-        { init = init
-        , view = lazy view
-        , update = update
-        , subscriptions = subscriptions
-        }
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.batch
-        [ Pouch.Ports.getEntries (decodePouchEntries NewEntries)
-        , Pouch.Ports.updatedEntry (decodePouchEntry NewEntry)
-        , Pouch.Ports.deletedEntry (decodeDeletedEntry DeletedEntry)
-
-        -- Not a huge fan of this; I should be mapping the subs for Page.login
-        , Pouch.Ports.logIn (Login.decodeLogin LoginCompleted)
-
-        -- Should be in a Session module or so
-        , Pouch.Ports.logOut (Login.decodeLogout LogOutCompleted)
-        ]
-
-
-
--- MODEL
 
 
 type Page
     = Blank
+    | NotFound
+    | Errored PageLoadError
+    | Home Home.Model
     | Entry Entry.Model
     | Login Login.Model
 
 
+
+-- | Settings User
+-- MODEL --
+
+
 type alias Model =
-    { entries : Dict String Entry
-    , pageState : Page
-    , mapState : Map.Model
-    , loggedIn : Maybe User
+    { session : Session
+    , pageState : PageState
     }
 
 
-emptyModel : Model
-emptyModel =
-    { entries = Dict.empty
-    , pageState = Entry Entry.initNew
-    , mapState = Map.initModel
-    , loggedIn = Nothing
+type PageState
+    = Loaded Page
+    | TransitioningFrom Page
+
+
+init : Location -> ( Model, Cmd Msg )
+init location =
+    setRoute (Route.fromLocation location) initModel
+
+
+initModel : Model
+initModel =
+    -- TODO: check
+    { session = { user = Nothing }
+    , pageState = Loaded initialPage
     }
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( emptyModel
-    , Cmd.batch
-        [ Request.Entry.list
-        , Pouch.Ports.checkAuthState "check"
+initialPage : Page
+initialPage =
+    Blank
+
+
+
+-- VIEW
+
+
+view : Model -> Html Msg
+view model =
+    case model.pageState of
+        Loaded page ->
+            viewPage model.session False page
+
+        TransitioningFrom page ->
+            viewPage model.session True page
+
+
+viewPage : Session -> Bool -> Page -> Html Msg
+viewPage session isLoading page =
+    let
+        frame =
+            Page.frame session.user
+    in
+        case page of
+            Blank ->
+                Html.text ""
+                    |> frame Page.Other
+
+            NotFound ->
+                NotFound.view session
+                    |> frame Page.Other
+
+            Errored subModel ->
+                Errored.view session subModel
+                    |> frame Page.Other
+
+            Home subModel ->
+                Home.view subModel
+                    |> frame Page.Home
+                    |> Html.map HomeMsg
+
+            Entry subModel ->
+                Entry.view subModel
+                    |> frame Page.NewEntry
+                    |> Html.map EntryMsg
+
+            -- Settings subModel ->
+            -- Errored.view session subModel
+            -- |> frame Page.Other
+            -- TODO: Add once Page.Settings implemented
+            -- Entry.view subModel
+            -- |> frame Page.Settings
+            -- |> Html.map SettingsMsg
+            Login subModel ->
+                Login.view subModel
+                    |> frame Page.Login
+                    |> Html.map LoginMsg
+
+
+getPage : PageState -> Page
+getPage pageState =
+    case pageState of
+        Loaded page ->
+            page
+
+        TransitioningFrom page ->
+            page
+
+
+
+-- SUBSCRIPTIONS --
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    -- Combine page-specific subs plus global ones (namely, session)
+    Sub.batch
+        [ pageSubscriptions (getPage model.pageState)
+        , Pouch.Ports.logOut (Login.decodeLogout LogOutCompleted)
         ]
-    )
+
+
+pageSubscriptions : Page -> Sub Msg
+pageSubscriptions page =
+    case page of
+        Blank ->
+            Sub.none
+
+        Errored _ ->
+            Sub.none
+
+        NotFound ->
+            Sub.none
+
+        Home subModel ->
+            Sub.map (\msg -> HomeMsg msg) (Home.subscriptions subModel)
+
+        -- Settings _ ->
+        -- Sub.none
+        Entry _ ->
+            Sub.none
+
+        Login subModel ->
+            Sub.map (\msg -> LoginMsg msg) (Login.subscriptions subModel)
+
+
+
+-- MSG --
+
+
+type Msg
+    = SetRoute (Maybe Route)
+    | HomeLoaded (Result PageLoadError Home.Model)
+    | LogOutCompleted (Result String Bool)
+    | HomeMsg Home.Msg
+    | EntryMsg Entry.Msg
+    | LoginMsg Login.Msg
+
+
+
+-- ROUTE MAPS --
+
+
+setRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
+setRoute maybeRoute model =
+    let
+        transition toMsg task =
+            { model | pageState = TransitioningFrom (getPage model.pageState) }
+                => Task.attempt toMsg task
+
+        errored =
+            pageErrored model
+    in
+        case maybeRoute of
+            Nothing ->
+                { model | pageState = Loaded NotFound } => Cmd.none
+
+            Just Route.Home ->
+                -- transition HomeLoaded (Home.init model.session)
+                { model | pageState = Loaded (Home Home.init) } => Request.Entry.list
+
+            Just Route.Login ->
+                { model | pageState = Loaded (Login Login.initialModel) } => Cmd.none
+
+            Just Route.Logout ->
+                -- Login.logout gets back on a port in subscriptions
+                -- Handling of it (deleting user, routing home) is handled in
+                -- Main.update
+                model
+                    => Cmd.batch [ Login.logout ]
+
+            Just Route.NewEntry ->
+                { model | pageState = Loaded (Entry Entry.init) } => Cmd.none
+
+            Just Route.Settings ->
+                errored Page.Other "Settings WIP"
+
+
+pageErrored : Model -> ActivePage -> String -> ( Model, Cmd msg )
+pageErrored model activePage errorMessage =
+    let
+        error =
+            Errored.pageLoadError activePage errorMessage
+    in
+        { model | pageState = Loaded (Errored error) } => Cmd.none
 
 
 
 -- UPDATE
 
 
-type Msg
-    = NoOp
-    | LoadEntries
-    | ExportCardsOffline
-    | ExportCardsOnline
-    | SetPage Page
-    | TogglePage
-    | DeleteEntry EntryId
-    | NewEntries (List Entry)
-    | NewEntry (Result String Entry)
-    | DeletedEntry (Result String EntryId)
-    | LoginCompleted (Result String User)
-    | LogOut
-    | LogOutCompleted (Result String Bool)
-    | EntryMsg Entry.Msg
-    | LoginMsg Login.Msg
-    | MapMsg Map.Msg
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        -- Messages that exist for all "pages"
-        NoOp ->
-            model ! []
-
-        SetPage pageState ->
-            { model | pageState = pageState } ! []
-
-        ExportCardsOffline ->
-            model ! [ Pouch.Ports.exportCards "offline" ]
-
-        ExportCardsOnline ->
-            model ! [ Pouch.Ports.exportCards "online" ]
-
-        TogglePage ->
-            let
-                nextPage =
-                    case model.pageState of
-                        Blank ->
-                            Blank
-
-                        Entry modelEntry ->
-                            Login Login.initialModel
-
-                        Login modelLogin ->
-                            Entry Entry.initNew
-            in
-                update (SetPage nextPage) model
-
-        DeleteEntry entryId ->
-            model ! [ Request.Entry.delete entryId ]
-
-        NewEntries entries ->
-            let
-                assocList =
-                    List.map (\e -> ( idToString e.id, e )) entries
-
-                newEntries =
-                    Dict.fromList (assocList)
-            in
-                { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarkers entries) ]
-
-        NewEntry (Err err) ->
-            model ! []
-
-        NewEntry (Ok entry) ->
-            let
-                newEntries =
-                    Dict.insert (idToString entry.id) entry model.entries
-            in
-                { model | entries = newEntries } ! [ Cmd.map MapMsg (Map.addMarkers [ entry ]) ]
-
-        DeletedEntry (Err err) ->
-            model ! []
-
-        DeletedEntry (Ok entryId) ->
-            let
-                newEntries =
-                    Dict.remove (idToString entryId) model.entries
-
-                ( newMapState, newMapCmd ) =
-                    Map.update (Map.RemoveMarker entryId) model.mapState
-            in
-                ( { model
-                    | entries = newEntries
-                    , mapState = newMapState
-                  }
-                , Cmd.map MapMsg newMapCmd
-                )
-
-        LogOut ->
-            ( model, Login.logout )
-
-        LoginCompleted (Err err) ->
-            model ! []
-
-        LoginCompleted (Ok user) ->
-            -- TODO: should be handled as messageToPage in updatePage below
-            -- once subs are mapped
-            { model | loggedIn = Just user } ! []
-
-        LogOutCompleted (Err err) ->
-            model ! []
-
-        LogOutCompleted (Ok ok) ->
-            { model | loggedIn = Nothing } ! []
-
-        LoadEntries ->
-            ( model, Pouch.Ports.listEntries "entry" )
-
-        MapMsg msg ->
-            -- more ad-hoc for Map messages, since we might want map to be co-located
-            let
-                ( newModel, newCmd ) =
-                    Map.update msg model.mapState
-            in
-                ( { model | mapState = newModel }, Cmd.map MapMsg newCmd )
-
-        -- Messages for another segment
-        _ ->
-            updatePage model.pageState msg model
+    updatePage (getPage model.pageState) msg model
 
 
 updatePage : Page -> Msg -> Model -> ( Model, Cmd Msg )
 updatePage page msg model =
-    -- More general function to abstract pages
     let
+        session =
+            model.session
+
         toPage toModel toMsg subUpdate subMsg subModel =
             let
                 ( newModel, newCmd ) =
                     subUpdate subMsg subModel
             in
-                ( { model | pageState = (toModel newModel) }, Cmd.map toMsg newCmd )
+                ( { model | pageState = Loaded (toModel newModel) }, Cmd.map toMsg newCmd )
+
+        errored =
+            pageErrored model
     in
         case ( msg, page ) of
+            ( SetRoute route, _ ) ->
+                setRoute route model
+
+            ( LogOutCompleted (Ok user), _ ) ->
+                let
+                    session =
+                        model.session
+                in
+                    { model | session = { session | user = Nothing } }
+                        => Cmd.batch [ Route.modifyUrl Route.Home ]
+
+            ( LogOutCompleted (Err error), _ ) ->
+                model => Cmd.none
+
+            ( HomeLoaded (Ok subModel), _ ) ->
+                { model | pageState = Loaded (Home subModel) } => Request.Entry.list
+
+            ( HomeLoaded (Err error), _ ) ->
+                { model | pageState = Loaded (Errored error) } => Cmd.none
+
+            ( HomeMsg subMsg, Home subModel ) ->
+                toPage Home HomeMsg (Home.update session) subMsg subModel
+
             ( EntryMsg subMsg, Entry subModel ) ->
-                toPage Entry EntryMsg (Entry.update) subMsg subModel
+                toPage Entry EntryMsg (Entry.update session) subMsg subModel
 
             ( LoginMsg subMsg, Login subModel ) ->
                 let
@@ -232,188 +286,32 @@ updatePage page msg model =
                                 model
 
                             Login.SetUser user ->
-                                { model | loggedIn = Just user }
-                in
-                    ( { newModel | pageState = (Login pageModel) }, Cmd.map LoginMsg cmd )
+                                let
+                                    session =
+                                        model.session
 
-            ( _, Blank ) ->
-                -- Disregard messages for Blank page/segment
-                model ! []
+                                    newSession =
+                                        { session | user = Just user }
+                                in
+                                    { model | session = newSession }
+                in
+                    { newModel | pageState = Loaded (Login pageModel) }
+                        => Cmd.map LoginMsg cmd
+
+            ( _, NotFound ) ->
+                -- Disregard messages when on NotFound page
+                model => Cmd.none
 
             ( _, _ ) ->
-                -- Disregard messages for wrong page/segment
-                model ! []
+                -- Disregard messages for wrong page
+                model => Cmd.none
 
 
-
--- VIEW
-
-
-view : Model -> Html Msg
-view model =
-    div []
-        [ viewHeader model.loggedIn
-        , div [ class "pa3 pt0 ph5-ns bg-white" ]
-            [ div [ class "mw7-ns center" ]
-                [ div [ class "mb2 mb4-ns" ]
-                    [ viewFlight
-                    , lazy2 viewPage model model.pageState
-                    , div [ class "measure center mt3" ]
-                        [ epButton [ class "db mb3 w-100 white bg-deep-blue", onClick ExportCardsOffline ] [ text "Export CSV (offline)" ]
-                        , epButton [ class "db w-100 white bg-deep-blue", onClick ExportCardsOnline ] [ text "Export Anki (online)" ]
-                        ]
-                    ]
-                , div [ class "pt3" ]
-                    [ lazy viewEntries (Dict.toList model.entries)
-                    ]
-                ]
-            , viewFooter
-            ]
-        ]
-
-
-viewHeader : Maybe User -> Html Msg
-viewHeader loggedIn =
-    let
-        name =
-            case loggedIn of
-                Nothing ->
-                    "Guest"
-
-                Just user ->
-                    user.username
-    in
-        div [ class "pa4" ]
-            [ avatar name [ class "pointer mw4 center", onClick TogglePage ]
-            ]
-
-
-viewFooter : Html Msg
-viewFooter =
-    div [ class "mt4" ]
-        [ hr [ class "mv0 w-100 bb bw1 b--black-10" ] []
-        , div
-            [ class "pv3 tc" ]
-            [ p [ class "f6 lh-copy measure center" ]
-                [ text "Ephemeral is an app for writing down words and their translations, as you encounter them"
-                ]
-            , span [ class "f6 lh-copy measure center" ]
-                [ text "Made with 😭 by Fotis Papadogeogopoulos"
-                ]
-            ]
-        ]
-
-
-viewFlight : Html Msg
-viewFlight =
-    let
-        classNames =
-            "mr3 bg-beige-gray deep-blue pointer fw6 shadow-button"
-    in
-        div [ class "mb4 tc" ]
-            [ epButton [ class classNames, onClick <| MapMsg (Map.SetLatLng ( Map.helsinkiLatLng, 12 )) ]
-                [ text "Helsinki" ]
-            , epButton [ class classNames, onClick <| MapMsg (Map.SetLatLng ( Map.worldLatLng, 1 )) ]
-                [ text "World" ]
-            , epButton [ class classNames, onClick <| MapMsg (Map.GoToCurrentLocation) ]
-                [ text "Current" ]
-            ]
-
-
-viewPage : Model -> Page -> Html Msg
-viewPage model page =
-    -- Pass things to page's view
-    case page of
-        Blank ->
-            Html.text ""
-
-        Login subModel ->
-            viewLoginLogout model.loggedIn subModel
-
-        Entry subModel ->
-            Entry.view subModel
-                |> Html.map EntryMsg
-
-
-viewLoginLogout : Maybe User -> Login.Model -> Html Msg
-viewLoginLogout loggedIn subModel =
-    case loggedIn of
-        Just user ->
-            div [ class "mt2 measure center" ]
-                [ p [ class "lh-copy f5 mb3 black-80" ] [ text "Note that logging out does not delete your local files. If you log in again, then the database will attempt to synchronise with the remote. This may or may not be what you intend." ]
-                , epButton [ class "w-100 white bg-deep-blue", onClick LogOut ] [ text "Log Out" ]
-                ]
-
-        Nothing ->
-            Login.view subModel
-                |> Html.map LoginMsg
-
-
-viewEntries : List ( String, Entry ) -> Html Msg
-viewEntries keyedEntries =
-    if keyedEntries /= [] then
-        Html.Keyed.node "div" [ class "dw" ] <| List.map (\( id, entry ) -> ( id, lazy viewEntry entry )) keyedEntries
-    else
-        div [ class "pa4 mb3 bg-main-blue br1 tc f5" ]
-            [ p [ class "dark-gray lh-copy" ]
-                [ text "Looks like you don't have any entries yet. Why don't you add one? :)"
-                ]
-            ]
-
-
-viewEntry : Entry -> Html Msg
-viewEntry entry =
-    div
-        [ class "dw-panel" ]
-        [ div
-            [ class "dw-panel__content bg-muted-blue mw5 center br4 pa4 shadow-card" ]
-            [ a [ onClick <| DeleteEntry entry.id, class "close handwriting black-70 hover-white" ] [ text "×" ]
-            , div [ class "white tl" ]
-                [ h2
-                    [ class "mt0 mb2 f5 f4-ns fw6 overflow-hidden" ]
-                    [ text entry.content ]
-                , h2
-                    [ class "mt0 f5 f4-ns fw6 overflow-hidden" ]
-                    [ text entry.translation ]
-                ]
-            , hr
-                [ class "w-100 mt4 mb3 bb bw1 b--black-10" ]
-                []
-            , div [ class "white f6 f5-ns" ]
-                [ span [ class "db mb2 tr truncate" ] [ text <| viewDate entry.addedAt ]
-                , span [ class "db mb1 tr truncate" ] [ text <| toString entry.location.latitude ++ ", " ]
-                , span [ class "db tr truncate" ] [ text <| toString entry.location.longitude ]
-                ]
-            ]
-        ]
-
-
-
--- viewEntryFlip : Entry -> Html Msg
--- viewEntryFlip entry =
---     div
---         [ class "dw-panel dw-flip dw-flip--md" ]
---         [ div
---             [ class "dw-panel__content dw-flip__content white" ]
---             [ div
---                 [ class "dw-flip__panel dw-flip__panel--front bg-muted-blue mw5 center br4 pa4 shadow-card" ]
---                 [ h2
---                     [ class "mt0 mb2 f5 f4-ns fw6 overflow-hidden" ]
---                     [ text entry.content ]
---                 , hr
---                     [ class "w-100 mt4 mb3 bb bw1 b--black-10" ]
---                     []
---                 , div [ class "near-white f6 f5-ns" ]
---                     [ span [ class "db mb2 tr truncate" ] [ text <| viewDate entry.addedAt ]
---                     , span [ class "db mb1 tr truncate" ] [ text <| toString entry.location.latitude ++ ", " ]
---                     , span [ class "db tr truncate" ] [ text <| toString entry.location.longitude ]
---                     ]
---                 ]
---             , div
---                 [ class "dw-flip__panel dw-flip__panel--back bg-light-blue mw5 center br4 pa4 shadow-card" ]
---                 [ h2
---                     [ class "mt0 f5 f4-ns fw6 overflow-hidden" ]
---                     [ text entry.translation ]
---                 ]
---             ]
---         ]
+main : Program Never Model Msg
+main =
+    Navigation.program (Route.fromLocation >> SetRoute)
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
