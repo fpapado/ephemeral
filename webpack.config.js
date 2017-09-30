@@ -69,7 +69,7 @@ var common = {
     path: path.join(__dirname, 'dist'),
 
     // Hash as appropriate for production; based on chunks etc.
-    filename: isProd ? '[name]-[chunkhash].js' : 'index.js'
+    filename: isProd ? '[name]-[chunkhash].js' : '[name]-[hash].js'
   },
   devtool: '#source-map',
   plugins: [
