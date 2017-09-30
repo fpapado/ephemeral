@@ -21,7 +21,7 @@ let offlinePlugin = new OfflinePlugin({
 
   caches: {
     main: [':rest:'],
-    additional: [':externals:']
+    additional: [':externals:', '*-chunk-*.js']
   },
 
   externals: [
@@ -80,12 +80,14 @@ var common = {
     new webpack.NamedModulesPlugin(),
 
     // Give dynamically `import()`-ed scripts a deterministic name for better
-    // long-term caching. Solution adapted from:
+    // long-term caching.
+    // Also append '.chunk' to the name, such that offline-plugin caches it
     new webpack.NamedChunksPlugin(
       chunk =>
         chunk.name
           ? chunk.name
-          : md5(chunk.mapModules(m => m.identifier()).join()).slice(0, 10)
+          : md5(chunk.mapModules(m => m.identifier()).join()).slice(0, 10) +
+            '-chunk'
     ),
 
     new HTMLWebpackPlugin({

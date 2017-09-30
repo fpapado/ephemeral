@@ -1,16 +1,23 @@
+- [ ] Use tachyons locally
+- [ ] ExtractText css
+- [ ] Critical css?
+
+- [ ] App shell?
+- [ ] Analyse bundle size
+- [ ] Separate index.js?
+- [ ] babel-polyfill and runtime?
+- [ ] Promise polyfill (or use lie, since pouchdb uses it)?
+- [ ] whatwg-fetch polyfill check
+- [ ] Update readme with new npm scripts
+- [ ] Caching considerations
+- [ ] lazy-load leaflet on shouldshowmap?
+- [ ] Are the name plugins necessary?
+
+- [X] SW script compression
+- [X] Add anki export to additional cache instead of main
+- [X] Webpack separate runtime
+- [X] Vendor bundle
+- [X] lazy-load anki stuff
 - [X] Compile separate modules and nomodules
   - Tested, not much difference (I guess leaflet and Pouchdb-browser already compiled)
     - [] Check later if we can recompile them
-- [ ] Separate index.js
-- [ ] babel-polyfill and runtime
-- [ ] Promise polyfill (or use lie, since pouchdb uses it)
-- [ ] Webpack separate runtime
-- [X] Vendor bundle
-- [ ] whatwg-fetch polyfill separately / webpack
-- [ ] Analyse bundle size
-- [ ] Update readme with new npm scripts
-- [ ] SW script compression
-- [X] lazy-load anki stuff
-- [ ] lazy-load leaflet on shouldshowmap?
-- [ ] Are the name plugins necessary?
-- [ ] Caching considerations
