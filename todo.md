@@ -9,7 +9,7 @@
 - [X] Critical css?
 - [X] Shell and css
 
-- [ ] Do not copy css folder into dist any more
+- [X] Do not copy css folder into dist any more
 - [ ] Check asset caching with s/w
 - [ ] Delayed loading spinner?
 

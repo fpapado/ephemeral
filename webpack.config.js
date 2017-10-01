@@ -259,7 +259,8 @@ if (isProd) {
     plugins: [
       new CopyWebpackPlugin([
         {
-          from: 'src/assets'
+          from: 'src/assets',
+          ignore: ['*.scss']
         }
       ]),
       new webpack.DefinePlugin({
