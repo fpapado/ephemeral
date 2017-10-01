@@ -159,6 +159,7 @@ var common = {
         }
       },
       {
+        // Transpile and extract scss
         test: /\.scss$/,
         exclude: [/elm-stuff/, /node_modules/],
         use: extractSass.extract({

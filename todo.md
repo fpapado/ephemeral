@@ -6,8 +6,15 @@
   - [ ] investigate with s/w
 - [ ] Serve fonts locally?
 
-- [ ] Remove unused css
-- [ ] Critical css?
+- [X] Critical css?
+- [X] Shell and css
+
+- [ ] Do not copy css folder into dist any more
+- [ ] Check asset caching with s/w
+- [ ] Delayed loading spinner?
+
+- [LATER] Remove unused css
+  - [ ] maybe with the new penthouse, or manually
 
 - [ ] Remove console logs with babel loader transform?
 
