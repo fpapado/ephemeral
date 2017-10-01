@@ -5,6 +5,7 @@ const md5 = require('md5');
 
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const NameAllModulesPlugin = require('name-all-modules-plugin');
@@ -24,11 +25,7 @@ let offlinePlugin = new OfflinePlugin({
     additional: [':externals:', '*-chunk-*.js']
   },
 
-  externals: [
-    'https://unpkg.com/leaflet@1.2.0/dist/leaflet.css',
-    'https://unpkg.com/tachyons@4.7.0/css/tachyons.min.css',
-    'https://fonts.googleapis.com/css?family=Pacifico'
-  ],
+  externals: ['https://fonts.googleapis.com/css?family=Pacifico'],
 
   ServiceWorker: {
     navigateFallbackURL: '/',
@@ -57,6 +54,12 @@ let bundlePlugin = new BundleAnalyzerPlugin({
   analyzerMode: 'static',
   openAnalyzer: false,
   reportFilename: 'bundle-analysis.html'
+});
+
+// Extract text
+const extractSass = new ExtractTextPlugin({
+  filename: '[name].[contenthash].css',
+  disable: !isProd
 });
 
 // -- Common Config --
@@ -115,7 +118,9 @@ var common = {
     // https://medium.com/webpack/predictable-long-term-caching-with-webpack-d3eee1d3fa31
     new NameAllModulesPlugin(),
 
-    pwaPlugin
+    pwaPlugin,
+
+    extractSass
   ],
   resolve: {
     modules: [path.join(__dirname, 'src'), 'node_modules'],
@@ -156,7 +161,27 @@ var common = {
       {
         test: /\.scss$/,
         exclude: [/elm-stuff/, /node_modules/],
-        loaders: ['style-loader', 'css-loader', 'sass-loader']
+        use: extractSass.extract({
+          use: [
+            {
+              loader: 'css-loader',
+              options: {
+                minimize: isProd,
+                sourceMap: !isProd
+              }
+            },
+            {
+              loader: 'resolve-url-loader'
+            },
+            {
+              loader: 'sass-loader',
+              options: {
+                sourceMap: !isProd
+              }
+            }
+          ],
+          fallback: 'style-loader'
+        })
       },
       {
         test: /\.css$/,

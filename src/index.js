@@ -9,11 +9,11 @@ import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import config from 'config';
 import {string2Hex} from './js/util.js';
 
+require('./assets/css/styles.scss');
+
 if (!window.Promise) {
   window.Promise = Promise;
 }
-
-require('./assets/css/styles.css');
 
 OfflinePluginRuntime.install({
   onUpdating: () => {

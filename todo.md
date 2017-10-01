@@ -1,6 +1,15 @@
-- [ ] Use tachyons locally
-- [ ] ExtractText css
+- [X] Use tachyons locally
+- [X] ExtractText css
+- [X] Minimize css
+- [X] Leaflet css?
+- [X] URL for font?
+  - [ ] investigate with s/w
+- [ ] Serve fonts locally?
+
+- [ ] Remove unused css
 - [ ] Critical css?
+
+- [ ] Remove console logs with babel loader transform?
 
 - [ ] App shell?
 - [ ] Analyse bundle size

@@ -1,6 +1,7 @@
-.h6 {
-  height: 24rem;
-}
+@import url('https://fonts.googleapis.com/css?family=Pacifico');
+@import '~tachyons';
+@import '~leaflet/dist/leaflet.css';
+
 @media screen and (min-width: 30em) {
   .h6-ns {
     height: 24rem;
@@ -98,16 +99,11 @@ a.close {
   white-space: nowrap;
 }
 
-a.close:hover{
+a.close:hover {
   background-color: #db8972;
 }
 
-/*!
-  * driveway - pure CSS masonry layout aid
-  *
-  * @license MIT
-  * @author jh3y
-*/
+/*! driveway CSS | @license MIT | @author jh3y */
 .dw {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
@@ -309,5 +305,5 @@ a.close:hover{
 }
 
 .elm-overlay {
-  z-index: 2
+  z-index: 2;
 }
