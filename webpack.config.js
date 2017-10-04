@@ -25,7 +25,7 @@ let offlinePlugin = new OfflinePlugin({
     additional: [':externals:', '*-chunk-*.js']
   },
 
-  externals: ['https://fonts.googleapis.com/css?family=Pacifico'],
+  // externals: ['https://fonts.googleapis.com/css?family=Pacifico'],
 
   ServiceWorker: {
     navigateFallbackURL: '/',
@@ -48,6 +48,12 @@ let pwaPlugin = new WebpackPwaManifest({
     }
   ]
 });
+
+// Babel plugins
+let babelPlugins = [
+  'syntax-dynamic-import'
+  // ['transform-remove-console', {exclude: ['error', 'warn', 'info']}]
+];
 
 // Bundle analyzer config
 let bundlePlugin = new BundleAnalyzerPlugin({
@@ -96,9 +102,14 @@ var common = {
     new HTMLWebpackPlugin({
       // using .ejs prevents other loaders causing errors
       template: 'src/index.ejs',
+      minify: isProd
+        ? {collapseWhitespace: true, collapseInlineTagWhitespace: true}
+        : false,
       // inject details of output file at end of body
       inject: 'body'
     }),
+
+    new webpack.optimize.ModuleConcatenationPlugin(),
 
     new webpack.optimize.CommonsChunkPlugin({
       name: ['vendor'],
@@ -154,7 +165,7 @@ var common = {
                 }
               ]
             ],
-            plugins: ['syntax-dynamic-import']
+            plugins: babelPlugins
           }
         }
       },
@@ -199,12 +210,16 @@ var common = {
         }
       },
       {
-        test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        test: /\.svg$/,
+        loader: 'svg-url-loader'
+      },
+      {
+        test: /\.(ttf|eot)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         exclude: [/elm-stuff/, /node_modules/],
         loader: 'file-loader'
       },
       {
-        test: /\.(jpe?g|png|gif|svg)$/i,
+        test: /\.(jpe?g|png|gif)$/i,
         loader: 'file-loader'
       }
     ]

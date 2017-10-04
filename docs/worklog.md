@@ -3,11 +3,16 @@
   - split out vendors
   - load Anki things dynamically
 
+- [ ] Fix session check
+  - Currently, if logged in and page reloads, shown as logged out
+
 More Navigation / routing stuff
 - [ ] Style nav bar
 - [ ] z-index nav bar and map
 - [ ] Investigate Save/Commit and Geolocation
 - [ ] Hide map where not needed (load dynamically, even?)
+
+http://jxnblk.com/hello-color/?c=a5dbf7
 
 - [] Entry Page: Confirmation on success
   - [] In general, messaging service

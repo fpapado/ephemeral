@@ -17,21 +17,21 @@ if (!window.Promise) {
 
 OfflinePluginRuntime.install({
   onUpdating: () => {
-    console.log('SW Event:', 'onUpdating');
+    console.info('SW Event:', 'onUpdating');
   },
   onUpdateReady: () => {
-    console.log('SW Event:', 'onUpdateReady');
+    console.info('SW Event:', 'onUpdateReady');
     // Tells to new SW to take control immediately
     OfflinePluginRuntime.applyUpdate();
   },
   onUpdated: () => {
-    console.log('SW Event:', 'onUpdated');
+    console.info('SW Event:', 'onUpdated');
     // Reload the webpage to load into the new version
     window.location.reload();
   },
 
   onUpdateFailed: () => {
-    console.log('SW Event:', 'onUpdateFailed');
+    console.error('SW Event:', 'onUpdateFailed');
   }
 });
 
@@ -106,7 +106,7 @@ function syncRemote(local, remote) {
     })
     .on('change', info => {
       // something changed
-      console.info('Something changed!', info);
+      console.log('Something changed!', info);
 
       let {change, direction} = info;
 
