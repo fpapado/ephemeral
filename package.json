@@ -52,10 +52,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack-dashboard -- webpack-dev-server --hot --inline --port 3000",
-    "production:build": "NODE_ENV=production webpack --progress && npm run inline-css",
-    "inline-css": "critical dist/index.html --base dist/ --inline --minify > dist/index-critical.html && mv dist/index-critical.html dist/index.html",
+    "production:build":
+      "NODE_ENV=production webpack --progress --display-optimization-bailout && npm run inline-css",
+    "inline-css":
+      "critical dist/index.html --base dist/ --inline --minify > dist/index-critical.html && mv dist/index-critical.html dist/index.html",
     "postinstall": "elm-package install -y",
-    "pouchdb-server": "pouchdb-server --config pouchdb-server/config.json --dir pouchdb-server"
+    "pouchdb-server":
+      "pouchdb-server --config pouchdb-server/config.json --dir pouchdb-server"
   },
   "author": "fpapado <fotis@fpapado.com>",
   "license": "ISC",

@@ -50,10 +50,12 @@ let pwaPlugin = new WebpackPwaManifest({
 });
 
 // Babel plugins
-let babelPlugins = [
-  'syntax-dynamic-import'
-  // ['transform-remove-console', {exclude: ['error', 'warn', 'info']}]
+let babelPluginsProd = [
+  'syntax-dynamic-import',
+  ['transform-remove-console', {exclude: ['error', 'warn', 'info']}]
 ];
+
+let babelPluginsDev = ['syntax-dynamic-import'];
 
 // Bundle analyzer config
 let bundlePlugin = new BundleAnalyzerPlugin({
@@ -151,7 +153,6 @@ var common = {
         use: {
           loader: 'babel-loader',
           options: {
-            cacheDirectory: true,
             presets: [
               [
                 'env',
@@ -165,7 +166,7 @@ var common = {
                 }
               ]
             ],
-            plugins: babelPlugins
+            plugins: isProd ? babelPluginsProd : babelPluginsDev
           }
         }
       },
