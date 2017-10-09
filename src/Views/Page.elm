@@ -1,10 +1,10 @@
 module Views.Page exposing (ActivePage(..), frame)
 
+import Data.User exposing (User)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Data.User exposing (User)
-import Views.General exposing (epButton, avatar)
 import Route exposing (Route)
+import Views.General exposing (avatar, epButton)
 
 
 type ActivePage
@@ -29,8 +29,8 @@ frame user page content =
 
 viewMenu : ActivePage -> Maybe User -> Html msg
 viewMenu page user =
-    div [ class "fixed bottom-0 left-0 w-100 z-1" ]
-        [ nav [ class "pv2 mw7-ns center flex flex-row justify-center items-center space-around black-80 bg-beige-gray-2" ] <|
+    div [ class "fixed bottom-0 left-0 w-100 z-9999" ]
+        [ nav [ class "shadow-nav pv2 mw7-ns center flex flex-row content-around justify-around items-center f6 f5-ns black bg-nav" ] <|
             [ navbarLink (page == Home) Route.Home [ text "Home" ]
             , navbarLink (page == NewEntry) Route.NewEntry [ text "Add" ]
             , navbarLink (page == Settings) Route.Settings [ text "Settings" ]
@@ -62,9 +62,9 @@ viewHeader loggedIn =
                 Just user ->
                     user.username
     in
-        div [ class "pa4" ]
-            [ avatar name [ class "pointer mw4 center" ]
-            ]
+    div [ class "pa4" ]
+        [ avatar name [ class "pointer mw4 center" ]
+        ]
 
 
 viewFooter : Html msg
@@ -85,5 +85,5 @@ viewFooter =
 
 navbarLink : Bool -> Route -> List (Html msg) -> Html msg
 navbarLink isActive route linkContent =
-    div [ classList [ ( "pa3", True ) ] ]
-        [ a [ classList [ ( "dim link f6 b", True ), ( "deep-blue", isActive ), ( "black-80", not isActive ) ], Route.href route ] linkContent ]
+    div [ class "pa3" ]
+        [ a [ classList [ ( "pa3 dim link b", True ), ( "red-brown", isActive ), ( "black", not isActive ) ], Route.href route ] linkContent ]
