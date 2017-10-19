@@ -1,4 +1,10 @@
-module Views.General exposing (formField, epButton, avatar)
+module Views.General
+    exposing
+        ( formField
+        , epButton
+        , avatar
+        , paragraph
+        )
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -43,3 +49,9 @@ avatar name attributes =
             []
         , span [ class "db fw6 f6 black-80" ] [ text name ]
         ]
+
+
+paragraph : List (Html.Attribute msg) -> List (Html.Html msg) -> Html msg
+paragraph attributes children =
+    p ((class "lh-copy f5 mb3 black-80") :: attributes)
+        children
