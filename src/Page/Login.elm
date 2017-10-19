@@ -175,7 +175,7 @@ viewErrors errors =
         viewError ( field, err ) =
             span [ class "db mb2" ] [ text err ]
     in
-        div [ class "mt2 pa3 f5 bg-light-red white" ] <|
+        div [ class "mt2 pa3 f5 bg-deep-red white" ] <|
             List.map viewError errors
 
 
@@ -196,6 +196,6 @@ type alias Error =
 validate : Model -> List Error
 validate =
     Validate.all
-        [ .username >> ifBlank ( Username, "email can't be blank." )
-        , .password >> ifBlank ( Password, "password can't be blank." )
+        [ .username >> ifBlank ( Username, "Username can't be blank." )
+        , .password >> ifBlank ( Password, "Password can't be blank." )
         ]
