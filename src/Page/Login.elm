@@ -164,7 +164,7 @@ view model =
             , formField model.password SetPassword "password" "Password" "password" "Your password."
             , epButton [ class "w-100 white bg-deep-blue" ] [ text "Log In" ]
             , viewIf (model.errors /= []) (viewErrors model.errors)
-            , paragraph [] [ text "Logging in allows automatic syncing of your files to a remote database. Files on your device are persisted between visits even without logging in, but you might want the backup. Currently, signups are not active, but we're working on it!" ] v
+            , paragraph [ class "mt4 pa3 bg-light-gray tj" ] [ text "Logging in allows automatic syncing of your files to a remote database. Files on your device are persisted between visits even without logging in, but you might want the backup. Currently, signups are not active, but we're working on it!" ]
             ]
         ]
 

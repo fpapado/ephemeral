@@ -13,7 +13,7 @@ import Html.Events exposing (onInput)
 
 formField : String -> (String -> msg) -> String -> String -> String -> String -> Html msg
 formField inputValue msg inputId labelText inputType descText =
-    -- TODO: That signature, consider a config record of some kind
+    -- TODO: That signature... consider a config record of some kind
     -- TODO: allow extra attributes
     div [ class "mb3" ]
         [ label [ class "f6 b db mv2", for inputId ] [ text labelText ]
