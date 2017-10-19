@@ -5,11 +5,26 @@ module Leaflet.Types
         , defaultZoomPanOptions
         , MarkerOptions
         , defaultMarkerOptions
+        , encodeMarkerOptions
+        , encodeIconOptions
+        , encodePoint
+        , encodeLatLng
+        , encodeZoomPanOptions
         )
+
+import Json.Encode as E
 
 
 type alias LatLng =
     ( Float, Float )
+
+
+encodeLatLng : LatLng -> E.Value
+encodeLatLng ( lat, lng ) =
+    E.list
+        [ E.float lat
+        , E.float lng
+        ]
 
 
 {-| Reference: <http://leafletjs.com/reference.html#marker-options>
@@ -26,6 +41,22 @@ type alias MarkerOptions =
     , riseOnHover : Bool
     , riseOffset : Int
     }
+
+
+encodeMarkerOptions : MarkerOptions -> E.Value
+encodeMarkerOptions opts =
+    E.object
+        [ ( "icon", encodeIconOptions opts.icon )
+        , ( "clickable", E.bool opts.clickable )
+        , ( "draggable", E.bool opts.draggable )
+        , ( "keyboard", E.bool opts.keyboard )
+        , ( "title", E.string opts.title )
+        , ( "alt", E.string opts.alt )
+        , ( "zIndexOffset", E.int opts.zIndexOffset )
+        , ( "opacity", E.float opts.opacity )
+        , ( "riseOnHover", E.bool opts.riseOnHover )
+        , ( "riseOffset", E.int opts.riseOffset )
+        ]
 
 
 defaultMarkerOptions : MarkerOptions
@@ -57,6 +88,22 @@ type alias IconOptions =
     , popupAnchor : Point
     , className : String
     }
+
+
+encodeIconOptions : IconOptions -> E.Value
+encodeIconOptions opts =
+    E.object
+        [ ( "iconUrl", E.string opts.iconUrl )
+        , ( "iconRetinaUrl", E.string opts.iconRetinaUrl )
+        , ( "iconSize", encodePoint opts.iconSize )
+        , ( "iconAnchor", encodePoint opts.iconAnchor )
+        , ( "shadowUrl", E.string opts.shadowUrl )
+        , ( "shadowRetinaUrl", E.string opts.shadowRetinaUrl )
+        , ( "shadowSize", encodePoint opts.shadowSize )
+        , ( "shadowAnchor", encodePoint opts.shadowAnchor )
+        , ( "popupAnchor", encodePoint opts.popupAnchor )
+        , ( "className", E.string opts.className )
+        ]
 
 
 leafletDistributionBase : String
@@ -91,8 +138,23 @@ type alias Point =
     ( Int, Int )
 
 
+encodePoint : Point -> E.Value
+encodePoint ( x, y ) =
+    E.list
+        [ E.int x
+        , E.int y
+        ]
+
+
 type alias ZoomOptions =
     { animate : Bool }
+
+
+encodeZoomOptions : ZoomOptions -> E.Value
+encodeZoomOptions opts =
+    E.object
+        [ ( "animate", E.bool opts.animate )
+        ]
 
 
 type alias PanOptions =
@@ -103,12 +165,32 @@ type alias PanOptions =
     }
 
 
+encodePanOptions : PanOptions -> E.Value
+encodePanOptions opts =
+    E.object
+        [ ( "animate", E.bool opts.animate )
+        , ( "duration", E.float opts.duration )
+        , ( "easeLinearity", E.float opts.easeLinearity )
+        , ( "noMoveStart", E.bool opts.noMoveStart )
+        ]
+
+
 type alias ZoomPanOptions =
     { reset : Bool
     , pan : PanOptions
     , zoom : ZoomOptions
     , animate : Bool
     }
+
+
+encodeZoomPanOptions : ZoomPanOptions -> E.Value
+encodeZoomPanOptions opts =
+    E.object
+        [ ( "reset", E.bool opts.reset )
+        , ( "pan", encodePanOptions opts.pan )
+        , ( "zoom", encodeZoomOptions opts.zoom )
+        , ( "animate", E.bool opts.animate )
+        ]
 
 
 defaultZoomPanOptions : ZoomPanOptions

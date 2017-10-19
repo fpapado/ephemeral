@@ -6,10 +6,11 @@ import PouchDB from 'pouchdb-browser';
 import PouchAuth from 'pouchdb-authentication';
 
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
+
 import config from 'config';
 import { string2Hex } from './js/util.js';
 
-require('./assets/css/styles.scss');
+import styles from './assets/css/styles.scss';
 
 if (!window.Promise) {
   window.Promise = Promise;
@@ -233,19 +234,10 @@ app.ports.checkAuthState.subscribe(data => {
     });
 });
 
-app.ports.setView.subscribe(data => {
-  mymap.setView.apply(mymap, data);
-});
-
-app.ports.setMarkers.subscribe(data => {
-  setMarkers(data);
-});
+// -- Leaflet Subscriptions --
 
 function setMarkers(data) {
-  data.forEach((data, index) => {
-    // TODO: change to {...}?
-    let [id, latLng, markerOptions, popupText] = data;
-
+  data.forEach(({ id, latLng, markerOptions, popupText }, index) => {
     markerOptions.icon = new L.Icon(markerOptions.icon);
     let marker = L.marker(latLng, markerOptions);
 
@@ -260,6 +252,10 @@ function setMarkers(data) {
   });
 }
 
+function setView({ center, zoom, options }) {
+  mymap.setView(center, zoom, options);
+}
+
 function removeMarker(data) {
   let id = data;
   if (markers.hasOwnProperty(id)) {
@@ -269,14 +265,17 @@ function removeMarker(data) {
 }
 
 app.ports.toLeaflet.subscribe(msg => {
-  switch (msg.action) {
-    case 'setMarkers':
-      console.log('Message to set markers');
+  console.log(msg);
+  switch (msg.type) {
+    case 'SetView':
+      setView(msg.data);
+      break;
+
+    case 'SetMarkers':
       setMarkers(msg.data);
       break;
 
-    case 'removeMarker':
-      console.log('Message to remove marker');
+    case 'RemoveMarker':
       removeMarker(msg.data);
       break;
 
