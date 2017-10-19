@@ -19,8 +19,8 @@ frame : Maybe User -> ActivePage -> Html msg -> Html msg
 frame user page content =
     div []
         [ viewMenu page user
-        , viewHeader user
-        , div [ class "pa3 pt0 ph5-ns bg-white" ]
+        -- , viewHeader user
+        , div [ class "pa3 pt4 ph5-ns bg-white" ]
             [ div [ class "mw7-ns center" ] [ content ]
             , viewFooter
             ]
@@ -30,8 +30,8 @@ frame user page content =
 viewMenu : ActivePage -> Maybe User -> Html msg
 viewMenu page user =
     div [ class "fixed bottom-0 left-0 w-100 z-9999" ]
-        [ nav [ class "shadow-nav pv2 mw7-ns center flex flex-row content-around justify-around items-center f6 f5-ns black bg-nav" ] <|
-            [ navbarLink (page == Home) Route.Home [ text "Home" ]
+        [ nav [ class "shadow-nav pv1 mw7-ns center flex flex-row content-center justify-center items-center f6 f5-ns black bg-nav" ] <|
+            [ navbarLink (page == Home) Route.Home [ text "List" ]
             , navbarLink (page == NewEntry) Route.NewEntry [ text "Add" ]
             , navbarLink (page == Settings) Route.Settings [ text "Settings" ]
             ]
@@ -43,11 +43,11 @@ viewSignIn : ActivePage -> Maybe User -> List (Html msg)
 viewSignIn page user =
     case user of
         Nothing ->
-            [ navbarLink (page == Login) Route.Login [ text "Log in" ]
+            [ navbarLink (page == Login) Route.Login [ text "Login" ]
             ]
 
         Just user ->
-            [ navbarLink False Route.Logout [ text "Sign out" ]
+            [ navbarLink False Route.Logout [ text user.username ]
             ]
 
 
@@ -86,4 +86,4 @@ viewFooter =
 navbarLink : Bool -> Route -> List (Html msg) -> Html msg
 navbarLink isActive route linkContent =
     div [ class "pa3" ]
-        [ a [ classList [ ( "pa3 dim link b", True ), ( "red-brown", isActive ), ( "black", not isActive ) ], Route.href route ] linkContent ]
+        [ a [ classList [ ( "pa3 dim link b", True ), ( "white", isActive ), ( "nav-disabled", not isActive ) ], Route.href route ] linkContent ]
