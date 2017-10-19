@@ -82,7 +82,6 @@ var common = {
     // Hash as appropriate for production; based on chunks etc.
     filename: isProd ? '[name]-[chunkhash].js' : '[name]-[hash].js'
   },
-  devtool: '#source-map',
   plugins: [
     new CleanWebpackPlugin(['dist']),
 
@@ -231,6 +230,7 @@ var common = {
 if (!isProd) {
   console.log('Building for dev...');
   module.exports = merge(common, {
+    devtool: 'cheap-module-eval-source-map',
     plugins: [
       // Prevents compilation errors causing the hot loader to lose state
       new webpack.NoEmitOnErrorsPlugin(),
@@ -273,6 +273,7 @@ if (!isProd) {
 if (isProd) {
   console.log('Building for prod...');
   module.exports = merge(common, {
+    devtool: 'source-map',
     plugins: [
       new CopyWebpackPlugin([
         {

@@ -1,7 +1,5 @@
 # Next
-- [ ] Bundle-size commit
-  - split out vendors
-  - load Anki things dynamically
+- [ ] Fonts, font loading, caching
 
 - [ ] Fix session check
   - Currently, if logged in and page reloads, shown as logged out
