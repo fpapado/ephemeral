@@ -19,6 +19,7 @@ frame : Maybe User -> ActivePage -> Html msg -> Html msg
 frame user page content =
     div []
         [ viewMenu page user
+
         -- , viewHeader user
         , div [ class "pa3 pt4 ph5-ns bg-white" ]
             [ div [ class "mw7-ns center" ] [ content ]
@@ -29,7 +30,7 @@ frame user page content =
 
 viewMenu : ActivePage -> Maybe User -> Html msg
 viewMenu page user =
-    div [ class "fixed bottom-0 left-0 w-100 z-9999" ]
+    div [ class "bt b--black-20 fixed bottom-0 left-0 w-100 z-9999" ]
         [ nav [ class "shadow-nav pv1 mw7-ns center flex flex-row content-center justify-center items-center f6 f5-ns black bg-nav" ] <|
             [ navbarLink (page == Home) Route.Home [ text "List" ]
             , navbarLink (page == NewEntry) Route.NewEntry [ text "Add" ]
@@ -62,9 +63,9 @@ viewHeader loggedIn =
                 Just user ->
                     user.username
     in
-    div [ class "pa4" ]
-        [ avatar name [ class "pointer mw4 center" ]
-        ]
+        div [ class "pa4" ]
+            [ avatar name [ class "pointer mw4 center" ]
+            ]
 
 
 viewFooter : Html msg
@@ -86,4 +87,4 @@ viewFooter =
 navbarLink : Bool -> Route -> List (Html msg) -> Html msg
 navbarLink isActive route linkContent =
     div [ class "pa3" ]
-        [ a [ classList [ ( "pa3 dim link b", True ), ( "white", isActive ), ( "nav-disabled", not isActive ) ], Route.href route ] linkContent ]
+        [ a [ classList [ ( "pa3 link b", True ), ( "white hover-white", isActive ), ( "dim nav-disabled", not isActive ) ], Route.href route ] linkContent ]

@@ -1,6 +1,6 @@
 // @import url('https://fonts.googleapis.com/css?family=Pacifico');
-@import '~tachyons';
-@import '~leaflet/dist/leaflet.css';
+@import "~tachyons";
+@import "~leaflet/dist/leaflet.css";
 
 @media screen and (min-width: 30em) {
   .h6-ns {
@@ -9,7 +9,7 @@
 }
 
 .logo {
-  background-image: url('../logo.svg');
+  background-image: url("../logo.svg");
 }
 
 .shadow-card {
@@ -96,7 +96,6 @@
 /* Quasi-component things */
 a.close {
   float: right;
-  display: inline-block;
   margin-top: -25px;
   margin-right: -25px;
   text-decoration: none;

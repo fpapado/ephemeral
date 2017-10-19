@@ -10,6 +10,9 @@ More Navigation / routing stuff
 - [ ] Investigate Save/Commit and Geolocation
 - [ ] Hide map where not needed (load dynamically, even?)
 
+- [ ] Port branch
+- [ ] DB helpers
+
 http://jxnblk.com/hello-color/?c=a5dbf7
 
 - [] Entry Page: Confirmation on success

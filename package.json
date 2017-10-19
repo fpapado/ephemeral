@@ -36,6 +36,7 @@
     "offline-plugin": "^4.8.3",
     "postcss-loader": "^2.0.6",
     "resolve-url-loader": "^2.0.3",
+    "sass-lint": "^1.12.1",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.18.2",
     "svg-inline-loader": "^0.8.0",
@@ -52,13 +53,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack-dashboard -- webpack-dev-server --hot --inline --port 3000",
-    "production:build":
-      "NODE_ENV=production webpack --progress --display-optimization-bailout && npm run inline-css",
-    "inline-css":
-      "critical dist/index.html --base dist/ --inline --minify > dist/index-critical.html && mv dist/index-critical.html dist/index.html",
+    "production:build": "NODE_ENV=production webpack --progress --display-optimization-bailout && npm run inline-css",
+    "inline-css": "critical dist/index.html --base dist/ --inline --minify > dist/index-critical.html && mv dist/index-critical.html dist/index.html",
     "postinstall": "elm-package install -y",
-    "pouchdb-server":
-      "pouchdb-server --config pouchdb-server/config.json --dir pouchdb-server"
+    "pouchdb-server": "pouchdb-server --config pouchdb-server/config.json --dir pouchdb-server"
   },
   "author": "fpapado <fotis@fpapado.com>",
   "license": "ISC",
