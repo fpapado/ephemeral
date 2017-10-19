@@ -2,6 +2,7 @@ elm-stuff/
 repl-temp-*
 node_modules/
 yarn-error.log
+.vscode
 
 elm.js
 dist

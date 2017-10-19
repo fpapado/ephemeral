@@ -1,10 +1,10 @@
 module Views.Page exposing (ActivePage(..), frame)
 
+import Data.User exposing (User)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Data.User exposing (User)
-import Views.General exposing (epButton, avatar)
 import Route exposing (Route)
+import Views.General exposing (avatar, epButton)
 
 
 type ActivePage
@@ -19,8 +19,9 @@ frame : Maybe User -> ActivePage -> Html msg -> Html msg
 frame user page content =
     div []
         [ viewMenu page user
-        , viewHeader user
-        , div [ class "pa3 pt0 ph5-ns bg-white" ]
+
+        -- , viewHeader user
+        , div [ class "pa3 pt4 ph5-ns bg-white" ]
             [ div [ class "mw7-ns center" ] [ content ]
             , viewFooter
             ]
@@ -29,9 +30,9 @@ frame user page content =
 
 viewMenu : ActivePage -> Maybe User -> Html msg
 viewMenu page user =
-    div [ class "fixed bottom-0 left-0 w-100 z-1" ]
-        [ nav [ class "pv2 mw7-ns center flex flex-row justify-center items-center space-around black-80 bg-beige-gray-2" ] <|
-            [ navbarLink (page == Home) Route.Home [ text "Home" ]
+    div [ class "fixed bottom-0 left-0 w-100 z-9999" ]
+        [ nav [ class "pv1 mw7-ns center flex flex-row content-center justify-center items-center f6 f5-ns black bg-nav bt b--black-20" ] <|
+            [ navbarLink (page == Home) Route.Home [ text "List" ]
             , navbarLink (page == NewEntry) Route.NewEntry [ text "Add" ]
             , navbarLink (page == Settings) Route.Settings [ text "Settings" ]
             ]
@@ -43,11 +44,11 @@ viewSignIn : ActivePage -> Maybe User -> List (Html msg)
 viewSignIn page user =
     case user of
         Nothing ->
-            [ navbarLink (page == Login) Route.Login [ text "Log in" ]
+            [ navbarLink (page == Login) Route.Login [ text "Login" ]
             ]
 
         Just user ->
-            [ navbarLink False Route.Logout [ text "Sign out" ]
+            [ navbarLink False Route.Logout [ text user.username ]
             ]
 
 
@@ -85,5 +86,5 @@ viewFooter =
 
 navbarLink : Bool -> Route -> List (Html msg) -> Html msg
 navbarLink isActive route linkContent =
-    div [ classList [ ( "pa3", True ) ] ]
-        [ a [ classList [ ( "dim link f6 b", True ), ( "deep-blue", isActive ), ( "black-80", not isActive ) ], Route.href route ] linkContent ]
+    div [ class "pa3" ]
+        [ a [ classList [ ( "pa3 link b", True ), ( "white hover-white", isActive ), ( "dim nav-disabled", not isActive ) ], Route.href route ] linkContent ]

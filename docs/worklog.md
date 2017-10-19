@@ -1,16 +1,13 @@
 # Next
-- [ ] Fonts, font loading, caching
+More Navigation / routing stuff
+- [ ] Hide map where not needed (load dynamically, even?)
+- [ ] Investigate Save/Commit and Geolocation
 
 - [ ] Fix session check
   - Currently, if logged in and page reloads, shown as logged out
 
-More Navigation / routing stuff
-- [ ] Style nav bar
-- [ ] z-index nav bar and map
-- [ ] Investigate Save/Commit and Geolocation
-- [ ] Hide map where not needed (load dynamically, even?)
-
-http://jxnblk.com/hello-color/?c=a5dbf7
+- [ ] Port branch
+- [ ] DB helpers
 
 - [] Entry Page: Confirmation on success
   - [] In general, messaging service
@@ -36,6 +33,7 @@ http://jxnblk.com/hello-color/?c=a5dbf7
 - [ ] Default location
 
 # Other ideas
+- [ ] Fonts, font loading, caching
 - Page.initData Cmd convention? Would avoid having to send Request.listEntries directly on Main.elm etc.
 - Style-elements?
 - offline indicator

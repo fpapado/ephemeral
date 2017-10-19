@@ -1,4 +1,10 @@
-module Views.General exposing (formField, epButton, avatar)
+module Views.General
+    exposing
+        ( formField
+        , epButton
+        , avatar
+        , paragraph
+        )
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -7,7 +13,7 @@ import Html.Events exposing (onInput)
 
 formField : String -> (String -> msg) -> String -> String -> String -> String -> Html msg
 formField inputValue msg inputId labelText inputType descText =
-    -- TODO: That signature, consider a config record of some kind
+    -- TODO: That signature... consider a config record of some kind
     -- TODO: allow extra attributes
     div [ class "mb3" ]
         [ label [ class "f6 b db mv2", for inputId ] [ text labelText ]
@@ -43,3 +49,9 @@ avatar name attributes =
             []
         , span [ class "db fw6 f6 black-80" ] [ text name ]
         ]
+
+
+paragraph : List (Html.Attribute msg) -> List (Html.Html msg) -> Html msg
+paragraph attributes children =
+    p ((class "lh-copy f5 mb3 black-80") :: attributes)
+        children
