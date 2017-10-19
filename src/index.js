@@ -3,41 +3,42 @@
 import Promise from 'promise-polyfill';
 import L from 'leaflet';
 import PouchDB from 'pouchdb-browser';
+import PouchAuth from 'pouchdb-authentication';
+
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import config from 'config';
 import {string2Hex} from './js/util.js';
-import {exportCardsCSV, exportCardsAnki} from './js/export.js';
+
+require('./assets/css/styles.scss');
 
 if (!window.Promise) {
   window.Promise = Promise;
 }
 
-require('./assets/css/styles.css');
-
 OfflinePluginRuntime.install({
   onUpdating: () => {
-    console.log('SW Event:', 'onUpdating');
+    console.info('SW Event:', 'onUpdating');
   },
   onUpdateReady: () => {
-    console.log('SW Event:', 'onUpdateReady');
+    console.info('SW Event:', 'onUpdateReady');
     // Tells to new SW to take control immediately
     OfflinePluginRuntime.applyUpdate();
   },
   onUpdated: () => {
-    console.log('SW Event:', 'onUpdated');
+    console.info('SW Event:', 'onUpdated');
     // Reload the webpage to load into the new version
     window.location.reload();
   },
 
   onUpdateFailed: () => {
-    console.log('SW Event:', 'onUpdateFailed');
+    console.error('SW Event:', 'onUpdateFailed');
   }
 });
 
 const Elm = require('./Main');
 
 window.PouchDB = PouchDB;
-PouchDB.plugin(require('pouchdb-authentication'));
+PouchDB.plugin(PouchAuth);
 
 let db = new PouchDB('ephemeral');
 
@@ -105,7 +106,7 @@ function syncRemote(local, remote) {
     })
     .on('change', info => {
       // something changed
-      console.info('Something changed!', info);
+      console.log('Something changed!', info);
 
       let {change, direction} = info;
 
@@ -361,16 +362,19 @@ app.ports.listEntries.subscribe(str => {
 });
 
 app.ports.exportCards.subscribe(version => {
-  if (version === 'offline') {
-    console.log('Will export');
-    db.allDocs({include_docs: true}).then(docs => {
-      let entries = docs.rows.map(row => row.doc);
-      exportCardsCSV(entries);
-    });
-  } else if (version === 'online') {
-    db.allDocs({include_docs: true}).then(docs => {
-      let entries = docs.rows.map(row => row.doc);
-      exportCardsAnki(entries);
-    });
-  }
+  // Lazy-load exports
+  import('./js/export.js').then(({exportCardsCSV, exportCardsAnki}) => {
+    if (version === 'offline') {
+      console.log('Will export');
+      db.allDocs({include_docs: true}).then(docs => {
+        let entries = docs.rows.map(row => row.doc);
+        exportCardsCSV(entries);
+      });
+    } else if (version === 'online') {
+      db.allDocs({include_docs: true}).then(docs => {
+        let entries = docs.rows.map(row => row.doc);
+        exportCardsAnki(entries);
+      });
+    }
+  });
 });

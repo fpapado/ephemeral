@@ -1,28 +1,22 @@
-# Routing branch
+# Next
+- [ ] Fonts, font loading, caching
 
-- [X] Routing with pages:
-  - [X] Main page + Login page
-  - [~] Map subs for subpages etc.
-  - [X] Make models work for subpages
-  - [X] Basic Menu
-  - [X] Navigation at the bottom
+- [ ] Fix session check
+  - Currently, if logged in and page reloads, shown as logged out
 
-  - [X] Log in / Log out
-    - [X] Routeto home / send message
-  - [X] Login State in nav
-    - [X] Update user on logging in
-    - [X] Delete user on logging out
-
+More Navigation / routing stuff
 - [ ] Style nav bar
-
+- [ ] z-index nav bar and map
 - [ ] Investigate Save/Commit and Geolocation
-
 - [ ] Hide map where not needed (load dynamically, even?)
-- [ ] Make map additions directly in JS from the DB stream?
-  - As in, make DB the single source of truth
+
+http://jxnblk.com/hello-color/?c=a5dbf7
 
 - [] Entry Page: Confirmation on success
   - [] In general, messaging service
+
+- [ ] Make map additions directly in JS from the DB stream?
+  - As in, make DB the single source of truth
 
 # Port branch
 - [ ] Port architecture, merging ports
@@ -44,8 +38,8 @@
 # Other ideas
 - Page.initData Cmd convention? Would avoid having to send Request.listEntries directly on Main.elm etc.
 - Style-elements?
-
-- [ ] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
+- offline indicator
+- Friendly 404
 
 - [ ] Full(er) CRUD
   - [ ] Delete message
@@ -69,6 +63,10 @@
 - [ ] Factor things out of Page.Login into Request.Session or something (esp. login/logout and decoders)
 
 - [ ] UX
+  - [ ] Loading, disabled button
+    - [ ] Basically RemoteData modelling
+  - [ ] Offline/online status
+  - [ ] Custom 404 and offline page
   - [ ] Message on successful login
     - [ ] Ditto on failed
   - [ ] Place get errors
@@ -90,9 +88,12 @@
 
 
 - [ ] Better Pouch
+  - [ ] Port architecture
   - [ ] API for Pouch access in JS
+  - [ ] DateTime or custom based id? https://pouchdb.com/2014/06/17/12-pro-tips-for-better-code-with-pouchdb.html
   - [ ] Upsert https://pouchdb.com/guides/conflicts.html
   - [ ] Conflict resolution
+    - [ ] Upsert?
   - [ ] Error handling for Pouch
     - [ ] Particularly, replication errors over ports
       - [ ] On JS filter, send on port
@@ -108,25 +109,14 @@
 - [X] Merge NewEntry and UpdatedEntry (same functionality, since they both remove the entry with the id)
    - [ ] Eventually use Dict for entries
 
-- [ ] Full CRUD
 - [ ] Port architecture
   - [ ] Single port per responsibility, parse on either side?
   - [ ] For instance, log in /out
+  - [ ] Full CRUD
 
 - [ ] Errors over ports when creation/deletion fails?
 
-- [X] "Fly to": Helsinki, World, My Location
-
-- [X] Use entry.id instead of indexed map in entries
-
-- [X] Check SW updates
-
-
-# Base
-- Decide which fields are editable
-- Decide between pages / routing
-
-# UI/UX
+# More UI/UX
 - [ ] UI/UX Pass
   - [ ] Error view, English
   - [ ] Show message on Geolocation error, that a default position was used
@@ -134,6 +124,7 @@
   - [ ] "Success" message
   - [ ] Flexbox for flight buttons
   - [ ] Packery with 4 items and 3 columns can be wonky
+  - [ ] Later: Grid and fallbacks
 
 - [ ] Refresh/cleanup
   - [X] 'Card' view for cards

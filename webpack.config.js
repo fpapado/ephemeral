@@ -1,17 +1,20 @@
 const webpack = require('webpack');
 const path = require('path');
 const merge = require('webpack-merge');
+const md5 = require('md5');
 
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const NameAllModulesPlugin = require('name-all-modules-plugin');
 const OfflinePlugin = require('offline-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const DashboardPlugin = require('webpack-dashboard/plugin');
+const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 
-var TARGET_ENV =
-  process.env.npm_lifecycle_event === 'prod' ? 'production' : 'development';
-
-var filename = TARGET_ENV == 'production' ? '[name]-[hash].js' : 'index.js';
+var isProd = process.env.NODE_ENV === 'production';
 
 // -- Offline Plugin --
 let offlinePlugin = new OfflinePlugin({
@@ -19,18 +22,15 @@ let offlinePlugin = new OfflinePlugin({
 
   caches: {
     main: [':rest:'],
-    additional: [':externals:']
+    additional: [':externals:', '*-chunk-*.js']
   },
 
-  externals: [
-    'https://unpkg.com/leaflet@1.2.0/dist/leaflet.css',
-    'https://unpkg.com/tachyons@4.7.0/css/tachyons.min.css',
-    'https://fonts.googleapis.com/css?family=Pacifico'
-  ],
+  // externals: ['https://fonts.googleapis.com/css?family=Pacifico'],
 
   ServiceWorker: {
     navigateFallbackURL: '/',
-    events: true
+    events: true,
+    minify: true
   }
 });
 
@@ -49,23 +49,90 @@ let pwaPlugin = new WebpackPwaManifest({
   ]
 });
 
+// Babel plugins
+let babelPluginsProd = [
+  'syntax-dynamic-import',
+  ['transform-remove-console', {exclude: ['error', 'warn', 'info']}]
+];
+
+let babelPluginsDev = ['syntax-dynamic-import'];
+
+// Bundle analyzer config
+let bundlePlugin = new BundleAnalyzerPlugin({
+  analyzerMode: 'static',
+  openAnalyzer: false,
+  reportFilename: 'bundle-analysis.html'
+});
+
+// Extract text
+const extractSass = new ExtractTextPlugin({
+  filename: '[name].[contenthash].css',
+  disable: !isProd
+});
+
 // -- Common Config --
 var common = {
-  entry: ['whatwg-fetch', './src/index.js'],
+  entry: {
+    main: './src/index.js',
+    vendor: ['pouchdb-browser', 'pouchdb-authentication', 'leaflet']
+  },
   output: {
     path: path.join(__dirname, 'dist'),
-    // add hash when building for production
-    filename: filename
+
+    // Hash as appropriate for production; based on chunks etc.
+    filename: isProd ? '[name]-[chunkhash].js' : '[name]-[hash].js'
   },
   plugins: [
+    new CleanWebpackPlugin(['dist']),
+
+    // Give modules a deterministic name for better long-term caching:
+    // https://github.com/webpack/webpack.js.org/issues/652#issuecomment-273023082
+    new webpack.NamedModulesPlugin(),
+
+    // Give dynamically `import()`-ed scripts a deterministic name for better
+    // long-term caching.
+    // Also append '.chunk' to the name, such that offline-plugin caches it
+    new webpack.NamedChunksPlugin(
+      chunk =>
+        chunk.name
+          ? chunk.name
+          : md5(chunk.mapModules(m => m.identifier()).join()).slice(0, 10) +
+            '-chunk'
+    ),
+
     new HTMLWebpackPlugin({
       // using .ejs prevents other loaders causing errors
       template: 'src/index.ejs',
+      minify: isProd
+        ? {collapseWhitespace: true, collapseInlineTagWhitespace: true}
+        : false,
       // inject details of output file at end of body
       inject: 'body'
     }),
+
+    new webpack.optimize.ModuleConcatenationPlugin(),
+
+    new webpack.optimize.CommonsChunkPlugin({
+      name: ['vendor'],
+      minChunks: Infinity
+      // (with more entries, this ensures that no other module
+      // goes into the vendor chunk)
+      // TODO: add a common entry point if needed
+    }),
+
+    //// Extract runtime code so updates don't affect app-code caching:
+    // https://webpack.js.org/guides/caching
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'runtime'
+    }),
+
+    // Give deterministic names to all webpacks non-"normal" modules
+    // https://medium.com/webpack/predictable-long-term-caching-with-webpack-d3eee1d3fa31
+    new NameAllModulesPlugin(),
+
     pwaPlugin,
-    new DashboardPlugin()
+
+    extractSass
   ],
   resolve: {
     modules: [path.join(__dirname, 'src'), 'node_modules'],
@@ -85,15 +152,49 @@ var common = {
         use: {
           loader: 'babel-loader',
           options: {
-            // env: automatically determines the Babel plugins you need based on your supported environments
-            presets: ['env']
+            cacheDirectory: true,
+            presets: [
+              [
+                'env',
+                {
+                  debug: true,
+                  modules: false,
+                  useBuiltIns: true,
+                  targets: {
+                    browsers: ['> 1%', 'last 2 versions', 'Firefox ESR']
+                  }
+                }
+              ]
+            ],
+            plugins: isProd ? babelPluginsProd : babelPluginsDev
           }
         }
       },
       {
+        // Transpile and extract scss
         test: /\.scss$/,
         exclude: [/elm-stuff/, /node_modules/],
-        loaders: ['style-loader', 'css-loader', 'sass-loader']
+        use: extractSass.extract({
+          use: [
+            {
+              loader: 'css-loader',
+              options: {
+                minimize: isProd,
+                sourceMap: !isProd
+              }
+            },
+            {
+              loader: 'resolve-url-loader'
+            },
+            {
+              loader: 'sass-loader',
+              options: {
+                sourceMap: !isProd
+              }
+            }
+          ],
+          fallback: 'style-loader'
+        })
       },
       {
         test: /\.css$/,
@@ -110,27 +211,30 @@ var common = {
         }
       },
       {
-        test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        test: /\.svg$/,
+        loader: 'svg-url-loader'
+      },
+      {
+        test: /\.(ttf|eot)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         exclude: [/elm-stuff/, /node_modules/],
         loader: 'file-loader'
       },
       {
-        test: /\.(jpe?g|png|gif|svg)$/i,
+        test: /\.(jpe?g|png|gif)$/i,
         loader: 'file-loader'
       }
     ]
   }
 };
 
-if (TARGET_ENV === 'development') {
+if (!isProd) {
   console.log('Building for dev...');
   module.exports = merge(common, {
+    devtool: 'cheap-module-eval-source-map',
     plugins: [
-      // Suggested for hot-loading
-      new webpack.NamedModulesPlugin(),
       // Prevents compilation errors causing the hot loader to lose state
-      new webpack.NoEmitOnErrorsPlugin()
-      // , offlinePlugin
+      new webpack.NoEmitOnErrorsPlugin(),
+      new DashboardPlugin()
     ],
     resolve: {
       alias: {
@@ -166,17 +270,38 @@ if (TARGET_ENV === 'development') {
   });
 }
 
-if (TARGET_ENV === 'production') {
+if (isProd) {
   console.log('Building for prod...');
   module.exports = merge(common, {
+    devtool: 'source-map',
     plugins: [
       new CopyWebpackPlugin([
         {
-          from: 'src/assets'
+          from: 'src/assets',
+          ignore: ['*.scss']
         }
       ]),
-      new webpack.optimize.UglifyJsPlugin(),
-      offlinePlugin
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify('production')
+        }
+      }),
+      new UglifyJsPlugin({
+        sourceMap: true,
+        uglifyOptions: {
+          compress: {
+            warnings: false
+          },
+          mangle: {
+            safari10: true
+          },
+          output: {
+            comments: false
+          }
+        }
+      }),
+      offlinePlugin,
+      bundlePlugin
     ],
     resolve: {
       alias: {
