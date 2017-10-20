@@ -2,7 +2,6 @@
   "name": "ephemeral-offline",
   "version": "1.0.0",
   "description": "An Elm front-end for note-taking",
-  "main": "elm.js",
   "dependencies": {
     "csv-stringify": "^1.0.4",
     "file-saver": "^1.3.3",
@@ -43,6 +42,7 @@
     "style-loader": "^0.18.2",
     "svg-inline-loader": "^0.8.0",
     "svg-url-loader": "^2.2.0",
+    "ts-loader": "^3.0.5",
     "typescript": "^2.5.3",
     "uglifyjs-webpack-plugin": "^1.0.0-beta.2",
     "url-loader": "^0.5.9",
@@ -55,8 +55,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack-dashboard -- webpack-dev-server --hot --inline --port 3000",
-    "production:build": "NODE_ENV=production webpack --progress --display-optimization-bailout && npm run inline-css",
+    "dev": "NODE_PATH=. webpack-dashboard -- webpack-dev-server --hot --inline --port 3000",
+    "production:build": "NODE_PATH=. NODE_ENV=production webpack --progress --display-optimization-bailout && npm run inline-css",
     "inline-css": "critical dist/index.html --base dist/ --inline --minify > dist/index-critical.html && mv dist/index-critical.html dist/index.html",
     "postinstall": "elm-package install -y",
     "pouchdb-server": "pouchdb-server --config pouchdb-server/config.json --dir pouchdb-server"

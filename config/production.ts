@@ -1,4 +1,4 @@
-module.exports = {
+export const config = {
   name: 'production',
   environment: 'production',
 

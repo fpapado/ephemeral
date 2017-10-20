@@ -12,7 +12,7 @@ const NameAllModulesPlugin = require('name-all-modules-plugin');
 const OfflinePlugin = require('offline-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const DashboardPlugin = require('webpack-dashboard/plugin');
-const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 var isProd = process.env.NODE_ENV === 'production';
 
@@ -52,7 +52,7 @@ let pwaPlugin = new WebpackPwaManifest({
 // Babel plugins
 let babelPluginsProd = [
   'syntax-dynamic-import',
-  ['transform-remove-console', {exclude: ['error', 'warn', 'info']}]
+  ['transform-remove-console', { exclude: ['error', 'warn', 'info'] }]
 ];
 
 let babelPluginsDev = ['syntax-dynamic-import'];
@@ -73,8 +73,9 @@ const extractSass = new ExtractTextPlugin({
 // -- Common Config --
 var common = {
   entry: {
-    main: './src/index.js',
-    vendor: ['pouchdb-browser', 'pouchdb-authentication', 'leaflet']
+    main: './src/index.ts',
+    vendor: ['pouchdb-browser', 'pouchdb-authentication', 'leaflet', 'xstream']
+    // styles: './src/assets/css/styles.scss'
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -102,9 +103,9 @@ var common = {
 
     new HTMLWebpackPlugin({
       // using .ejs prevents other loaders causing errors
-      template: 'src/index.ejs',
+      template: './src/index.ejs',
       minify: isProd
-        ? {collapseWhitespace: true, collapseInlineTagWhitespace: true}
+        ? { collapseWhitespace: true, collapseInlineTagWhitespace: true }
         : false,
       // inject details of output file at end of body
       inject: 'body'
@@ -135,16 +136,29 @@ var common = {
     extractSass
   ],
   resolve: {
-    modules: [path.join(__dirname, 'src'), 'node_modules'],
-    extensions: ['.js', '.elm', '.css', '.scss', '.png']
+    extensions: ['.ts', '.js', '.scss'],
+    alias: [
+      {
+        name: 'ephemeral/elm',
+        alias: path.resolve(__dirname, 'src', 'Main.elm')
+      },
+      {
+        name: 'ephemeral',
+        alias: path.resolve(__dirname, 'src')
+      }
+    ]
   },
   module: {
-    // noParse: /(lie|pouchdb|pouchdb-browser)\.js$/,
     rules: [
       {
         test: /\.html$/,
         exclude: /node_modules/,
         loader: 'file-loader?name=[name].[ext]'
+      },
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        loader: 'ts-loader'
       },
       {
         test: /\.js$/,
@@ -237,9 +251,12 @@ if (!isProd) {
       new DashboardPlugin()
     ],
     resolve: {
-      alias: {
-        config: path.join(__dirname, 'config/development.js')
-      }
+      alias: [
+        {
+          name: 'config',
+          alias: path.join(__dirname, 'config/development.ts')
+        }
+      ]
     },
     module: {
       rules: [
@@ -304,9 +321,12 @@ if (isProd) {
       bundlePlugin
     ],
     resolve: {
-      alias: {
-        config: path.join(__dirname, 'config/production.js')
-      }
+      alias: [
+        {
+          name: 'config',
+          alias: path.join(__dirname, 'config/production.ts')
+        }
+      ]
     },
     module: {
       rules: [

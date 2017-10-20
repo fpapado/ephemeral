@@ -16,10 +16,10 @@ More Navigation / routing stuff
   - As in, make DB the single source of truth
 
 # Port branch
-- [ ] TypeScript
+- [X] TypeScript
 - [ ] Union Types for messages
-- [ ] Everything a stream
 - [ ] Split into modules, taking the app as argument
+- [ ] Everything a stream
 - [ ] DB helpers?
 
 - [ ] Port architecture, merging ports

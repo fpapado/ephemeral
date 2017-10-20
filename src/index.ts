@@ -1,21 +1,23 @@
-'use strict';
-
 import Promise from 'promise-polyfill';
 import L from 'leaflet';
 import PouchDB from 'pouchdb-browser';
 import PouchAuth from 'pouchdb-authentication';
 import xs from 'xstream';
 
+import { config } from 'config';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
+import './assets/css/styles.scss';
 
-import config from 'config';
-import { string2Hex } from './js/util.js';
+import { Ephemeral } from 'ephemeral/elm';
+import { string2Hex } from './js/util';
 
-import styles from './assets/css/styles.scss';
-
-if (!window.Promise) {
-  window.Promise = Promise;
+if (!window['Promise']) {
+  window['Promise'] = Promise;
 }
+
+// Embed Elm
+const root = document.getElementById('root');
+const app = Ephemeral.embed(root);
 
 OfflinePluginRuntime.install({
   onUpdating: () => {
@@ -37,9 +39,8 @@ OfflinePluginRuntime.install({
   }
 });
 
-const Elm = require('./Main');
-
-window.PouchDB = PouchDB;
+//@ts-ignore
+window['PouchDB'] = PouchDB;
 PouchDB.plugin(PouchAuth);
 
 let db = new PouchDB('ephemeral');
@@ -155,9 +156,6 @@ let mymap = L.map('mapid', {
 }).setView([60.1719, 24.9414], 12);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mymap);
-
-let root = document.getElementById('root');
-let app = Elm.Main.embed(root);
 
 // -- Port Subscriptions --
 let markers = {};
@@ -379,7 +377,7 @@ app.ports.listEntries.subscribe(str => {
 
 app.ports.exportCards.subscribe(version => {
   // Lazy-load exports
-  import('./js/export.js').then(({ exportCardsCSV, exportCardsAnki }) => {
+  import('./js/export').then(({ exportCardsCSV, exportCardsAnki }) => {
     if (version === 'offline') {
       console.log('Will export');
       db.allDocs({ include_docs: true }).then(docs => {
