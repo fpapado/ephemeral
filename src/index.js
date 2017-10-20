@@ -4,6 +4,7 @@ import Promise from 'promise-polyfill';
 import L from 'leaflet';
 import PouchDB from 'pouchdb-browser';
 import PouchAuth from 'pouchdb-authentication';
+import xs from 'xstream';
 
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 
@@ -264,25 +265,41 @@ function removeMarker(data) {
   }
 }
 
-app.ports.toLeaflet.subscribe(msg => {
-  console.log(msg);
-  switch (msg.type) {
-    case 'SetView':
-      setView(msg.data);
-      break;
+// type LeafletMsg = SetView | SetMarkers | RemoveMarker
+// type SetView = {type: "SetView", data: any}
+// type SetMarkers = {type: "SetMarkers", data: any}
+// type RemoveMarker = {type: "RemoveMarker", data: any}
+const leafletMsgProducer = {
+  start: listener => app.ports.toLeaflet.subscribe(msg => listener.next(msg)),
+  stop: () => app.ports.toLeaflet.unsubscribe()
+};
 
-    case 'SetMarkers':
-      setMarkers(msg.data);
-      break;
+const leafletMsgListener = {
+  next: msg => {
+    console.log(msg);
+    switch (msg.type) {
+      case 'SetView':
+        setView(msg.data);
+        break;
 
-    case 'RemoveMarker':
-      removeMarker(msg.data);
-      break;
+      case 'SetMarkers':
+        setMarkers(msg.data);
+        break;
 
-    default:
-      console.warn('Leaflet Port command not recognised');
-  }
-});
+      case 'RemoveMarker':
+        removeMarker(msg.data);
+        break;
+
+      default:
+        console.warn('Leaflet Port command not recognised');
+    }
+  },
+  error: err => console.error(err),
+  complete: () => console.log('completed')
+};
+
+const leafletMsg$ = xs.create(leafletMsgProducer);
+leafletMsg$.addListener(leafletMsgListener);
 
 app.ports.saveEntry.subscribe(data => {
   console.log('Got entry to create', data);

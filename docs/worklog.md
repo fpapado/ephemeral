@@ -16,6 +16,12 @@ More Navigation / routing stuff
   - As in, make DB the single source of truth
 
 # Port branch
+- [ ] TypeScript
+- [ ] Union Types for messages
+- [ ] Everything a stream
+- [ ] Split into modules, taking the app as argument
+- [ ] DB helpers?
+
 - [ ] Port architecture, merging ports
   - [ ] e.g. could have:
     translatePouchUpdate : (Result String Entry -> msg) -> (Result Sting String -> msg) -> Value -> msg
