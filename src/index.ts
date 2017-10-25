@@ -376,8 +376,8 @@ app.ports.listEntries.subscribe(str => {
 });
 
 app.ports.exportCards.subscribe(version => {
-  // Lazy-load exports
-  import('./js/export').then(({ exportCardsCSV, exportCardsAnki }) => {
+  // Lazy-load scripts for exporting cards
+  import(/* webpackChunkName: "export" */ './js/export').then(({ exportCardsCSV, exportCardsAnki }) => {
     if (version === 'offline') {
       console.log('Will export');
       db.allDocs({ include_docs: true }).then(docs => {
