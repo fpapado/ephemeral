@@ -8,17 +8,19 @@ import { config } from 'config';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import './assets/css/styles.scss';
 
-import { Ephemeral } from 'ephemeral/elm';
+import { Main } from 'ephemeral/elm';
 import { string2Hex } from './js/util';
 
+// TODO: Can probably ditch this
 if (!window['Promise']) {
   window['Promise'] = Promise;
 }
 
 // Embed Elm
 const root = document.getElementById('root');
-const app = Ephemeral.embed(root);
+const app = Main.embed(root);
 
+// Embed offline plugin runtime
 OfflinePluginRuntime.install({
   onUpdating: () => {
     console.info('SW Event:', 'onUpdating');
@@ -40,15 +42,16 @@ OfflinePluginRuntime.install({
 });
 
 //@ts-ignore
-window['PouchDB'] = PouchDB;
-PouchDB.plugin(PouchAuth);
+window['PouchDB'] = PouchDB; // needed for dev tools
 
+// Set up PouchDB
+PouchDB.plugin(PouchAuth);
 let db = new PouchDB('ephemeral');
 
 // Before checking logins, we use the base url to check _users and _sessions
 // After that, we customise using initDB() to include the user's db suffix
 // NOTE: there seems to be a bug(?), where leaving the naked URL in will
-// result in an error. Thus passing an extra path after (_users for convenience)
+// result in an error. Thus passing a doc path after (_users for convenience)
 // is required. This is fine because the DB url is overwritten afterwards.
 let url = config.couchUrl + '_users';
 let remoteDB = new PouchDB(url, { skip_setup: true });
@@ -57,45 +60,63 @@ let syncHandler;
 
 isUserLoggedIn(remoteDB).then(res => {
   if (res.ok) {
-    console.info('User is logged in, will sync.', res);
-    remoteDB = initDB(res.name);
+    console.info('User is logged in, will sync.');
+
+    // Configure remote as appropriate for each environment
+    let remoteDB;
+    if (config.environment == 'production') {
+      remoteDB = initDB(config.couchUrl, {
+        method: 'dbPerUser',
+        username: res.name
+      });
+    } else {
+      remoteDB = initDB(config.couchUrl, {
+        method: 'direct',
+        dbName: config.dbName
+      });
+    }
+    // Set the global sync handler
     syncHandler = syncRemote(db, remoteDB);
   } else {
-    console.warn('User is not logged in, not syncing.');
+    console.warn(res.reason, 'Will not sync.');
   }
 });
 
-function initDB(name) {
-  let suffix;
+type DBInitParams =
+  | { method: 'direct'; dbName: string }
+  | { method: 'dbPerUser'; username: string };
+
+function initDB(couchUrl: string, initParams: DBInitParams) {
+  let dbName;
 
   /* Using db-per-user in production, so we must figure out the user's db.
      The couch-per-user plugin makes a DB of the form:
         userdb-{hex username}
   */
-  if (config.environment === 'production') {
-    suffix = 'userdb-' + string2Hex(name);
+  if (initParams.method === 'dbPerUser') {
+    dbName = 'userdb-' + string2Hex(initParams.username);
   } else {
-    suffix = config.dbName;
+    dbName = initParams.dbName;
   }
 
-  let url = config.couchUrl + suffix;
+  let url = couchUrl + dbName;
   let remote = new PouchDB(url, { skip_setup: true });
 
   return remote;
 }
 
-function isUserLoggedIn(remote) {
-  let loggedIn = remote
+function isUserLoggedIn(remoteDB) {
+  let loggedIn = remoteDB
     .getSession()
     .then(res => {
       if (!res.userCtx.name) {
-        return { ok: false };
+        return { ok: false, reason: 'User is not logged in' };
       } else {
         return { ok: true, name: res.userCtx.name };
       }
     })
     .catch(err => {
-      throw 'Error in establishing connection';
+      return { ok: false, reason: 'Error in establishing connection' };
     });
   return loggedIn;
 }
@@ -178,7 +199,20 @@ app.ports.sendLogin.subscribe(user => {
     })
     .then(name => {
       // Start replication, assign to global remote and handler
-      remoteDB = initDB(name);
+      let remoteDB;
+      if (config.environment == 'production') {
+        remoteDB = initDB(config.couchUrl, {
+          method: 'dbPerUser',
+          username: name
+        });
+      } else {
+        remoteDB = initDB(config.couchUrl, {
+          method: 'direct',
+          dbName: config.dbName
+        });
+      }
+
+      // Set the global sync handler
       syncHandler = syncRemote(db, remoteDB);
     })
     .catch(err => {
@@ -377,18 +411,20 @@ app.ports.listEntries.subscribe(str => {
 
 app.ports.exportCards.subscribe(version => {
   // Lazy-load scripts for exporting cards
-  import(/* webpackChunkName: "export" */ './js/export').then(({ exportCardsCSV, exportCardsAnki }) => {
-    if (version === 'offline') {
-      console.log('Will export');
-      db.allDocs({ include_docs: true }).then(docs => {
-        let entries = docs.rows.map(row => row.doc);
-        exportCardsCSV(entries);
-      });
-    } else if (version === 'online') {
-      db.allDocs({ include_docs: true }).then(docs => {
-        let entries = docs.rows.map(row => row.doc);
-        exportCardsAnki(entries);
-      });
+  import(/* webpackChunkName: "export" */ './js/export').then(
+    ({ exportCardsCSV, exportCardsAnki }) => {
+      if (version === 'offline') {
+        console.log('Will export');
+        db.allDocs({ include_docs: true }).then(docs => {
+          let entries = docs.rows.map(row => row.doc);
+          exportCardsCSV(entries);
+        });
+      } else if (version === 'online') {
+        db.allDocs({ include_docs: true }).then(docs => {
+          let entries = docs.rows.map(row => row.doc);
+          exportCardsAnki(entries);
+        });
+      }
     }
-  });
+  );
 });

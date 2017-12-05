@@ -9,7 +9,7 @@ declare module 'ephemeral/elm' {
     };
   };
 
-  export const Ephemeral: {
+  export const Main: {
     embed(node: HTMLElement): ElmApp;
   };
 }
