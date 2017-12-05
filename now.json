@@ -1,0 +1,6 @@
+{
+  "name": "ephemeral",
+  "alias": "ephemeral",
+  "region": "eu-west-1",
+  "type": "static"
+}

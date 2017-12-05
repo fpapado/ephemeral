@@ -56,11 +56,17 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "NODE_PATH=. webpack-dashboard -- webpack-dev-server --hot --inline --port 3000",
-    "production:build": "NODE_PATH=. NODE_ENV=production webpack --progress --display-optimization-bailout && npm run inline-css",
-    "inline-css": "critical dist/index.html --base dist/ --inline --minify > dist/index-critical.html && mv dist/index-critical.html dist/index.html",
+    "dev":
+      "NODE_PATH=. webpack-dashboard -- webpack-dev-server --hot --inline --port 3000",
+    "production:build":
+      "NODE_PATH=. NODE_ENV=production webpack --progress --display-optimization-bailout && npm run inline-css",
+    "inline-css":
+      "critical dist/index.html --base dist/ --inline --minify > dist/index-critical.html && mv dist/index-critical.html dist/index.html",
     "postinstall": "elm-package install -y",
-    "pouchdb-server": "pouchdb-server --config pouchdb-server/config.json --dir pouchdb-server"
+    "pouchdb-server":
+      "pouchdb-server --config pouchdb-server/config.json --dir pouchdb-server",
+    "deploy": "cd dist && now -A ../now.json && now alias -A ../now.json",
+    "release": "npm run production:build && npm run deploy"
   },
   "author": "fpapado <fotis@fpapado.com>",
   "license": "ISC",
