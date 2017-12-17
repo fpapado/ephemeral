@@ -1,6 +1,5 @@
 import L from 'leaflet';
-import xs from 'xstream';
-import { leafletMsg$ } from 'ephemeral/index';
+import xs, { Stream } from 'xstream';
 
 // MODEL
 interface Model {
@@ -11,13 +10,13 @@ interface Model {
 let model: Model = {};
 
 // INIT
-export function initLeaflet(): void {
+export function initLeaflet(msg$: Stream<LeafletMsg>): void {
   // Set the initial model
   model = initModel();
 
   // Launch Subscriptions
   // TODO: Could we be passing the stream in here?
-  leafletMsg$.debug().addListener({
+  msg$.debug().addListener({
     next: msg => update(msg),
     error: err => console.error(err),
     complete: () => console.log('completed')

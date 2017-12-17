@@ -167,21 +167,20 @@ function cancelSync(handler) {
 }
 
 // -- Port Subscriptions --
-// Stream with Leaflet Messages from Elm
-export const leafletMsg$: Stream<LeafletMsg> = xs.create({
-  start: function(listener) {
-    app.ports.toLeaflet.subscribe(msg => {
-      listener.next(msg);
-    });
-  },
-  stop: function() {
-    app.ports.toLeaflet.unsubscribe();
-  }
-});
-
-// Initialise Leaflet module
-// TODO: consider passing in stream
-initLeaflet();
+// Initialise Leaflet module with
+// a stream of leaflet-related Messages from Elm
+initLeaflet(
+  xs.create({
+    start: function(listener) {
+      app.ports.toLeaflet.subscribe(msg => {
+        listener.next(msg);
+      });
+    },
+    stop: function() {
+      app.ports.toLeaflet.unsubscribe();
+    }
+  })
+);
 
 // Other ports (legacy)
 app.ports.sendLogin.subscribe(user => {
