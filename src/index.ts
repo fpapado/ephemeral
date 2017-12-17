@@ -1,8 +1,7 @@
-import Promise from 'promise-polyfill';
-import L from 'leaflet';
 import PouchDB from 'pouchdb-browser';
 import PouchAuth from 'pouchdb-authentication';
-import xs from 'xstream';
+import xs, { Stream } from 'xstream';
+import { initLeaflet, LeafletMsg } from 'ephemeral/Leaflet/index';
 
 import { config } from 'config';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
@@ -10,11 +9,6 @@ import './assets/css/styles.scss';
 
 import { Main } from 'ephemeral/elm';
 import { string2Hex } from './js/util';
-
-// TODO: Can probably ditch this
-if (!window['Promise']) {
-  window['Promise'] = Promise;
-}
 
 // Embed Elm
 const root = document.getElementById('root');
@@ -172,15 +166,24 @@ function cancelSync(handler) {
   return true;
 }
 
-let mymap = L.map('mapid', {
-  preferCanvas: true
-}).setView([60.1719, 24.9414], 12);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mymap);
-
 // -- Port Subscriptions --
-let markers = {};
+// Stream with Leaflet Messages from Elm
+export const leafletMsg$: Stream<LeafletMsg> = xs.create({
+  start: function(listener) {
+    app.ports.toLeaflet.subscribe(msg => {
+      listener.next(msg);
+    });
+  },
+  stop: function() {
+    app.ports.toLeaflet.unsubscribe();
+  }
+});
 
+// Initialise Leaflet module
+// TODO: consider passing in stream
+initLeaflet();
+
+// Other ports (legacy)
 app.ports.sendLogin.subscribe(user => {
   console.log('Got user to log in', user.username);
 
@@ -267,91 +270,6 @@ app.ports.checkAuthState.subscribe(data => {
     });
 });
 
-// -- Leaflet Subscriptions --
-
-function setMarkers(data) {
-  data.forEach(({ id, latLng, markerOptions, popupText }, index) => {
-    markerOptions.icon = new L.Icon(markerOptions.icon);
-    let marker = L.marker(latLng, markerOptions);
-
-    marker.bindPopup(popupText);
-
-    if (!markers.hasOwnProperty(id)) {
-      marker.addTo(mymap);
-      markers[id] = marker;
-    } else {
-      Object.assign(markers[id], marker);
-    }
-  });
-}
-
-function setView({ center, zoom, options }) {
-  mymap.setView(center, zoom, options);
-}
-
-function removeMarker(data) {
-  let id = data;
-  if (markers.hasOwnProperty(id)) {
-    let marker = markers[id];
-    mymap.removeLayer(marker);
-  }
-}
-
-// type LeafletMsg = SetView | SetMarkers | RemoveMarker
-// type SetView = {type: "SetView", data: any}
-// type SetMarkers = {type: "SetMarkers", data: any}
-// type RemoveMarker = {type: "RemoveMarker", data: any}
-const leafletMsgProducer = {
-  start: listener => app.ports.toLeaflet.subscribe(msg => listener.next(msg)),
-  stop: () => app.ports.toLeaflet.unsubscribe()
-};
-
-const leafletMsgListener = {
-  next: msg => {
-    console.log(msg);
-    switch (msg.type) {
-      case 'SetView':
-        setView(msg.data);
-        break;
-
-      case 'SetMarkers':
-        setMarkers(msg.data);
-        break;
-
-      case 'RemoveMarker':
-        removeMarker(msg.data);
-        break;
-
-      default:
-        console.warn('Leaflet Port command not recognised');
-    }
-  },
-  error: err => console.error(err),
-  complete: () => console.log('completed')
-};
-
-const leafletMsg$ = xs.create(leafletMsgProducer);
-leafletMsg$.addListener(leafletMsgListener);
-
-app.ports.saveEntry.subscribe(data => {
-  console.log('Got entry to create', data);
-  let meta = { type: 'entry' };
-  let doc = Object.assign(data, meta);
-
-  db
-    .post(doc)
-    .then(res => {
-      db.get(res.id).then(doc => {
-        console.log('Successfully created', doc);
-        app.ports.updatedEntry.send(doc);
-      });
-    })
-    .catch(err => {
-      console.error('Failed to create', err);
-      // TODO: Send back over port that Err error?
-    });
-});
-
 app.ports.updateEntry.subscribe(data => {
   console.log('Got entry to update', data);
 
@@ -378,6 +296,25 @@ app.ports.updateEntry.subscribe(data => {
     .catch(err => {
       console.error('Failed to update', err);
       // TODO: Send back over port that Err error
+    });
+});
+
+app.ports.saveEntry.subscribe(data => {
+  console.log('Got entry to create', data);
+  let meta = { type: 'entry' };
+  let doc = Object.assign(data, meta);
+
+  db
+    .post(doc)
+    .then(res => {
+      db.get(res.id).then(doc => {
+        console.log('Successfully created', doc);
+        app.ports.updatedEntry.send(doc);
+      });
+    })
+    .catch(err => {
+      console.error('Failed to create', err);
+      // TODO: Send back over port that Err error?
     });
 });
 

@@ -36,7 +36,7 @@
     "offline-plugin": "^4.8.3",
     "postcss-loader": "^2.0.6",
     "pouchdb-server": "^2.3.7",
-    "prettier": "^1.7.4",
+    "prettier": "^1.9.2",
     "resolve-url-loader": "^2.0.3",
     "sass-lint": "^1.12.1",
     "sass-loader": "^6.0.6",
@@ -56,15 +56,11 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev":
-      "NODE_PATH=. webpack-dashboard -- webpack-dev-server --hot --inline --port 3000",
-    "production:build":
-      "NODE_PATH=. NODE_ENV=production webpack --progress --display-optimization-bailout && npm run inline-css",
-    "inline-css":
-      "critical dist/index.html --base dist/ --inline --minify > dist/index-critical.html && mv dist/index-critical.html dist/index.html",
+    "dev": "NODE_PATH=. webpack-dashboard -- webpack-dev-server --hot --inline --port 3000",
+    "production:build": "NODE_PATH=. NODE_ENV=production webpack --progress --display-optimization-bailout && npm run inline-css",
+    "inline-css": "critical dist/index.html --base dist/ --inline --minify > dist/index-critical.html && mv dist/index-critical.html dist/index.html",
     "postinstall": "elm-package install -y",
-    "pouchdb-server":
-      "pouchdb-server --config pouchdb-server/config.json --dir pouchdb-server",
+    "pouchdb-server": "pouchdb-server --config pouchdb-server/config.json --dir pouchdb-server",
     "deploy": "cd dist && now -A ../now.json && now alias -A ../now.json",
     "release": "npm run production:build && npm run deploy"
   },
