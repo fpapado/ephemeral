@@ -9,14 +9,14 @@ import { string2Hex } from 'ephemeral/js/util';
 
 // MODEL
 interface Model {
-  localDB: any;
-  remoteDB: any;
-  syncHandler?: any;
+  localDB?: PouchDB.Database;
+  remoteDB?: PouchDB.Database;
+  syncHandler?: PouchDB.Replication.Sync<{}>;
 }
 
 let model: Model = {
-  localDB: {},
-  remoteDB: {},
+  localDB: undefined,
+  remoteDB: undefined,
   syncHandler: undefined
 };
 
@@ -25,11 +25,41 @@ export function initPouch(msg$: Stream<PouchMsg>): void {
   // Set model, launch subscriptions
   initModel().then(m => {
     model = m;
+
+    // Command subscriptions
     msg$.debug().addListener({
       next: msg => update(msg),
       error: err => console.error(err),
       complete: () => console.log('completed')
     });
+
+    // DB change subscriptions
+    model.localDB
+      .changes({ live: true, include_docs: true })
+      .on('change', info => {
+        console.log('Something changed!', info);
+        const { doc } = info;
+
+        // Send all updates to the elm side, as appropriate
+        // TODO: might want to batch things into one big updatedEntries
+        if (doc._deleted) {
+          console.log('Deleted doc');
+          app.ports.deletedEntry.send({ _id: doc._id });
+        } else {
+          console.log('Updated doc');
+          app.ports.updatedEntry.send(doc);
+        }
+      })
+      .on('complete', info => {
+        console.log('Replication complete');
+      })
+      .on('error', (err: { error?: string; message?: string }) => {
+        if (err.error === 'unauthorized') {
+          console.error(err.message);
+        } else {
+          console.error('Unhandled error', err);
+        }
+      });
   });
 }
 
@@ -72,7 +102,7 @@ function initModel(): Promise<Model> {
     } else {
       console.warn(res.reason, 'Will not sync.');
       // TODO: Maybe?
-      return { localDB, remoteDB, undefined };
+      return { localDB, remoteDB };
     }
   });
 }
@@ -81,12 +111,15 @@ type DBInitParams =
   | { method: 'direct'; dbName: string }
   | { method: 'dbPerUser'; username: string };
 
-function initRemoteDB(couchUrl: string, initParams: DBInitParams) {
+function initRemoteDB(
+  couchUrl: string,
+  initParams: DBInitParams
+): PouchDB.Database {
   let dbName;
 
   /* Using db-per-user in production, so we must figure out the user's db.
-     The couch-per-user plugin makes a DB of the form:
-        userdb-{hex username}
+    The couch-per-user plugin makes a DB of the form:
+      userdb-{hex username}
   */
   if (initParams.method === 'dbPerUser') {
     dbName = 'userdb-' + string2Hex(initParams.username);
@@ -287,7 +320,7 @@ function saveEntry(db, data) {
     });
 }
 
-function deleteEntry(db, id) {
+function deleteEntry(db: PouchDB.Database, id) {
   console.log('Got entry to delete', id);
 
   db
@@ -332,49 +365,16 @@ function getUserIfLoggedIn(remoteDB) {
   return loggedIn;
 }
 
-function syncRemote(local, remote) {
+function syncRemote(
+  localDB: PouchDB.Database,
+  remoteDB: PouchDB.Database
+): PouchDB.Replication.Sync<{}> {
   console.info('Starting sync');
-  let syncHandler = local
-    .sync(remote, {
-      live: true,
-      retry: true
-    })
-    .on('change', info => {
-      // something changed
-      console.log('Something changed!', info);
 
-      let { change, direction } = info;
-
-      if (direction === 'pull') {
-        // TODO: might want to do this on the elm-side, and send things on single port?
-        // TODO: might want to batch things into one big updatedEntries ...
-        change.docs.forEach(doc => {
-          if (doc._deleted) {
-            console.log('Deleted doc');
-            app.ports.deletedEntry.send({ _id: doc._id });
-          } else {
-            app.ports.updatedEntry.send(doc);
-          }
-        });
-      }
-    })
-    .on('paused', info => {
-      // replication was paused, usually connection loss
-      console.log('Replication paused');
-    })
-    .on('active', info => {
-      console.log('Replication resumed');
-    })
-    .on('complete', info => {
-      console.log('Replication complete');
-    })
-    .on('error', err => {
-      if (err.error === 'unauthorized') {
-        console.error(err.message);
-      } else {
-        console.error('Unhandled error', err);
-      }
-    });
+  let syncHandler = localDB.sync(remoteDB, {
+    live: true,
+    retry: true
+  });
   return syncHandler;
 }
 

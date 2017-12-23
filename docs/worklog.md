@@ -17,10 +17,10 @@ More Navigation / routing stuff
 
 # Port branch
 - [X] TypeScript
-- [ ] Union Types for messages
-- [ ] Split into modules, taking the app as argument
-- [ ] Everything a stream
-- [ ] DB helpers?
+- [~] Union Types for messages
+- [~] Split into modules, taking the app as argument
+- [~] Everything a stream
+- [~] DB helpers?
 
 - [ ] Port architecture, merging ports
   - [ ] e.g. could have:
@@ -29,8 +29,8 @@ More Navigation / routing stuff
 
   - [ ] pouchToElm, pouchFromElm
     -> API with cases etc there.
-- [] toLeaflet; would require encoders for Leaflet.Types
-  - [ ] move port encoders to Port?
+- [X] toLeaflet; would require encoders for Leaflet.Types
+  - [?] move port encoders to Port?
 - [ ] Debatable whether to propagate error in Request.Entry or return empty Dict
   - [ ] Generally, errors from Ports
 
