@@ -13,7 +13,7 @@ import {
 import { Main } from 'ephemeral/elm';
 
 // Embed Elm
-const root = document.getElementById('root');
+const root = document.getElementById('root') as HTMLElement;
 export const app = Main.embed(root);
 
 // Embed offline plugin runtime
@@ -57,25 +57,28 @@ initLeaflet(
 initPouch(
   xs.createWithMemory({
     start: function(listener) {
+      // TODO: find a non-silly way to do these
       app.ports.sendLogin.subscribe((user: LoginUser) =>
-        listener.next(Msg('LoginUser', user))
+        listener.next(Msg('LoginUser' as 'LoginUser', user))
       );
       app.ports.sendLogout.subscribe((_: any) =>
-        listener.next(Msg('LogoutUser'))
+        listener.next(Msg('LogoutUser' as 'LogoutUser', {}))
       );
       app.ports.checkAuthState.subscribe((_: any) =>
-        listener.next(Msg('CheckAuth'))
+        listener.next(Msg('CheckAuth' as 'CheckAuth', {}))
       );
-      app.ports.updateEntry.subscribe((entry: ExistingDocument) =>
-        listener.next(Msg('UpdateEntry', entry))
+      app.ports.updateEntry.subscribe((entry: ExistingDocument<{}>) =>
+        listener.next(Msg('UpdateEntry' as 'UpdateEntry', entry))
       );
-      app.ports.saveEntry.subscribe((entry: NewDocument) =>
-        listener.next(Msg('SaveEntry', entry))
+      app.ports.saveEntry.subscribe((entry: NewDocument<{}>) =>
+        listener.next(Msg('SaveEntry' as 'SaveEntry', entry))
       );
-      app.ports.deleteEntry.subscribe(id =>
-        listener.next(Msg('DeleteEntry', id))
+      app.ports.deleteEntry.subscribe((id: DocumentID) =>
+        listener.next(Msg('DeleteEntry' as 'DeleteEntry', id))
       );
-      app.ports.listEntries.subscribe(_ => listener.next(Msg('ListEntries')));
+      app.ports.listEntries.subscribe((_: any) =>
+        listener.next(Msg('ListEntries' as 'ListEntries', {}))
+      );
     },
     stop: function() {
       app.ports.sendLogin.unsubscribe();

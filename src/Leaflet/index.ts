@@ -1,13 +1,31 @@
 import L from 'leaflet';
 import xs, { Stream } from 'xstream';
 
-// MODEL
-interface Model {
-  leafletMap?: any;
-  markers?: any; // TODO; could use a set
+// TYPES
+interface MarkerData {
+  id: string;
+  latLng: L.LatLngExpression;
+  // Extra attribute iconOptions since Elm only does JSON
+  markerOptions: L.MarkerOptions & { iconOptions: L.IconOptions };
+  popupText: string;
 }
 
-let model: Model = {};
+interface ViewData {
+  center: L.LatLngExpression;
+  zoom: number;
+  options: L.ZoomPanOptions;
+}
+
+// Silly alias, but TS has equally silly boilerplate for proper simple types
+type MarkerID = string;
+
+// MODEL
+interface Model {
+  leafletMap: L.Map;
+  markers: any; // TODO; could use a set
+}
+
+let model: Model;
 
 // INIT
 export function initLeaflet(msg$: Stream<LeafletMsg>): void {
@@ -37,10 +55,11 @@ function initModel(): Model {
 }
 
 // MSG
+// TODO: use existing Msg constructor
 export type LeafletMsg = SetView | SetMarkers | RemoveMarker;
-type SetView = { type: 'SetView'; data: any };
-type SetMarkers = { type: 'SetMarkers'; data: any };
-type RemoveMarker = { type: 'RemoveMarker'; data: any };
+type SetView = { type: 'SetView'; data: ViewData };
+type SetMarkers = { type: 'SetMarkers'; data: MarkerData[] };
+type RemoveMarker = { type: 'RemoveMarker'; data: MarkerID };
 
 // UPDATE
 // NOTE: these mutate things in place, since we're dealing with Leaflet.
@@ -67,9 +86,10 @@ const update = (msg: LeafletMsg) => {
 };
 
 // Update functions
-function setMarkers(data): void {
-  data.forEach(({ id, latLng, markerOptions, popupText }, index) => {
-    markerOptions.icon = new L.Icon(markerOptions.icon);
+function setMarkers(markers: MarkerData[]): void {
+  markers.forEach(({ id, latLng, markerOptions, popupText }, index) => {
+    // Reconstruct icon from iconOptions
+    markerOptions.icon = new L.Icon(markerOptions.iconOptions);
     let marker = L.marker(latLng, markerOptions);
 
     marker.bindPopup(popupText);
@@ -83,14 +103,13 @@ function setMarkers(data): void {
   });
 }
 
-function removeMarker(data): void {
-  let id = data;
+function removeMarker(id: MarkerID): void {
   if (model.markers.hasOwnProperty(id)) {
     let marker = model.markers[id];
     model.leafletMap.removeLayer(marker);
   }
 }
 
-function setView({ center, zoom, options }): void {
+function setView({ center, zoom, options }: ViewData): void {
   model.leafletMap.setView(center, zoom, options);
 }

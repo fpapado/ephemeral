@@ -30,7 +30,7 @@ encodeLatLng ( lat, lng ) =
 {-| Reference: <http://leafletjs.com/reference.html#marker-options>
 -}
 type alias MarkerOptions =
-    { icon : IconOptions
+    { iconOptions : IconOptions
     , clickable : Bool
     , draggable : Bool
     , keyboard : Bool
@@ -46,7 +46,7 @@ type alias MarkerOptions =
 encodeMarkerOptions : MarkerOptions -> E.Value
 encodeMarkerOptions opts =
     E.object
-        [ ( "icon", encodeIconOptions opts.icon )
+        [ ( "iconOptions", encodeIconOptions opts.iconOptions )
         , ( "clickable", E.bool opts.clickable )
         , ( "draggable", E.bool opts.draggable )
         , ( "keyboard", E.bool opts.keyboard )
@@ -61,7 +61,7 @@ encodeMarkerOptions opts =
 
 defaultMarkerOptions : MarkerOptions
 defaultMarkerOptions =
-    { icon = defaultIconOptions
+    { iconOptions = defaultIconOptions
     , clickable = True
     , draggable = False
     , keyboard = True

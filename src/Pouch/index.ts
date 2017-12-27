@@ -129,7 +129,8 @@ function initModel(): Promise<Model> {
 
 // MSG
 type Msg<MsgType, DataType = {}> = { msgType: MsgType; data: DataType };
-export function Msg(type: string, data = {}) {
+
+export function Msg<A, B extends {}>(type: A, data: B): Msg<A, B> {
   return {
     msgType: type,
     data: data

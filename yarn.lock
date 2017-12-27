@@ -27,6 +27,16 @@
   version "0.0.30"
   resolved "https://registry.yarnpkg.com/@types/debug/-/debug-0.0.30.tgz#dc1e40f7af3b9c815013a7860e6252f6352a84df"
 
+"@types/geojson@*":
+  version "7946.0.0"
+  resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.0.tgz#e8bc74e8183d966455f82023f0c72e1072a952d0"
+
+"@types/leaflet@^1.2.3":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@types/leaflet/-/leaflet-1.2.3.tgz#b21da59fa9f446c8efedefbd343496ccea5933b4"
+  dependencies:
+    "@types/geojson" "*"
+
 "@types/pouchdb-adapter-fruitdown@*":
   version "6.1.2"
   resolved "https://registry.yarnpkg.com/@types/pouchdb-adapter-fruitdown/-/pouchdb-adapter-fruitdown-6.1.2.tgz#9cd8b8d40f8a50ab1f4ad60fa1646d7cbba4213f"
