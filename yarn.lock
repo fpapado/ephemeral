@@ -23,9 +23,19 @@
   dependencies:
     "@typed/core" "2.1.0"
 
+"@types/csv-stringify@^1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@types/csv-stringify/-/csv-stringify-1.4.1.tgz#3d79d9391576f38bb981b90a745e1473f8b4d211"
+  dependencies:
+    "@types/node" "*"
+
 "@types/debug@*":
   version "0.0.30"
   resolved "https://registry.yarnpkg.com/@types/debug/-/debug-0.0.30.tgz#dc1e40f7af3b9c815013a7860e6252f6352a84df"
+
+"@types/file-saver@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@types/file-saver/-/file-saver-1.3.0.tgz#0ef213077e704fc3f4e7a86cfd31c9de4f4f47a7"
 
 "@types/geojson@*":
   version "7946.0.0"
@@ -36,6 +46,10 @@
   resolved "https://registry.yarnpkg.com/@types/leaflet/-/leaflet-1.2.3.tgz#b21da59fa9f446c8efedefbd343496ccea5933b4"
   dependencies:
     "@types/geojson" "*"
+
+"@types/node@*":
+  version "8.5.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.5.2.tgz#83b8103fa9a2c2e83d78f701a9aa7c9539739aa5"
 
 "@types/pouchdb-adapter-fruitdown@*":
   version "6.1.2"

@@ -2,8 +2,13 @@ import { saveAs } from 'file-saver';
 import stringify from 'csv-stringify';
 import 'whatwg-fetch';
 
-export function exportCardsCSV(cards) {
-  cardsToCsv(cards, (err, csv) => {
+interface Card {
+  content: string;
+  translation: string;
+}
+
+export function exportCardsCSV(cards: Card[]) {
+  cardsToCsv(cards, (err: any, csv: any) => {
     if (err) {
       console.warn('Error converting to CSV', err);
     } else {
@@ -13,7 +18,7 @@ export function exportCardsCSV(cards) {
   });
 }
 
-export function exportCardsAnki(cards) {
+export function exportCardsAnki(cards: Card[]) {
   getAnkiPkg(cards)
     .then(res => {
       return res.blob();
@@ -27,7 +32,7 @@ export function exportCardsAnki(cards) {
     });
 }
 
-function cardsToCsv(cards, cb) {
+function cardsToCsv(cards: Card[], cb: any) {
   let cardEntries = cards.map(({ content, translation }) => {
     return { content, translation };
   });
@@ -35,7 +40,7 @@ function cardsToCsv(cards, cb) {
   return stringify(cardEntries, { header: true }, cb);
 }
 
-function getAnkiPkg(cards) {
+function getAnkiPkg(cards: Card[]) {
   let cardEntries = cards.map(({ content, translation }) => {
     return { front: content, back: translation };
   });
