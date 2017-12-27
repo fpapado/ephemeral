@@ -19,7 +19,7 @@ declare module 'config' {
     name: string;
     environment: string;
     couchUrl: string;
-    dbName?: string;
+    dbName: string;
   };
 
   export const config: Config;
@@ -38,17 +38,14 @@ declare module 'config' {
 
 declare namespace PouchDB {
   namespace Authentication {
-
     interface UserContext {
       name: string;
       roles?: string[];
     }
 
-    interface User extends UserContext {
-    }
+    interface User extends UserContext {}
 
-    interface LoginResponse extends Core.BasicResponse, UserContext {
-    }
+    interface LoginResponse extends Core.BasicResponse, UserContext {}
 
     interface SessionResponse extends Core.BasicResponse {
       info: {
@@ -70,15 +67,24 @@ declare namespace PouchDB {
      * Log in an existing user.
      * Throws an error if the user doesn't exist yet, the password is wrong, the HTTP server is unreachable, or a meteor struck your computer.
      */
-    logIn(username: string, password: string,
-          callback: Core.Callback<Authentication.LoginResponse>): void;
+    logIn(
+      username: string,
+      password: string,
+      callback: Core.Callback<Authentication.LoginResponse>
+    ): void;
 
-    logIn(username: string, password: string,
-          options: Core.Options,
-          callback: Core.Callback<Authentication.LoginResponse>): void;
+    logIn(
+      username: string,
+      password: string,
+      options: Core.Options,
+      callback: Core.Callback<Authentication.LoginResponse>
+    ): void;
 
-    logIn(username: string, password: string,
-          options?: Core.Options): Promise<Authentication.LoginResponse>;
+    logIn(
+      username: string,
+      password: string,
+      options?: Core.Options
+    ): Promise<Authentication.LoginResponse>;
 
     /**
      * Logs out whichever user is currently logged in.
@@ -101,102 +107,158 @@ declare namespace PouchDB {
      * Throws an error if the user already exists or if the username is invalid, or if some network error occurred.
      * CouchDB has some limitations on user names (e.g. they cannot contain the character `:`).
      */
-    signUp(username: string, password: string,
-           callback: Core.Callback<Core.Response>): void;
+    signUp(
+      username: string,
+      password: string,
+      callback: Core.Callback<Core.Response>
+    ): void;
 
-    signUp(username: string, password: string,
-           options: Authentication.PutUserOptions,
-           callback: Core.Callback<Core.Response>): void;
+    signUp(
+      username: string,
+      password: string,
+      options: Authentication.PutUserOptions,
+      callback: Core.Callback<Core.Response>
+    ): void;
 
-    signUp(username: string, password: string,
-           options?: Authentication.PutUserOptions): Promise<Core.Response>;
+    signUp(
+      username: string,
+      password: string,
+      options?: Authentication.PutUserOptions
+    ): Promise<Core.Response>;
 
     /**
      * Returns the user document associated with a username.
      * (CouchDB, in a pleasing show of consistency, stores users as JSON documents in the special `_users` database.)
      * This is the primary way to get metadata about a user.
      */
-    getUser(username: string,
-            callback: Core.Callback<Core.Document<Content & Authentication.User> & Core.GetMeta>): void;
+    getUser(
+      username: string,
+      callback: Core.Callback<
+        Core.Document<Content & Authentication.User> & Core.GetMeta
+      >
+    ): void;
 
-    getUser(username: string,
-            options: PouchDB.Core.Options,
-            callback: Core.Callback<Core.Document<Content & Authentication.User> & Core.GetMeta>): void;
+    getUser(
+      username: string,
+      options: PouchDB.Core.Options,
+      callback: Core.Callback<
+        Core.Document<Content & Authentication.User> & Core.GetMeta
+      >
+    ): void;
 
-    getUser(username: string,
-            options?: PouchDB.Core.Options): Promise<Core.Document<Content & Authentication.User> & Core.GetMeta>;
+    getUser(
+      username: string,
+      options?: PouchDB.Core.Options
+    ): Promise<Core.Document<Content & Authentication.User> & Core.GetMeta>;
 
     /**
      * Update the metadata of a user.
      */
-    putUser(username: string,
-            callback: Core.Callback<Core.Response>): void;
+    putUser(username: string, callback: Core.Callback<Core.Response>): void;
 
-    putUser(username: string, options: Authentication.PutUserOptions,
-            callback: Core.Callback<Core.Response>): void;
+    putUser(
+      username: string,
+      options: Authentication.PutUserOptions,
+      callback: Core.Callback<Core.Response>
+    ): void;
 
-    putUser(username: string, options?: Authentication.PutUserOptions): Promise<Core.Response>;
+    putUser(
+      username: string,
+      options?: Authentication.PutUserOptions
+    ): Promise<Core.Response>;
 
     /**
      * Delete a user.
      */
-    deleteUser(username: string,
-               callback: Core.Callback<Core.Response>): void;
+    deleteUser(username: string, callback: Core.Callback<Core.Response>): void;
 
-    deleteUser(username: string,
-               options: Core.Options,
-               callback: Core.Callback<Core.Response>): void;
+    deleteUser(
+      username: string,
+      options: Core.Options,
+      callback: Core.Callback<Core.Response>
+    ): void;
 
-    deleteUser(username: string,
-               options?: Core.Options): Promise<Core.Response>;
+    deleteUser(
+      username: string,
+      options?: Core.Options
+    ): Promise<Core.Response>;
 
     /**
      * Set new `password` for user `username`.
      */
-    changePassword(username: string, password: string,
-                   callback: Core.Callback<Core.Response>): void;
+    changePassword(
+      username: string,
+      password: string,
+      callback: Core.Callback<Core.Response>
+    ): void;
 
-    changePassword(username: string, password: string,
-                   options: Core.Options,
-                   callback: Core.Callback<Core.Response>): void;
+    changePassword(
+      username: string,
+      password: string,
+      options: Core.Options,
+      callback: Core.Callback<Core.Response>
+    ): void;
 
-    changePassword(username: string, password: string,
-                   options?: Core.Options): Promise<Core.Response>;
+    changePassword(
+      username: string,
+      password: string,
+      options?: Core.Options
+    ): Promise<Core.Response>;
 
     /**
      * Renames `oldUsername` to `newUsername`.
      */
-    changeUsername(oldUsername: string, newUsername: string,
-                   callback: Core.Callback<Core.Response>): void;
+    changeUsername(
+      oldUsername: string,
+      newUsername: string,
+      callback: Core.Callback<Core.Response>
+    ): void;
 
-    changeUsername(oldUsername: string, newUsername: string,
-                   options: Core.Options,
-                   callback: Core.Callback<Core.Response>): void;
+    changeUsername(
+      oldUsername: string,
+      newUsername: string,
+      options: Core.Options,
+      callback: Core.Callback<Core.Response>
+    ): void;
 
-    changeUsername(oldUsername: string, newUsername: string,
-                   options?: Core.Options): Promise<Core.Response>;
+    changeUsername(
+      oldUsername: string,
+      newUsername: string,
+      options?: Core.Options
+    ): Promise<Core.Response>;
 
     /**
      * Sign up a new admin.
      */
-    signUpAdmin(username: string, password: string,
-                callback: Core.Callback<string>): void;
+    signUpAdmin(
+      username: string,
+      password: string,
+      callback: Core.Callback<string>
+    ): void;
 
-    signUpAdmin(username: string, password: string,
-                options: Authentication.PutUserOptions,
-                callback: Core.Callback<string>): void;
+    signUpAdmin(
+      username: string,
+      password: string,
+      options: Authentication.PutUserOptions,
+      callback: Core.Callback<string>
+    ): void;
 
-    signUpAdmin(username: string, password: string,
-                options?: Authentication.PutUserOptions): Promise<string>;
+    signUpAdmin(
+      username: string,
+      password: string,
+      options?: Authentication.PutUserOptions
+    ): Promise<string>;
 
     /**
      * Delete an admin.
      */
-    deleteAdmin(username: string,
-                callback: Core.Callback<string>): void;
+    deleteAdmin(username: string, callback: Core.Callback<string>): void;
 
-    deleteAdmin(username: string, options: Core.Options,
-                callback: Core.Callback<string>): void;
+    deleteAdmin(
+      username: string,
+      options: Core.Options,
+      callback: Core.Callback<string>
+    ): void;
 
     deleteAdmin(username: string, options?: Core.Options): Promise<string>;
   }

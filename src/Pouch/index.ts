@@ -4,25 +4,40 @@ import PouchAuth from 'pouchdb-authentication';
 import { app } from 'ephemeral';
 import { config } from 'config';
 import { string2Hex } from 'ephemeral/js/util';
+import { Either, unpack } from '@typed/either';
+import {
+  NewDocument,
+  Document,
+  ExistingDocument,
+  DocumentID,
+  LoginUser
+} from 'ephemeral/Pouch/types';
 
 /* Module responsible for PouchDB init and access */
 
+// TYPES
+// NOTE: Need to add this s.t TS typechecks correctly
+// and allows for PouchDB devtools integration
+declare global {
+  interface Window {
+    PouchDB: typeof PouchDB;
+  }
+}
+
 // MODEL
+// NOTE: 'Model' is a misnomer given the rampant mutation happening inside
+// the database, but I will take the symmetry over strict semantics.
 interface Model {
-  localDB?: PouchDB.Database;
-  remoteDB?: PouchDB.Database;
+  localDB: PouchDB.Database;
+  remoteDB: PouchDB.Database;
   syncHandler?: PouchDB.Replication.Sync<{}>;
 }
 
-let model: Model = {
-  localDB: undefined,
-  remoteDB: undefined,
-  syncHandler: undefined
-};
+let model: Model;
 
 // INIT
 export function initPouch(msg$: Stream<PouchMsg>): void {
-  // Set model, launch subscriptions
+  /* Set model, launch subscriptions */
   initModel().then(m => {
     model = m;
 
@@ -35,14 +50,14 @@ export function initPouch(msg$: Stream<PouchMsg>): void {
 
     // DB change subscriptions
     model.localDB
-      .changes({ live: true, include_docs: true })
+      .changes({ live: true, include_docs: true, since: 'now' })
       .on('change', info => {
         console.log('Something changed!', info);
         const { doc } = info;
 
         // Send all updates to the elm side, as appropriate
         // TODO: might want to batch things into one big updatedEntries
-        if (doc._deleted) {
+        if (doc && doc._deleted) {
           console.log('Deleted doc');
           app.ports.deletedEntry.send({ _id: doc._id });
         } else {
@@ -64,8 +79,8 @@ export function initPouch(msg$: Stream<PouchMsg>): void {
 }
 
 function initModel(): Promise<Model> {
-  //@ts-ignore
-  window['PouchDB'] = PouchDB; // needed for dev tools
+  // PouchDB Devtools integration
+  window.PouchDB = PouchDB;
 
   // Set up PouchDB
   PouchDB.plugin(PouchAuth);
@@ -80,62 +95,41 @@ function initModel(): Promise<Model> {
   let tempRemote = new PouchDB(url, { skip_setup: true });
 
   return getUserIfLoggedIn(tempRemote).then(res => {
-    let remoteDB, syncHandler;
-    if (res.ok) {
-      console.info('User is logged in, will sync.');
+    let remoteDB: PouchDB.Database<{}>,
+      syncHandler: PouchDB.Replication.Sync<{}>;
 
-      // Configure remote as appropriate for each environment
-      if (config.environment == 'production') {
-        remoteDB = initRemoteDB(config.couchUrl, {
-          method: 'dbPerUser',
-          username: res.name
-        });
-      } else {
-        remoteDB = initRemoteDB(config.couchUrl, {
-          method: 'direct',
-          dbName: config.dbName
-        });
-      }
-      // Set the sync handler and start sync
-      syncHandler = syncRemote(localDB, remoteDB);
-      return { localDB, remoteDB, syncHandler };
-    } else {
-      console.warn(res.reason, 'Will not sync.');
-      // TODO: Maybe?
-      return { localDB, remoteDB };
-    }
+    return unpack(
+      function(err) {
+        console.warn(err, 'Will not sync.');
+        return { localDB, remoteDB };
+      },
+      function(username) {
+        console.info('User is logged in, will sync.');
+
+        // Configure remote as appropriate for each environment
+        if (config.environment == 'production') {
+          remoteDB = initRemoteDB(config.couchUrl, {
+            method: 'dbPerUser',
+            username
+          });
+        } else {
+          remoteDB = initRemoteDB(config.couchUrl, {
+            method: 'direct',
+            dbName: config.dbName
+          });
+        }
+        // Set the sync handler and start sync
+        syncHandler = syncRemote(localDB, remoteDB);
+        return { localDB, remoteDB, syncHandler };
+      },
+      res
+    );
   });
 }
 
-type DBInitParams =
-  | { method: 'direct'; dbName: string }
-  | { method: 'dbPerUser'; username: string };
-
-function initRemoteDB(
-  couchUrl: string,
-  initParams: DBInitParams
-): PouchDB.Database {
-  let dbName;
-
-  /* Using db-per-user in production, so we must figure out the user's db.
-    The couch-per-user plugin makes a DB of the form:
-      userdb-{hex username}
-  */
-  if (initParams.method === 'dbPerUser') {
-    dbName = 'userdb-' + string2Hex(initParams.username);
-  } else {
-    dbName = initParams.dbName;
-  }
-
-  let url = couchUrl + dbName;
-  let remoteDB = new PouchDB(url, { skip_setup: true });
-
-  return remoteDB;
-}
-
 // MSG
-type Msg<MsgType, DataType = {}> = { msgType: MsgType; data?: DataType };
-export function Msg(type, data = {}) {
+type Msg<MsgType, DataType = {}> = { msgType: MsgType; data: DataType };
+export function Msg(type: string, data = {}) {
   return {
     msgType: type,
     data: data
@@ -143,12 +137,12 @@ export function Msg(type, data = {}) {
 }
 
 export type PouchMsg =
-  | Msg<'LoginUser', any> // User
+  | Msg<'LoginUser', LoginUser> // User
   | Msg<'LogoutUser'>
   | Msg<'CheckAuth'>
-  | Msg<'UpdateEntry', any> // Entry
-  | Msg<'SaveEntry', any> // Entry
-  | Msg<'DeleteEntry', number> // EntryId
+  | Msg<'UpdateEntry', ExistingDocument<{}>> // Entry
+  | Msg<'SaveEntry', NewDocument<{}>> // Entry
+  | Msg<'DeleteEntry', DocumentID> // EntryId
   | Msg<'ListEntries'>;
 
 // UPDATE
@@ -181,26 +175,27 @@ function update(msg: PouchMsg) {
 }
 
 // Update functions
-function loginUser(remoteDB, user) {
+function loginUser(remoteDB: PouchDB.Database<{}>, user: LoginUser) {
   console.log('Got user to log in', user.username);
 
   let { username, password } = user;
 
-  remoteDB
-    .login(username, password)
-    .then(res => {
-      console.log('Logged in!', res);
+  remoteDB.logIn(username, password).then(res => {
+    console.log('Logged in!', res);
 
-      if (res.ok === true) {
-        let { username } = res;
-        app.ports.logIn.send({ username: username });
-        return username;
-      }
-    })
-    .then(startSync(username));
+    if (res.ok === true) {
+      let { name } = res;
+      app.ports.logIn.send({ username: name });
+      startSync(name);
+      return name;
+    } else {
+      // TODO: send to Elm / show toast
+      console.error('Something went wrong when logging in');
+    }
+  });
 }
 
-function startSync(username) {
+function startSync(username: string) {
   // TODO: set model
   // Start replication, assign to global remote and handler
   let remoteDB;
@@ -229,7 +224,7 @@ function startSync(username) {
   }
 }
 
-function logOut(remoteDB) {
+function logOut(remoteDB: PouchDB.Database<{}>) {
   console.log('Got message to log out');
 
   // Cancel sync before logging out, otherwise we don't have auth
@@ -237,19 +232,18 @@ function logOut(remoteDB) {
   // TODO: decide where syncHandler should live
   cancelSync(model.syncHandler);
 
-  remoteDB
-    .logout()
-    .then(res => {
-      // res: {"ok": true}
-      console.log('Logging user out');
+  remoteDB.logOut().then(res => {
+    // res: {"ok": true}
+    console.log('Logging user out');
+    if (res.ok) {
       app.ports.logOut.send(res);
-    })
-    .catch(err => {
-      console.error('Something went wrong logging user out', err);
-    });
+    } else {
+      console.error('Something went wrong logging user out');
+    }
+  });
 }
 
-function checkAuth(remoteDB) {
+function checkAuth(remoteDB: PouchDB.Database<{}>) {
   console.log('Checking Auth');
 
   remoteDB
@@ -272,7 +266,7 @@ function checkAuth(remoteDB) {
     });
 }
 
-function updateEntry(db, data) {
+function updateEntry(db: PouchDB.Database<{}>, data: ExistingDocument<{}>) {
   console.log('Got entry to update', data);
 
   let { _id } = data;
@@ -301,7 +295,7 @@ function updateEntry(db, data) {
     });
 }
 
-function saveEntry(db, data) {
+function saveEntry(db: PouchDB.Database<{}>, data: NewDocument<{}>) {
   console.log('Got entry to create', data);
   let meta = { type: 'entry' };
   let doc = Object.assign(data, meta);
@@ -320,7 +314,7 @@ function saveEntry(db, data) {
     });
 }
 
-function deleteEntry(db: PouchDB.Database, id) {
+function deleteEntry(db: PouchDB.Database, id: DocumentID) {
   console.log('Got entry to delete', id);
 
   db
@@ -338,7 +332,7 @@ function deleteEntry(db: PouchDB.Database, id) {
     });
 }
 
-function listEntries(db) {
+function listEntries(db: PouchDB.Database<{}>) {
   console.log('Will list entries');
   let docs = db.allDocs({ include_docs: true }).then(docs => {
     let entries = docs.rows.map(row => row.doc);
@@ -349,18 +343,22 @@ function listEntries(db) {
 }
 
 // Utils
-function getUserIfLoggedIn(remoteDB) {
+type UserResult = Either<UserError, string>;
+type UserError = 'NOT_LOGGED_IN' | 'ERROR_CONNECTING';
+function getUserIfLoggedIn(
+  remoteDB: PouchDB.Database<{}>
+): Promise<UserResult> {
   let loggedIn = remoteDB
     .getSession()
     .then(res => {
       if (!res.userCtx.name) {
-        return { ok: false, reason: 'User is not logged in' };
+        return Either.left('NOT_LOGGED_IN' as 'NOT_LOGGED_IN');
       } else {
-        return { ok: true, name: res.userCtx.name };
+        return Either.of(res.userCtx.name);
       }
     })
     .catch(err => {
-      return { ok: false, reason: 'Error in establishing connection' };
+      return Either.left('ERROR_CONNECTING' as 'ERROR_CONNECTING');
     });
   return loggedIn;
 }
@@ -378,8 +376,37 @@ function syncRemote(
   return syncHandler;
 }
 
-function cancelSync(handler) {
-  // TODO: handle errors (lol)
-  handler.cancel();
+function cancelSync(handler?: PouchDB.Replication.Sync<{}>) {
+  if (!!handler) {
+    // TODO: handle errors (lol)
+    handler.cancel();
+  }
   return true;
+}
+
+// Utils
+type DBInitParams =
+  | { method: 'direct'; dbName: string }
+  | { method: 'dbPerUser'; username: string };
+
+function initRemoteDB(
+  couchUrl: string,
+  initParams: DBInitParams
+): PouchDB.Database {
+  let dbName;
+
+  /* Using db-per-user in production, so we must figure out the user's db.
+    The couch-per-user plugin makes a DB of the form:
+      userdb-{hex username}
+  */
+  if (initParams.method === 'dbPerUser') {
+    dbName = 'userdb-' + string2Hex(initParams.username);
+  } else {
+    dbName = initParams.dbName;
+  }
+
+  let url = couchUrl + dbName;
+  let remoteDB = new PouchDB(url, { skip_setup: true });
+
+  return remoteDB;
 }

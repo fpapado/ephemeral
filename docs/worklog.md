@@ -1,4 +1,9 @@
 # Next
+- [ ] Port merge for PouchDB
+- [ ] Move some of the Home stuff to a Pouch module
+- [ ] Complete types
+
+# Other
 More Navigation / routing stuff
 - [ ] Hide map where not needed (load dynamically, even?)
 - [ ] Investigate Save/Commit and Geolocation

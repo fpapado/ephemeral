@@ -1,10 +1,15 @@
 import xs, { Stream } from 'xstream';
 import { initLeaflet, LeafletMsg } from 'ephemeral/Leaflet/index';
 import { initPouch, PouchMsg, Msg } from 'ephemeral/Pouch/index';
-
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import './assets/css/styles.scss';
-
+import {
+  NewDocument,
+  Document,
+  ExistingDocument,
+  DocumentID,
+  LoginUser
+} from 'ephemeral/Pouch/types';
 import { Main } from 'ephemeral/elm';
 
 // Embed Elm
@@ -33,12 +38,11 @@ OfflinePluginRuntime.install({
 });
 
 // -- Port Subscriptions --
-// Initialise Leaflet module with
-// a stream of Leaflet-related Messages from Elm
+// Initialise Leaflet module with a stream of Leaflet-related Messages from Elm
 initLeaflet(
   xs.create({
     start: function(listener) {
-      app.ports.toLeaflet.subscribe(msg => {
+      app.ports.toLeaflet.subscribe((msg: LeafletMsg) => {
         listener.next(msg);
       });
     },
@@ -48,21 +52,24 @@ initLeaflet(
   })
 );
 
-// Initialise Pouch module with
-// a stream of Pouch-related Messages from Elm
+// Initialise Pouch module with a stream of Pouch-related Messages from Elm
 // Currently an aggregagtion of ports, pending migration
 initPouch(
   xs.createWithMemory({
     start: function(listener) {
-      app.ports.sendLogin.subscribe(user =>
+      app.ports.sendLogin.subscribe((user: LoginUser) =>
         listener.next(Msg('LoginUser', user))
       );
-      app.ports.sendLogout.subscribe(_ => listener.next(Msg('LogoutUser')));
-      app.ports.checkAuthState.subscribe(_ => listener.next(Msg('CheckAuth')));
-      app.ports.updateEntry.subscribe(entry =>
+      app.ports.sendLogout.subscribe((_: any) =>
+        listener.next(Msg('LogoutUser'))
+      );
+      app.ports.checkAuthState.subscribe((_: any) =>
+        listener.next(Msg('CheckAuth'))
+      );
+      app.ports.updateEntry.subscribe((entry: ExistingDocument) =>
         listener.next(Msg('UpdateEntry', entry))
       );
-      app.ports.saveEntry.subscribe(entry =>
+      app.ports.saveEntry.subscribe((entry: NewDocument) =>
         listener.next(Msg('SaveEntry', entry))
       );
       app.ports.deleteEntry.subscribe(id =>
