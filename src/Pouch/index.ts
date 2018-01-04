@@ -3,7 +3,7 @@ import PouchDB from 'pouchdb-browser';
 import PouchAuth from 'pouchdb-authentication';
 import { app } from 'ephemeral';
 import { config } from 'config';
-import { string2Hex } from 'ephemeral/js/util';
+import { string2Hex } from '../util/util';
 import { Either, unpack } from '@typed/either';
 import {
   NewDocument,
@@ -16,7 +16,7 @@ import {
   LoginUser,
   isEntry
 } from './types';
-import { Card } from '../js/export/types';
+import { Card } from '../export/types';
 
 /* Module responsible for PouchDB init and access */
 
@@ -355,7 +355,7 @@ function listEntries(db: PouchDB.Database<{}>) {
 }
 
 function exportCards(db: PouchDB.Database<Entry | {}>, method: ExportMethod) {
-  import(/* webpackChunkName: "export" */ '../js/export/export').then(
+  import(/* webpackChunkName: "export" */ '../export/export').then(
     ({ exportCardsCSV, exportCardsAnki }) => {
       db.allDocs({ include_docs: true }).then(docs => {
         let entries = docs.rows
