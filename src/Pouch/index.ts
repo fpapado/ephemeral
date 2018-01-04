@@ -8,10 +8,15 @@ import { Either, unpack } from '@typed/either';
 import {
   NewDocument,
   Document,
+  EntryContent,
+  Entry,
   ExistingDocument,
   DocumentID,
-  LoginUser
-} from 'ephemeral/Pouch/types';
+  ExportMethod,
+  LoginUser,
+  isEntry
+} from './types';
+import { Card } from '../js/export/types';
 
 /* Module responsible for PouchDB init and access */
 
@@ -27,10 +32,12 @@ declare global {
 // MODEL
 // NOTE: 'Model' is a misnomer given the rampant mutation happening inside
 // the database, but I will take the symmetry over strict semantics.
+// TODO: if there are other possible types of docs in DB, add to types.ts
+// and create a union to hold them
 interface Model {
   localDB: PouchDB.Database;
   remoteDB: PouchDB.Database;
-  syncHandler?: PouchDB.Replication.Sync<{}>;
+  syncHandler?: PouchDB.Replication.Sync<Entry>;
 }
 
 let model: Model;
@@ -142,9 +149,10 @@ export type PouchMsg =
   | Msg<'LogoutUser'>
   | Msg<'CheckAuth'>
   | Msg<'UpdateEntry', ExistingDocument<{}>> // Entry
-  | Msg<'SaveEntry', NewDocument<{}>> // Entry
+  | Msg<'SaveEntry', NewDocument<EntryContent>> // Entry
   | Msg<'DeleteEntry', DocumentID> // EntryId
-  | Msg<'ListEntries'>;
+  | Msg<'ListEntries'>
+  | Msg<'ExportCards', ExportMethod>;
 
 // UPDATE
 function update(msg: PouchMsg) {
@@ -170,6 +178,8 @@ function update(msg: PouchMsg) {
     case 'ListEntries':
       listEntries(model.localDB);
       break;
+    case 'ExportCards':
+      exportCards(model.localDB, msg.data);
     default:
       console.warn('Leaflet Port command not recognised');
   }
@@ -296,10 +306,11 @@ function updateEntry(db: PouchDB.Database<{}>, data: ExistingDocument<{}>) {
     });
 }
 
-function saveEntry(db: PouchDB.Database<{}>, data: NewDocument<{}>) {
+function saveEntry(db: PouchDB.Database<{}>, data: NewDocument<EntryContent>) {
   console.log('Got entry to create', data);
-  let meta = { type: 'entry' };
-  let doc = Object.assign(data, meta);
+  // TODO: play with this
+  let meta = { type: 'entry' as 'entry' };
+  let doc: Entry = Object.assign(data, meta);
 
   db
     .post(doc)
@@ -341,6 +352,23 @@ function listEntries(db: PouchDB.Database<{}>) {
 
     app.ports.getEntries.send(entries);
   });
+}
+
+function exportCards(db: PouchDB.Database<Entry | {}>, method: ExportMethod) {
+  import(/* webpackChunkName: "export" */ '../js/export/export').then(
+    ({ exportCardsCSV, exportCardsAnki }) => {
+      db.allDocs({ include_docs: true }).then(docs => {
+        let entries = docs.rows
+          .map(row => row.doc)
+          .filter(row => row !== undefined && isEntry(row)) as Card[]; // assertion required to convince of undefined removal
+        if (method === 'CSV') {
+          exportCardsCSV(entries);
+        } else if (method === 'ANKI') {
+          exportCardsAnki(entries);
+        }
+      });
+    }
+  );
 }
 
 // Utils

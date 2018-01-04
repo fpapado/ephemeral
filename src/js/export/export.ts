@@ -1,11 +1,7 @@
 import { saveAs } from 'file-saver';
 import stringify from 'csv-stringify';
 import 'whatwg-fetch';
-
-interface Card {
-  content: string;
-  translation: string;
-}
+import { Card } from './types';
 
 export function exportCardsCSV(cards: Card[]) {
   cardsToCsv(cards, (err: any, csv: any) => {
@@ -33,6 +29,7 @@ export function exportCardsAnki(cards: Card[]) {
 }
 
 function cardsToCsv(cards: Card[], cb: any) {
+  // "Pick" content, translation from cards
   let cardEntries = cards.map(({ content, translation }) => {
     return { content, translation };
   });
