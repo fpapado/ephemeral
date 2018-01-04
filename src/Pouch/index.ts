@@ -370,7 +370,7 @@ function listEntries(db: EphemeralDB) {
 }
 
 function exportCards(db: EphemeralDB, method: ExportMethod) {
-  import(/* webpackChunkName: "export" */ '../export/export').then(
+  import(/* webpackChunkName: "export-chunk" */ '../export/export').then(
     ({ exportCardsCSV, exportCardsAnki }) => {
       db.allDocs({ include_docs: true }).then(docs => {
         let entries = docs.rows
