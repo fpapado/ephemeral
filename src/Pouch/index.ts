@@ -48,6 +48,7 @@ let model: Model;
 export function initPouch(msg$: Stream<PouchMsg>): void {
   /* Set model, launch subscriptions */
   initModel().then(m => {
+    console.log(m);
     model = m;
 
     // Command subscriptions
@@ -109,7 +110,7 @@ function initModel(): Promise<Model> {
     return unpack(
       function(err) {
         console.warn(err, 'Will not sync.');
-        return { localDB, remoteDB };
+        return { localDB, remoteDB: tempRemote };
       },
       function(username) {
         console.info('User is logged in, will sync.');
@@ -159,7 +160,15 @@ export type PouchMsg =
 function update(msg: PouchMsg) {
   switch (msg.msgType) {
     case 'LoginUser':
-      loginUser(model.remoteDB, msg.data);
+      loginUser(model.remoteDB, msg.data).then(name => {
+        // TODO: send error if failed
+        if (name) {
+          let newModel = startSync(name);
+          // TODO: send error if failed
+          // Update references to remoteDB and syncHandler
+          model = { ...model, ...newModel };
+        }
+      });
       break;
     case 'LogoutUser':
       logOut(model.remoteDB);
@@ -181,8 +190,9 @@ function update(msg: PouchMsg) {
       break;
     case 'ExportCards':
       exportCards(model.localDB, msg.data);
+      break;
     default:
-      console.warn('Leaflet Port command not recognised');
+      console.warn('Pouch command not recognised');
   }
 }
 
@@ -192,13 +202,14 @@ function loginUser(remoteDB: EphemeralDB, user: LoginUser) {
 
   let { username, password } = user;
 
-  remoteDB.logIn(username, password).then(res => {
+  return remoteDB.logIn(username, password).then(res => {
     console.log('Logged in!', res);
 
     if (res.ok === true) {
       let { name } = res;
+
+      // Report that we logged in successfully
       app.ports.logIn.send({ username: name });
-      startSync(name);
       return name;
     } else {
       // TODO: send to Elm / show toast
@@ -208,9 +219,9 @@ function loginUser(remoteDB: EphemeralDB, user: LoginUser) {
 }
 
 function startSync(username: string) {
-  // TODO: set model
-  // Start replication, assign to global remote and handler
-  let remoteDB;
+  let remoteDB: EphemeralDB, syncHandler: PouchDB.Replication.Sync<DBDoc>;
+
+  // Pick the correct remote database
   if (config.environment == 'production') {
     remoteDB = initRemoteDB(config.couchUrl, {
       method: 'dbPerUser',
@@ -224,8 +235,9 @@ function startSync(username: string) {
   }
 
   try {
-    // Return a sync handler
-    return syncRemote(model.localDB, remoteDB);
+    // Return a sync handler and the configured remoteDB
+    syncHandler = syncRemote(model.localDB, remoteDB);
+    return { remoteDB, syncHandler };
   } catch (err) {
     // TODO: send error over port
     if (err.name === 'unauthorized') {
