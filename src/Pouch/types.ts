@@ -1,3 +1,4 @@
+// Entry
 export interface EntryContent {
   // TODO: play with this
   content: string;
@@ -12,6 +13,14 @@ export function isEntry(doc: {}): doc is Entry {
   return (<Entry>doc).type === 'entry';
 }
 
+// Database Contents
+// Add things to the union as appropriate
+// Leaving {} is desirable, in case we want some arbitrary data and
+// we already check isEntry() when needed
+export type DBDoc = Entry | {};
+export type EphemeralDB = PouchDB.Database<DBDoc>;
+
+// User Login types
 export interface LoginUser {
   username: string;
   password: string;

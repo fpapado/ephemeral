@@ -1,7 +1,9 @@
 # Next
 - [ ] Port merge for PouchDB
 - [ ] Move some of the Home stuff to a Pouch module
-- [ ] Complete types
+- [X] Complete types
+
+- [ ] Type PouchDB Documents (e.g. PouchDB.Database<Entry | ...>
 
 # Other
 More Navigation / routing stuff

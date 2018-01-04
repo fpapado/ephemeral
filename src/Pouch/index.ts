@@ -12,6 +12,8 @@ import {
   Entry,
   ExistingDocument,
   DocumentID,
+  EphemeralDB,
+  DBDoc,
   ExportMethod,
   LoginUser,
   isEntry
@@ -35,9 +37,9 @@ declare global {
 // TODO: if there are other possible types of docs in DB, add to types.ts
 // and create a union to hold them
 interface Model {
-  localDB: PouchDB.Database;
-  remoteDB: PouchDB.Database;
-  syncHandler?: PouchDB.Replication.Sync<Entry>;
+  localDB: EphemeralDB;
+  remoteDB: EphemeralDB;
+  syncHandler?: PouchDB.Replication.Sync<DBDoc>;
 }
 
 let model: Model;
@@ -102,8 +104,7 @@ function initModel(): Promise<Model> {
   let tempRemote = new PouchDB(url, { skip_setup: true });
 
   return getUserIfLoggedIn(tempRemote).then(res => {
-    let remoteDB: PouchDB.Database<{}>,
-      syncHandler: PouchDB.Replication.Sync<{}>;
+    let remoteDB: EphemeralDB, syncHandler: PouchDB.Replication.Sync<DBDoc>;
 
     return unpack(
       function(err) {
@@ -186,7 +187,7 @@ function update(msg: PouchMsg) {
 }
 
 // Update functions
-function loginUser(remoteDB: PouchDB.Database<{}>, user: LoginUser) {
+function loginUser(remoteDB: EphemeralDB, user: LoginUser) {
   console.log('Got user to log in', user.username);
 
   let { username, password } = user;
@@ -235,7 +236,7 @@ function startSync(username: string) {
   }
 }
 
-function logOut(remoteDB: PouchDB.Database<{}>) {
+function logOut(remoteDB: EphemeralDB) {
   console.log('Got message to log out');
 
   // Cancel sync before logging out, otherwise we don't have auth
@@ -254,7 +255,7 @@ function logOut(remoteDB: PouchDB.Database<{}>) {
   });
 }
 
-function checkAuth(remoteDB: PouchDB.Database<{}>) {
+function checkAuth(remoteDB: EphemeralDB) {
   console.log('Checking Auth');
 
   remoteDB
@@ -277,7 +278,7 @@ function checkAuth(remoteDB: PouchDB.Database<{}>) {
     });
 }
 
-function updateEntry(db: PouchDB.Database<{}>, data: ExistingDocument<{}>) {
+function updateEntry(db: EphemeralDB, data: ExistingDocument<{}>) {
   console.log('Got entry to update', data);
 
   let { _id } = data;
@@ -306,7 +307,7 @@ function updateEntry(db: PouchDB.Database<{}>, data: ExistingDocument<{}>) {
     });
 }
 
-function saveEntry(db: PouchDB.Database<{}>, data: NewDocument<EntryContent>) {
+function saveEntry(db: EphemeralDB, data: NewDocument<EntryContent>) {
   console.log('Got entry to create', data);
   // TODO: play with this
   let meta = { type: 'entry' as 'entry' };
@@ -326,7 +327,7 @@ function saveEntry(db: PouchDB.Database<{}>, data: NewDocument<EntryContent>) {
     });
 }
 
-function deleteEntry(db: PouchDB.Database, id: DocumentID) {
+function deleteEntry(db: EphemeralDB, id: DocumentID) {
   console.log('Got entry to delete', id);
 
   db
@@ -344,23 +345,25 @@ function deleteEntry(db: PouchDB.Database, id: DocumentID) {
     });
 }
 
-function listEntries(db: PouchDB.Database<{}>) {
+function listEntries(db: EphemeralDB) {
   console.log('Will list entries');
   let docs = db.allDocs({ include_docs: true }).then(docs => {
-    let entries = docs.rows.map(row => row.doc);
+    let entries = docs.rows
+      .map(row => row.doc)
+      .filter(doc => doc && isEntry(doc)) as Entry[];
     console.log('Listing entries', entries);
 
     app.ports.getEntries.send(entries);
   });
 }
 
-function exportCards(db: PouchDB.Database<Entry | {}>, method: ExportMethod) {
+function exportCards(db: EphemeralDB, method: ExportMethod) {
   import(/* webpackChunkName: "export" */ '../export/export').then(
     ({ exportCardsCSV, exportCardsAnki }) => {
       db.allDocs({ include_docs: true }).then(docs => {
         let entries = docs.rows
           .map(row => row.doc)
-          .filter(row => row !== undefined && isEntry(row)) as Card[]; // assertion required to convince of undefined removal
+          .filter(row => row !== undefined && isEntry(row)) as Entry[]; // assertion required to convince of undefined removal
         if (method === 'CSV') {
           exportCardsCSV(entries);
         } else if (method === 'ANKI') {
@@ -374,9 +377,7 @@ function exportCards(db: PouchDB.Database<Entry | {}>, method: ExportMethod) {
 // Utils
 type UserResult = Either<UserError, string>;
 type UserError = 'NOT_LOGGED_IN' | 'ERROR_CONNECTING';
-function getUserIfLoggedIn(
-  remoteDB: PouchDB.Database<{}>
-): Promise<UserResult> {
+function getUserIfLoggedIn(remoteDB: EphemeralDB): Promise<UserResult> {
   let loggedIn = remoteDB
     .getSession()
     .then(res => {
@@ -393,9 +394,9 @@ function getUserIfLoggedIn(
 }
 
 function syncRemote(
-  localDB: PouchDB.Database,
-  remoteDB: PouchDB.Database
-): PouchDB.Replication.Sync<{}> {
+  localDB: EphemeralDB,
+  remoteDB: EphemeralDB
+): PouchDB.Replication.Sync<DBDoc> {
   console.info('Starting sync');
 
   let syncHandler = localDB.sync(remoteDB, {
@@ -405,7 +406,7 @@ function syncRemote(
   return syncHandler;
 }
 
-function cancelSync(handler?: PouchDB.Replication.Sync<{}>) {
+function cancelSync(handler?: PouchDB.Replication.Sync<DBDoc>) {
   if (!!handler) {
     // TODO: handle errors (lol)
     handler.cancel();
@@ -418,10 +419,7 @@ type DBInitParams =
   | { method: 'direct'; dbName: string }
   | { method: 'dbPerUser'; username: string };
 
-function initRemoteDB(
-  couchUrl: string,
-  initParams: DBInitParams
-): PouchDB.Database {
+function initRemoteDB(couchUrl: string, initParams: DBInitParams): EphemeralDB {
   let dbName;
 
   /* Using db-per-user in production, so we must figure out the user's db.
