@@ -1,8 +1,8 @@
 # Next
-- Icons and navigation
-
+- [ ] Full screen map
 - [ ] Port merge for PouchDB
 - [ ] Move some of the Home stuff to a Pouch module
+- [ ] Use Pouch as source of truth, only remove / update items based on Pouch sub messages
 
 # Other
 More Navigation / routing stuff
@@ -179,6 +179,40 @@ More Navigation / routing stuff
 - [X] Leaflet integration
 - [ ] Set up pouchdb-server locally and automatically with dev account
 
+
+# Bundle Stuff
+- [ ] Remove console (there is a babel plugin for this)
+- [ ] Scope hoisting
+- [ ] Try babily?
+- [ ] Serve font async / non-blocking
+  - locally?
+  - currently import(..) in critical CSS blocks
+  - https://github.com/bramstein/fontfaceobserver
+  - https://www.filamentgroup.com/lab/font-events.html
+  - NOTE: Do this once fonts are settled
+
+- [ ] Cursive font fallback
+- [ ] lazy-load leaflet on shouldshowmap?
+- [ ] Remove console logs with babel loader transform?
+
+- [ ] New Penthouse
+
+# Probably not important
+- [ ] babel-polyfill and runtime?
+- [ ] Promise polyfill (or use lie, since pouchdb uses it)?
+- [ ] whatwg-fetch polyfill check
+- [ ] Update readme with new npm scripts
+- [ ] Caching considerations
+- [ ] Delayed loading spinner?
+
+- [X] SW script compression
+- [X] Add anki export to additional cache instead of main
+- [X] Webpack separate runtime
+- [X] Vendor bundle
+- [X] lazy-load anki stuff
+- [X] Compile separate modules and nomodules
+  - Tested, not much difference (I guess leaflet and Pouchdb-browser already compiled)
+    - [] Check later if we can recompile them
 
 # Moonshot
 - [ ] Have shared "channels" (db with group-write/group-red)
