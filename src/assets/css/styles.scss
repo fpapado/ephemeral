@@ -12,6 +12,11 @@
   }
 }
 
+// Based on the icons being 24px
+.h-nav {
+  height: 48px;
+}
+
 .logo {
   background-image: url("../logo.svg");
 }
@@ -324,5 +329,5 @@ a.close:hover {
 }
 
 .elm-overlay {
-  z-index: 2;
+  z-index: 999;
 }

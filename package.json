@@ -14,7 +14,7 @@
     "pouchdb-authentication": "^1.0.0",
     "pouchdb-browser": "^6.4.1",
     "promise-polyfill": "6.0.2",
-    "tachyons": "^4.7.4",
+    "tachyons": "^4.9.0",
     "whatwg-fetch": "^2.0.3",
     "xstream": "^11.0.0"
   },

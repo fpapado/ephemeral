@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Route exposing (Route)
 import Views.General exposing (avatar, epButton)
+import Views.Icons as Icons exposing (edit, list, logIn, logOut, settings)
 
 
 type ActivePage
@@ -30,11 +31,11 @@ frame user page content =
 
 viewMenu : ActivePage -> Maybe User -> Html msg
 viewMenu page user =
-    div [ class "fixed bottom-0 left-0 w-100 z-9999" ]
-        [ nav [ class "pv1 mw7-ns center flex flex-row content-center justify-center items-center f6 f5-ns black bg-nav bt b--black-20" ] <|
-            [ navbarLink (page == Home) Route.Home [ text "List" ]
-            , navbarLink (page == NewEntry) Route.NewEntry [ text "Add" ]
-            , navbarLink (page == Settings) Route.Settings [ text "Settings" ]
+    div [ class "h-nav fixed bottom-0 left-0 w-100 z-999" ]
+        [ nav [ class "h-100 mw7-ns center flex flex-row f6 f5-ns black bg-nav bt b--black-20" ] <|
+            [ navbarLink (page == Home) Route.Home [ iconAndText Icons.list "List" ]
+            , navbarLink (page == NewEntry) Route.NewEntry [ iconAndText Icons.edit "Add" ]
+            , navbarLink (page == Settings) Route.Settings [ iconAndText Icons.settings "Settings" ]
             ]
                 ++ viewSignIn page user
         ]
@@ -44,12 +45,17 @@ viewSignIn : ActivePage -> Maybe User -> List (Html msg)
 viewSignIn page user =
     case user of
         Nothing ->
-            [ navbarLink (page == Login) Route.Login [ text "Login" ]
+            [ navbarLink (page == Login) Route.Login [ iconAndText Icons.logIn "Login" ]
             ]
 
         Just user ->
-            [ navbarLink False Route.Logout [ text user.username ]
+            [ navbarLink False Route.Logout [ iconAndText Icons.logOut "Logout" ]
             ]
+
+
+iconAndText icon txt =
+    -- , p [ class "mt1 mb0" ] [ text txt ]
+    div [ class "mv0 center relative flex flex-column items-center justify-center" ] [ icon ]
 
 
 viewHeader : Maybe User -> Html msg
@@ -86,5 +92,5 @@ viewFooter =
 
 navbarLink : Bool -> Route -> List (Html msg) -> Html msg
 navbarLink isActive route linkContent =
-    div [ class "pa3" ]
-        [ a [ classList [ ( "pa3 link b", True ), ( "white hover-white", isActive ), ( "dim nav-disabled", not isActive ) ], Route.href route ] linkContent ]
+    div [ class "h-100 flex flex-column flex-grow-1 justify-center items-center" ]
+        [ a [ classList [ ( "w-100 h-100 flex items-center link b", True ), ( "white hover-white", isActive ), ( "dim nav-disabled", not isActive ) ], Route.href route ] linkContent ]
