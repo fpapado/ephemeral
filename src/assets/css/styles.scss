@@ -6,9 +6,25 @@
 @import "~tachyons";
 @import "~leaflet/dist/leaflet.css";
 
+// Height that takes into account header and paddings
+.h-fullmap {
+  // 100 vh - Header height - header padding - all padding
+  height: calc(100vh - 2rem - 2 * .5rem);
+}
+
 @media screen and (min-width: 30em) {
   .h6-ns {
     height: 24rem;
+  }
+
+  .h-fullmap-ns {
+    // 100 vh - Header height - header padding - all padding
+    height: calc(100vh - 4rem - 2 * 1rem - 2 * 1rem);
+  }
+
+  .min-h-container-ns {
+    // 100 vh - all padding on body
+    min-height: calc(100vh - 2 * 1rem);
   }
 }
 

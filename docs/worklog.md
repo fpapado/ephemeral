@@ -3,6 +3,7 @@
 - [ ] Port merge for PouchDB
 - [ ] Move some of the Home stuff to a Pouch module
 - [ ] Use Pouch as source of truth, only remove / update items based on Pouch sub messages
+- [ ] Rename Login -> Session
 
 # Other
 More Navigation / routing stuff

@@ -56,8 +56,9 @@ function initModel(): Model {
 
 // MSG
 // TODO: use existing Msg constructor
-export type LeafletMsg = SetView | SetMarkers | RemoveMarker;
+export type LeafletMsg = SetView | FullScreenToggle | SetMarkers | RemoveMarker;
 type SetView = { type: 'SetView'; data: ViewData };
+type FullScreenToggle = { type: 'FullScreenToggle'; data: 'ON' | 'OFF' };
 type SetMarkers = { type: 'SetMarkers'; data: MarkerData[] };
 type RemoveMarker = { type: 'RemoveMarker'; data: MarkerID };
 
@@ -78,6 +79,10 @@ const update = (msg: LeafletMsg) => {
 
     case 'RemoveMarker':
       removeMarker(msg.data);
+      break;
+
+    case 'FullScreenToggle':
+      setFullScreen(msg.data);
       break;
 
     default:
@@ -112,4 +117,18 @@ function removeMarker(id: MarkerID): void {
 
 function setView({ center, zoom, options }: ViewData): void {
   model.leafletMap.setView(center, zoom, options);
+}
+
+function setFullScreen(dir: 'ON' | 'OFF'): void {
+  let map = document.getElementById('mapid') as HTMLElement;
+
+  // It's not fullscreen
+  if (dir === 'ON') {
+    map.classList.remove('h5', 'h6-ns');
+    map.classList.add('h-fullmap', 'h-fullmap-ns');
+  } else {
+    // It's full
+    map.classList.remove('h-fullmap', 'h-fullmap-ns');
+    map.classList.add('h5', 'h6-ns');
+  }
 }

@@ -1,11 +1,11 @@
-module Views.Page exposing (ActivePage(..), frame)
+module Views.Page exposing (ActivePage(..), frame, fullFrame)
 
 import Data.User exposing (User)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Route exposing (Route)
 import Views.General exposing (avatar, epButton)
-import Views.Icons as Icons exposing (edit, list, logIn, logOut, settings)
+import Views.Icons as Icons
 
 
 type ActivePage
@@ -14,6 +14,7 @@ type ActivePage
     | Login
     | Settings
     | NewEntry
+    | FullMap
 
 
 frame : Maybe User -> ActivePage -> Html msg -> Html msg
@@ -29,12 +30,20 @@ frame user page content =
         ]
 
 
+fullFrame : Maybe User -> ActivePage -> Html msg -> Html msg
+fullFrame user page content =
+    div []
+        [ viewMenu page user
+        ]
+
+
 viewMenu : ActivePage -> Maybe User -> Html msg
 viewMenu page user =
     div [ class "h-nav fixed bottom-0 left-0 w-100 z-999" ]
         [ nav [ class "h-100 mw7-ns center flex flex-row f6 f5-ns black bg-nav bt b--black-20" ] <|
             [ navbarLink (page == Home) Route.Home [ iconAndText Icons.list "List" ]
             , navbarLink (page == NewEntry) Route.NewEntry [ iconAndText Icons.edit "Add" ]
+            , navbarLink (page == FullMap) Route.FullMap [ iconAndText Icons.map "Add" ]
             , navbarLink (page == Settings) Route.Settings [ iconAndText Icons.settings "Settings" ]
             ]
                 ++ viewSignIn page user
@@ -53,6 +62,7 @@ viewSignIn page user =
             ]
 
 
+iconAndText : Html msg -> a -> Html msg
 iconAndText icon txt =
     -- , p [ class "mt1 mb0" ] [ text txt ]
     div [ class "mv0 center relative flex flex-column items-center justify-center" ] [ icon ]

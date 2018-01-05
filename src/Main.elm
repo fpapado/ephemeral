@@ -9,10 +9,12 @@ import Views.Page as Page exposing (ActivePage)
 import Page.Entry as Entry
 import Page.Home as Home
 import Page.Login as Login exposing (logout)
+import Page.FullMap as FullMap
 import Page.NotFound as NotFound
 import Page.Errored as Errored exposing (PageLoadError)
 import Util exposing ((=>))
 import Navigation exposing (Location)
+import Map exposing (mapFullScreenOff, mapFullScreenOn)
 import Pouch.Ports
 
 
@@ -23,6 +25,7 @@ type Page
     | Home Home.Model
     | Entry Entry.Model
     | Login Login.Model
+    | FullMap
 
 
 
@@ -78,6 +81,9 @@ viewPage session isLoading page =
     let
         frame =
             Page.frame session.user
+
+        fullFrame =
+            Page.fullFrame session.user
     in
         case page of
             Blank ->
@@ -91,6 +97,10 @@ viewPage session isLoading page =
             Errored subModel ->
                 Errored.view session subModel
                     |> frame Page.Other
+
+            FullMap ->
+                FullMap.view session
+                    |> fullFrame Page.FullMap
 
             Home subModel ->
                 Home.view subModel
@@ -158,6 +168,9 @@ pageSubscriptions page =
         Entry _ ->
             Sub.none
 
+        FullMap ->
+            Sub.none
+
         Login subModel ->
             Sub.map (\msg -> LoginMsg msg) (Login.subscriptions subModel)
 
@@ -195,10 +208,19 @@ setRoute maybeRoute model =
 
             Just Route.Home ->
                 -- transition HomeLoaded (Home.init model.session)
-                { model | pageState = Loaded (Home Home.init) } => Request.Entry.list
+                { model | pageState = Loaded (Home Home.init) } => Cmd.batch [ Request.Entry.list, mapFullScreenOff ]
+
+            Just Route.NewEntry ->
+                { model | pageState = Loaded (Entry Entry.init) } => mapFullScreenOff
+
+            Just Route.FullMap ->
+                { model | pageState = Loaded FullMap } => Cmd.batch [ Request.Entry.list, mapFullScreenOn ]
+
+            Just Route.Settings ->
+                errored Page.Other "Settings WIP"
 
             Just Route.Login ->
-                { model | pageState = Loaded (Login Login.initialModel) } => Cmd.none
+                { model | pageState = Loaded (Login Login.initialModel) } => mapFullScreenOff
 
             Just Route.Logout ->
                 -- Login.logout gets back on a port in subscriptions
@@ -206,12 +228,6 @@ setRoute maybeRoute model =
                 -- Main.update
                 model
                     => Cmd.batch [ Login.logout ]
-
-            Just Route.NewEntry ->
-                { model | pageState = Loaded (Entry Entry.init) } => Cmd.none
-
-            Just Route.Settings ->
-                errored Page.Other "Settings WIP"
 
 
 pageErrored : Model -> ActivePage -> String -> ( Model, Cmd msg )

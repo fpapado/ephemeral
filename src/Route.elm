@@ -12,6 +12,7 @@ import UrlParser as Url exposing ((</>), Parser, oneOf, parseHash, s, string)
 type Route
     = Home
     | Login
+    | FullMap
     | Logout
     | Settings
     | NewEntry
@@ -28,6 +29,7 @@ route =
         , Url.map Login (s "login")
         , Url.map Logout (s "logout")
         , Url.map Settings (s "settings")
+        , Url.map FullMap (s "map")
         , Url.map NewEntry (s "entry")
         ]
 
@@ -55,6 +57,9 @@ routeToString page =
 
                 NewEntry ->
                     [ "entry" ]
+
+                FullMap ->
+                    [ "map" ]
     in
         "#/" ++ String.join "/" pieces
 

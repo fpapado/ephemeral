@@ -8,6 +8,8 @@ module Map
         , Msg(..)
         , helsinkiLatLng
         , worldLatLng
+        , mapFullScreenOn
+        , mapFullScreenOff
         )
 
 import Geolocation exposing (Location)
@@ -185,6 +187,28 @@ encodeSetView ( latLng, zoom, opts ) =
         ]
 
 
+type ToggleDir
+    = ON
+    | OFF
+
+
+encodeFullScreenToggle : ToggleDir -> Json.Encode.Value
+encodeFullScreenToggle dir =
+    let
+        dirToString dir =
+            case dir of
+                ON ->
+                    "ON"
+
+                OFF ->
+                    "OFF"
+    in
+        Json.Encode.object
+            [ ( "type", Json.Encode.string "FullScreenToggle" )
+            , ( "data", Json.Encode.string <| dirToString dir )
+            ]
+
+
 encodeSetMarkers : List Json.Encode.Value -> Json.Encode.Value
 encodeSetMarkers markers =
     Json.Encode.object
@@ -199,3 +223,13 @@ encodeRemoveMarker entryId =
         [ ( "type", Json.Encode.string "RemoveMarker" )
         , ( "data", Json.Encode.string <| idToString entryId )
         ]
+
+
+mapFullScreenOn : Cmd msg
+mapFullScreenOn =
+    encodeFullScreenToggle ON |> Leaflet.Ports.toLeaflet
+
+
+mapFullScreenOff : Cmd msg
+mapFullScreenOff =
+    encodeFullScreenToggle OFF |> Leaflet.Ports.toLeaflet
