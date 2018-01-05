@@ -1,4 +1,10 @@
 # Next
+- Icons and navigation
+
+- [ ] Port merge for PouchDB
+- [ ] Move some of the Home stuff to a Pouch module
+
+# Other
 More Navigation / routing stuff
 - [ ] Hide map where not needed (load dynamically, even?)
 - [ ] Investigate Save/Commit and Geolocation
@@ -16,6 +22,12 @@ More Navigation / routing stuff
   - As in, make DB the single source of truth
 
 # Port branch
+- [X] TypeScript
+- [~] Union Types for messages
+- [~] Split into modules, taking the app as argument
+- [~] Everything a stream
+- [~] DB helpers?
+
 - [ ] Port architecture, merging ports
   - [ ] e.g. could have:
     translatePouchUpdate : (Result String Entry -> msg) -> (Result Sting String -> msg) -> Value -> msg
@@ -23,8 +35,8 @@ More Navigation / routing stuff
 
   - [ ] pouchToElm, pouchFromElm
     -> API with cases etc there.
-- [] toLeaflet; would require encoders for Leaflet.Types
-  - [ ] move port encoders to Port?
+- [X] toLeaflet; would require encoders for Leaflet.Types
+  - [?] move port encoders to Port?
 - [ ] Debatable whether to propagate error in Request.Entry or return empty Dict
   - [ ] Generally, errors from Ports
 

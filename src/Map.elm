@@ -16,7 +16,17 @@ import Data.Entry exposing (Entry, EntryId, idToString)
 import Task
 import Json.Encode
 import Util exposing (viewDate)
-import Leaflet.Types exposing (LatLng, ZoomPanOptions, defaultZoomPanOptions, MarkerOptions, defaultMarkerOptions)
+import Leaflet.Types
+    exposing
+        ( LatLng
+        , ZoomPanOptions
+        , defaultZoomPanOptions
+        , MarkerOptions
+        , defaultMarkerOptions
+        , encodeMarkerOptions
+        , encodeZoomPanOptions
+        , encodeLatLng
+        )
 import Leaflet.Ports
 
 
@@ -59,7 +69,7 @@ update msg model =
     case msg of
         SetLatLng ( latLng, zoom ) ->
             ( { model | latLng = latLng }
-            , Leaflet.Ports.setView ( latLng, zoom, model.zoomPanOptions )
+            , encodeSetView ( latLng, zoom, model.zoomPanOptions ) |> Leaflet.Ports.toLeaflet
             )
 
         AddMarkers markers ->
@@ -67,14 +77,14 @@ update msg model =
                 newModel =
                     addMarkersToModel markers model
             in
-                ( newModel, Leaflet.Ports.setMarkers <| markersAsOutboundType newModel.markers )
+                ( newModel, encodeMarkers newModel.markers |> encodeSetMarkers |> Leaflet.Ports.toLeaflet )
 
         RemoveMarker entryId ->
             let
                 newMarkers =
                     Dict.remove (idToString entryId) model.markers
             in
-                ( { model | markers = newMarkers }, Leaflet.Ports.toLeaflet <| encodeRemoveMarker entryId )
+                ( { model | markers = newMarkers }, encodeRemoveMarker entryId |> Leaflet.Ports.toLeaflet )
 
         GetCenter latLng ->
             { model | latLng = latLng } ! []
@@ -147,15 +157,45 @@ makePopup entry =
         ++ "</div>"
 
 
-markersAsOutboundType : Dict String ( LatLng, String ) -> List ( String, LatLng, MarkerOptions, String )
-markersAsOutboundType markers =
+encodeMarkers : Dict String ( LatLng, String ) -> List Json.Encode.Value
+encodeMarkers markers =
     Dict.toList markers
-        |> List.map (\( id, ( latLng, popupText ) ) -> ( id, latLng, defaultMarkerOptions, popupText ))
+        |> List.map
+            (\( id, ( latLng, popupText ) ) ->
+                Json.Encode.object
+                    [ ( "id", Json.Encode.string id )
+                    , ( "latLng", encodeLatLng latLng )
+                    , ( "markerOptions", encodeMarkerOptions defaultMarkerOptions )
+                    , ( "popupText", Json.Encode.string popupText )
+                    ]
+            )
+
+
+encodeSetView : ( LatLng, Int, ZoomPanOptions ) -> Json.Encode.Value
+encodeSetView ( latLng, zoom, opts ) =
+    Json.Encode.object
+        [ ( "type", Json.Encode.string "SetView" )
+        , ( "data"
+          , Json.Encode.object
+                [ ( "center", encodeLatLng latLng )
+                , ( "zoom", Json.Encode.int zoom )
+                , ( "options", encodeZoomPanOptions opts )
+                ]
+          )
+        ]
+
+
+encodeSetMarkers : List Json.Encode.Value -> Json.Encode.Value
+encodeSetMarkers markers =
+    Json.Encode.object
+        [ ( "type", Json.Encode.string "SetMarkers" )
+        , ( "data", Json.Encode.list markers )
+        ]
 
 
 encodeRemoveMarker : EntryId -> Json.Encode.Value
 encodeRemoveMarker entryId =
     Json.Encode.object
-        [ ( "action", Json.Encode.string "removeMarker" )
+        [ ( "type", Json.Encode.string "RemoveMarker" )
         , ( "data", Json.Encode.string <| idToString entryId )
         ]

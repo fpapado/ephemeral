@@ -39,8 +39,8 @@ subscriptions model =
 
 type Msg
     = LoadEntries
-    | ExportCardsOffline
-    | ExportCardsOnline
+    | ExportCardsCsv
+    | ExportCardsAnki
     | DeleteEntry EntryId
     | NewEntries (List Entry)
     | NewEntry (Result String Entry)
@@ -54,11 +54,11 @@ update session msg model =
         LoadEntries ->
             ( model, Pouch.Ports.listEntries "entry" )
 
-        ExportCardsOffline ->
-            model ! [ Pouch.Ports.exportCards "offline" ]
+        ExportCardsCsv ->
+            model ! [ Pouch.Ports.exportCards "CSV" ]
 
-        ExportCardsOnline ->
-            model ! [ Pouch.Ports.exportCards "online" ]
+        ExportCardsAnki ->
+            model ! [ Pouch.Ports.exportCards "ANKI" ]
 
         DeleteEntry entryId ->
             model ! [ Request.Entry.delete entryId ]
@@ -116,8 +116,8 @@ view model =
         [ div [ class "mb2 mb4-ns" ]
             [ viewFlight
             , div [ class "measure center mt3" ]
-                [ epButton [ class "db mb3 w-100 white bg-deep-blue", onClick ExportCardsOffline ] [ text "Export CSV (offline)" ]
-                , epButton [ class "db w-100 white bg-deep-blue", onClick ExportCardsOnline ] [ text "Export Anki (online)" ]
+                [ epButton [ class "db mb3 w-100 white bg-deep-blue", onClick ExportCardsCsv ] [ text "Export CSV (offline)" ]
+                , epButton [ class "db w-100 white bg-deep-blue", onClick ExportCardsAnki ] [ text "Export Anki (online)" ]
                 ]
             ]
         , div [ class "pt3" ]
