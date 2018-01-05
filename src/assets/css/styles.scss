@@ -6,10 +6,13 @@
 @import "~tachyons";
 @import "~leaflet/dist/leaflet.css";
 
+/* Heights */
+$navheight: 48px;
+
 // Height that takes into account header and paddings
 .h-fullmap {
-  // 100 vh - Header height - header padding - all padding
-  height: calc(100vh - 2rem - 2 * .5rem);
+  // 100 vh - Header height - header padding - all padding - navheight
+  height: calc(100vh - 2rem - 2 * .5rem - #{$navheight});
 }
 
 @media screen and (min-width: 30em) {
@@ -19,7 +22,8 @@
 
   .h-fullmap-ns {
     // 100 vh - Header height - header padding - all padding
-    height: calc(100vh - 4rem - 2 * 1rem - 2 * 1rem);
+    // NOTE: not sure why 1 * 1rem instead of 2 *
+    height: calc(100vh - 4rem - 2 * 1rem - 1 * 1rem - #{$navheight});
   }
 
   .min-h-container-ns {
@@ -30,7 +34,7 @@
 
 // Based on the icons being 24px
 .h-nav {
-  height: 48px;
+  height: $navheight;
 }
 
 .logo {

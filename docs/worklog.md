@@ -1,5 +1,6 @@
 # Next
-- [ ] Full screen map
+- [X] Full screen map
+- [ ] MapState separately
 - [ ] Port merge for PouchDB
 - [ ] Move some of the Home stuff to a Pouch module
 - [ ] Use Pouch as source of truth, only remove / update items based on Pouch sub messages
