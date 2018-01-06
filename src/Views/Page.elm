@@ -103,4 +103,4 @@ viewFooter =
 navbarLink : Bool -> Route -> List (Html msg) -> Html msg
 navbarLink isActive route linkContent =
     div [ class "h-100 flex flex-column flex-grow-1 justify-center items-center" ]
-        [ a [ classList [ ( "w-100 h-100 flex items-center link b", True ), ( "white hover-white", isActive ), ( "dim nav-disabled", not isActive ) ], Route.href route ] linkContent ]
+        [ a [ classList [ ( "w-100 h-100 flex items-center b", True ), ( "white hover-white", isActive ), ( "dim nav-disabled", not isActive ) ], Route.href route ] linkContent ]

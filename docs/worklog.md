@@ -1,7 +1,10 @@
 # Next
 - [X] Full screen map
 - [ ] MapState separately
+- [ ] Hide map
+- [ ] Export location in CSV
 - [ ] Port merge for PouchDB
+- [ ] Search
 - [ ] Move some of the Home stuff to a Pouch module
 - [ ] Use Pouch as source of truth, only remove / update items based on Pouch sub messages
 - [ ] Rename Login -> Session
