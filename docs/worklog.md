@@ -2,9 +2,11 @@
 - [X] Full screen map
 - [X] "Hide map" Msg & port command
 - [ ] Navigation in map view
+- [ ] ZoomPanOptions overhaul
 
 - [ ] Export location in CSV
 - [ ] Not loading markers and items on initial load in production
+- [ ] Check loggedIn state consistently, esp. initial load
 
 - [ ] Separate MapState
 - [ ] Separate EntryState

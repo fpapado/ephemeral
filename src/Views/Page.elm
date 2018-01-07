@@ -34,6 +34,7 @@ fullFrame : Maybe User -> ActivePage -> Html msg -> Html msg
 fullFrame user page content =
     div []
         [ viewMenu page user
+        , content
         ]
 
 

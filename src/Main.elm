@@ -14,7 +14,7 @@ import Page.NotFound as NotFound
 import Page.Errored as Errored exposing (PageLoadError)
 import Util exposing ((=>))
 import Navigation exposing (Location)
-import Map exposing (setMapState, MapToggleDir(..), MapFullscreenState(..))
+import Map exposing (setMapView, MapToggleDir(..), MapFullscreenState(..))
 import Pouch.Ports
 
 
@@ -25,7 +25,7 @@ type Page
     | Home Home.Model
     | Entry Entry.Model
     | Login Login.Model
-    | FullMap
+    | FullMap FullMap.Model
 
 
 
@@ -98,9 +98,10 @@ viewPage session isLoading page =
                 Errored.view session subModel
                     |> frame Page.Other
 
-            FullMap ->
-                FullMap.view session
+            FullMap subModel ->
+                FullMap.view
                     |> fullFrame Page.FullMap
+                    |> Html.map FullMapMsg
 
             Home subModel ->
                 Home.view subModel
@@ -168,7 +169,7 @@ pageSubscriptions page =
         Entry _ ->
             Sub.none
 
-        FullMap ->
+        FullMap subModel ->
             Sub.none
 
         Login subModel ->
@@ -186,6 +187,7 @@ type Msg
     | HomeMsg Home.Msg
     | EntryMsg Entry.Msg
     | LoginMsg Login.Msg
+    | FullMapMsg FullMap.Msg
 
 
 
@@ -208,19 +210,19 @@ setRoute maybeRoute model =
 
             Just Route.Home ->
                 -- transition HomeLoaded (Home.init model.session)
-                { model | pageState = Loaded (Home Home.init) } => Cmd.batch [ Request.Entry.list, setMapState <| On NoFullscreen ]
+                { model | pageState = Loaded (Home Home.init) } => Cmd.batch [ Request.Entry.list, setMapView <| On NoFullscreen ]
 
             Just Route.NewEntry ->
-                { model | pageState = Loaded (Entry Entry.init) } => setMapState Off
+                { model | pageState = Loaded (Entry Entry.init) } => setMapView Off
 
             Just Route.FullMap ->
-                { model | pageState = Loaded FullMap } => Cmd.batch [ Request.Entry.list, setMapState <| On Fullscreen ]
+                { model | pageState = Loaded (FullMap {}) } => Cmd.batch [ Request.Entry.list, setMapView <| On Fullscreen ]
 
             Just Route.Settings ->
                 errored Page.Other "Settings WIP"
 
             Just Route.Login ->
-                { model | pageState = Loaded (Login Login.initialModel) } => setMapState Off
+                { model | pageState = Loaded (Login Login.initialModel) } => setMapView Off
 
             Just Route.Logout ->
                 -- Login.logout gets back on a port in subscriptions
@@ -236,7 +238,7 @@ pageErrored model activePage errorMessage =
         error =
             Errored.pageLoadError activePage errorMessage
     in
-        { model | pageState = Loaded (Errored error) } => Cmd.batch [ setMapState Off ]
+        { model | pageState = Loaded (Errored error) } => Cmd.batch [ setMapView Off ]
 
 
 
@@ -290,6 +292,9 @@ updatePage page msg model =
 
             ( EntryMsg subMsg, Entry subModel ) ->
                 toPage Entry EntryMsg (Entry.update session) subMsg subModel
+
+            ( FullMapMsg subMsg, FullMap subModel ) ->
+                toPage FullMap FullMapMsg FullMap.update subMsg subModel
 
             ( LoginMsg subMsg, Login subModel ) ->
                 let

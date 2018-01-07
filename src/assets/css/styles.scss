@@ -12,7 +12,7 @@ $navheight: 48px;
 // Height that takes into account header and paddings
 .h-fullmap {
   // 100 vh - Header height - header padding - all padding - navheight
-  height: calc(100vh - 2rem - 2 * .5rem - #{$navheight});
+  height: calc(100vh - 2rem - 2 * .5rem - #{$navheight} - 4rem);
 }
 
 @media screen and (min-width: 30em) {
@@ -23,7 +23,7 @@ $navheight: 48px;
   .h-fullmap-ns {
     // 100 vh - Header height - header padding - all padding
     // NOTE: not sure why 1 * 1rem instead of 2 *
-    height: calc(100vh - 4rem - 2 * 1rem - 1 * 1rem - #{$navheight});
+    height: calc(100vh - 4rem - 2 * 1rem - 1 * 1rem - #{$navheight} - 4rem);
   }
 
   .min-h-container-ns {

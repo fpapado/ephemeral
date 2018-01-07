@@ -8,7 +8,8 @@ module Map
         , Msg(..)
         , helsinkiLatLng
         , worldLatLng
-        , setMapState
+        , setMapView
+        , setView
         , MapToggleDir(..)
         , MapFullscreenState(..)
         )
@@ -72,7 +73,7 @@ update msg model =
     case msg of
         SetLatLng ( latLng, zoom ) ->
             ( { model | latLng = latLng }
-            , encodeSetView ( latLng, zoom, model.zoomPanOptions ) |> Leaflet.Ports.toLeaflet
+            , setView ( latLng, zoom )
             )
 
         AddMarkers markers ->
@@ -93,7 +94,7 @@ update msg model =
             { model | latLng = latLng } ! []
 
         SetToCurrent (Ok { latitude, longitude }) ->
-            update (SetLatLng ( ( latitude, longitude ), 12 )) model
+            update (SetLatLng ( ( latitude, longitude ), 14 )) model
 
         SetToCurrent (Err error) ->
             update (SetLatLng ( ( 0, 0 ), 1 )) model
@@ -146,9 +147,18 @@ type MapFullscreenState
     | NoFullscreen
 
 
-setMapState : MapToggleDir -> Cmd msg
-setMapState dir =
+setMapView : MapToggleDir -> Cmd msg
+setMapView dir =
     encodeMapToggle dir |> Leaflet.Ports.toLeaflet
+
+
+setView : ( LatLng, Int ) -> Cmd msg
+setView ( latLng, zoom ) =
+    encodeSetView ( latLng, zoom, defaultZoomPanOptions ) |> Leaflet.Ports.toLeaflet
+
+
+
+-- Utils
 
 
 entryToMarker : Entry -> ( String, LatLng, String )
