@@ -26,7 +26,9 @@ type alias Model =
 
 view : Html Msg
 view =
-    main_ [] [ viewDestinationButtons ]
+    main_ [ class "absolute top-0 left-0 w-100 h-100 z-9999 events-none" ]
+        [ div [ class "mw7-ns pb5 center h-100 flex flex-column justify-end" ] [ viewDestinationButtons ]
+        ]
 
 
 
@@ -58,13 +60,13 @@ viewDestinationButtons : Html Msg
 viewDestinationButtons =
     let
         classNames =
-            "mr3 bg-beige-gray deep-blue pointer fw6 shadow-button"
+            "mr3 bg-beige-gray deep-blue pointer fw6 shadow-button events-auto"
     in
         div [ class "pt1 tc" ]
             [ epButton [ class classNames, onClick <| SetView ( Map.helsinkiLatLng, 12 ) ]
                 [ text "Helsinki" ]
-            , epButton [ class classNames, onClick <| SetView ( Map.worldLatLng, 1 ) ]
-                [ text "World" ]
             , epButton [ class classNames, onClick <| GoToCurrentLocation ]
                 [ text "Current" ]
+            , epButton [ class classNames, onClick <| SetView ( Map.worldLatLng, 1 ) ]
+                [ text "World" ]
             ]

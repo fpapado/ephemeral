@@ -135,10 +135,10 @@ viewFlight =
         div [ class "mb4 tc" ]
             [ epButton [ class classNames, onClick <| MapMsg (Map.SetLatLng ( Map.helsinkiLatLng, 12 )) ]
                 [ text "Helsinki" ]
-            , epButton [ class classNames, onClick <| MapMsg (Map.SetLatLng ( Map.worldLatLng, 1 )) ]
-                [ text "World" ]
             , epButton [ class classNames, onClick <| MapMsg (Map.GoToCurrentLocation) ]
                 [ text "Current" ]
+            , epButton [ class classNames, onClick <| MapMsg (Map.SetLatLng ( Map.worldLatLng, 1 )) ]
+                [ text "World" ]
             ]
 
 

@@ -1,7 +1,7 @@
 # Next
 - [X] Full screen map
 - [X] "Hide map" Msg & port command
-- [ ] Navigation in map view
+- [X] Navigation in map view
 - [ ] ZoomPanOptions overhaul
 
 - [ ] Export location in CSV
