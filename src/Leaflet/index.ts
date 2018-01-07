@@ -75,6 +75,7 @@ const update = (msg: LeafletMsg) => {
 
     case 'SetMarkers':
       setMarkers(msg.data);
+      model.leafletMap.invalidateSize();
       break;
 
     case 'RemoveMarker':
@@ -83,6 +84,7 @@ const update = (msg: LeafletMsg) => {
 
     case 'FullScreenToggle':
       setFullScreen(msg.data);
+      model.leafletMap.invalidateSize();
       break;
 
     default:
@@ -133,7 +135,6 @@ function setFullScreen(dir: MapToggleDir): void {
       map.classList.add('h-fullmap', 'h-fullmap-ns');
       break;
     case 'OnNoFullscreen':
-      console.log('on no fullscreen');
       mapOn();
       map.classList.remove('h-fullmap', 'h-fullmap-ns');
       map.classList.add('h5', 'h6-ns');
