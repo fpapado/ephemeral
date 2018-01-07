@@ -4,6 +4,7 @@
 - [ ] Navigation in map view
 
 - [ ] Export location in CSV
+- [ ] Not loading markers and items on initial load in production
 
 - [ ] Separate MapState
 - [ ] Separate EntryState

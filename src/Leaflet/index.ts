@@ -56,17 +56,23 @@ function initModel(): Model {
 
 // MSG
 // TODO: use existing Msg constructor
-export type LeafletMsg = SetView | FullScreenToggle | SetMarkers | RemoveMarker;
+export type LeafletMsg =
+  | SetView
+  | FullScreenToggle
+  | SetMarkers
+  | RemoveMarker
+  | OnInit;
 type SetView = { type: 'SetView'; data: ViewData };
 type FullScreenToggle = { type: 'FullScreenToggle'; data: MapToggleDir };
 type SetMarkers = { type: 'SetMarkers'; data: MarkerData[] };
 type RemoveMarker = { type: 'RemoveMarker'; data: MarkerID };
+type OnInit = { type: 'OnInit' };
 
 // UPDATE
 // NOTE: these mutate things in place, since we're dealing with Leaflet.
 // Perhaps, then, update is a misnomer.
-// We could be doing things immmutably (copy map, change things, return map, set
-// model.leafletMap = newMap), but I am not sure about the performance of that.
+// We could things immmutably (copy map, change things, return map, set
+// model. That would be mostly pointless, imo.
 const update = (msg: LeafletMsg) => {
   switch (msg.type) {
     case 'SetView':
@@ -75,7 +81,6 @@ const update = (msg: LeafletMsg) => {
 
     case 'SetMarkers':
       setMarkers(msg.data);
-      model.leafletMap.invalidateSize();
       break;
 
     case 'RemoveMarker':
@@ -84,6 +89,10 @@ const update = (msg: LeafletMsg) => {
 
     case 'FullScreenToggle':
       setFullScreen(msg.data);
+      model.leafletMap.invalidateSize();
+      break;
+
+    case 'OnInit':
       model.leafletMap.invalidateSize();
       break;
 
