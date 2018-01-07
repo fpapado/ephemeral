@@ -8,8 +8,9 @@ module Map
         , Msg(..)
         , helsinkiLatLng
         , worldLatLng
-        , mapFullScreenOn
-        , mapFullScreenOff
+        , setMapState
+        , MapToggleDir(..)
+        , MapFullscreenState(..)
         )
 
 import Geolocation exposing (Location)
@@ -118,6 +119,10 @@ addMarkersToModel markers model =
         { model | markers = newMarkers }
 
 
+
+-- Exposed Commands --
+
+
 addMarkers : List Entry -> Cmd Msg
 addMarkers entries =
     let
@@ -129,6 +134,21 @@ addMarkers entries =
                 (AddMarkers markers)
             )
             (Task.succeed ())
+
+
+type MapToggleDir
+    = On MapFullscreenState
+    | Off
+
+
+type MapFullscreenState
+    = Fullscreen
+    | NoFullscreen
+
+
+setMapState : MapToggleDir -> Cmd msg
+setMapState dir =
+    encodeMapToggle dir |> Leaflet.Ports.toLeaflet
 
 
 entryToMarker : Entry -> ( String, LatLng, String )
@@ -187,21 +207,19 @@ encodeSetView ( latLng, zoom, opts ) =
         ]
 
 
-type ToggleDir
-    = ON
-    | OFF
-
-
-encodeFullScreenToggle : ToggleDir -> Json.Encode.Value
-encodeFullScreenToggle dir =
+encodeMapToggle : MapToggleDir -> Json.Encode.Value
+encodeMapToggle dir =
     let
         dirToString dir =
             case dir of
-                ON ->
-                    "ON"
+                On Fullscreen ->
+                    "OnFullscreen"
 
-                OFF ->
-                    "OFF"
+                On NoFullscreen ->
+                    "OnNoFullscreen"
+
+                Off ->
+                    "Off"
     in
         Json.Encode.object
             [ ( "type", Json.Encode.string "FullScreenToggle" )
@@ -223,13 +241,3 @@ encodeRemoveMarker entryId =
         [ ( "type", Json.Encode.string "RemoveMarker" )
         , ( "data", Json.Encode.string <| idToString entryId )
         ]
-
-
-mapFullScreenOn : Cmd msg
-mapFullScreenOn =
-    encodeFullScreenToggle ON |> Leaflet.Ports.toLeaflet
-
-
-mapFullScreenOff : Cmd msg
-mapFullScreenOff =
-    encodeFullScreenToggle OFF |> Leaflet.Ports.toLeaflet

@@ -14,7 +14,7 @@ import Page.NotFound as NotFound
 import Page.Errored as Errored exposing (PageLoadError)
 import Util exposing ((=>))
 import Navigation exposing (Location)
-import Map exposing (mapFullScreenOff, mapFullScreenOn)
+import Map exposing (setMapState, MapToggleDir(..), MapFullscreenState(..))
 import Pouch.Ports
 
 
@@ -208,19 +208,19 @@ setRoute maybeRoute model =
 
             Just Route.Home ->
                 -- transition HomeLoaded (Home.init model.session)
-                { model | pageState = Loaded (Home Home.init) } => Cmd.batch [ Request.Entry.list, mapFullScreenOff ]
+                { model | pageState = Loaded (Home Home.init) } => Cmd.batch [ Request.Entry.list, setMapState <| On NoFullscreen ]
 
             Just Route.NewEntry ->
-                { model | pageState = Loaded (Entry Entry.init) } => mapFullScreenOff
+                { model | pageState = Loaded (Entry Entry.init) } => setMapState Off
 
             Just Route.FullMap ->
-                { model | pageState = Loaded FullMap } => Cmd.batch [ Request.Entry.list, mapFullScreenOn ]
+                { model | pageState = Loaded FullMap } => Cmd.batch [ Request.Entry.list, setMapState <| On Fullscreen ]
 
             Just Route.Settings ->
                 errored Page.Other "Settings WIP"
 
             Just Route.Login ->
-                { model | pageState = Loaded (Login Login.initialModel) } => mapFullScreenOff
+                { model | pageState = Loaded (Login Login.initialModel) } => setMapState Off
 
             Just Route.Logout ->
                 -- Login.logout gets back on a port in subscriptions
@@ -236,7 +236,7 @@ pageErrored model activePage errorMessage =
         error =
             Errored.pageLoadError activePage errorMessage
     in
-        { model | pageState = Loaded (Errored error) } => Cmd.none
+        { model | pageState = Loaded (Errored error) } => Cmd.batch [ setMapState Off ]
 
 
 

@@ -1,13 +1,20 @@
 # Next
 - [X] Full screen map
-- [ ] MapState separately
-- [ ] Hide map
+- [X] "Hide map" Msg & port command
+- [ ] Navigation in map view
+
 - [ ] Export location in CSV
+
+- [ ] Separate MapState
+- [ ] Separate EntryState
+- [ ] Load Entries on initial visit
+  - Might need some "loaded" signal via port
 - [ ] Port merge for PouchDB
 - [ ] Search
 - [ ] Move some of the Home stuff to a Pouch module
 - [ ] Use Pouch as source of truth, only remove / update items based on Pouch sub messages
-- [ ] Rename Login -> Session
+- [ ] Rename Login module -> Session
+- [ ] InterUI font
 
 # Other
 More Navigation / routing stuff
