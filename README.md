@@ -1,5 +1,7 @@
 # Ephemeral 🍃
 
+:warning: This version of Ephemeral is deprecated and archived. You can find the new repository at [https://github.com/fpapado/ephemeralnotes](https://github.com/fpapado/ephemeralnotes) and the new app at [https://ephemeralnotes.app](https://ephemeralnotes.app) :warning:
+
 Ephemeral is a progressive web app for writing down cards, tracking time added and location.
 The original motivation was writing down words and their translations as I encounter them, when travelling or moving to a new city.
 I also wanted to be able to access my notes easily, see relevant data, and be able to extend visualisations programatically.
